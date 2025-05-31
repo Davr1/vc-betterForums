@@ -115,9 +115,9 @@ const getTitlePostprocessor: (query: string) => unknown = findByCodeLazy('type:"
 const textHightlightParser = findByCodeLazy("hideSimpleEmbedContent:", "1!==");
 // const ChannelComponent = findByCodeLazy("remainingTags:", "unsafe_rawColors");
 const idk4 = findByCodeLazy("CHANNEL_PINNED_MESSAGE)");
-const Idk5 = findByCodeLazy(".t.CSIeU1");
-const Face = findByCodeLazy("this.defaultRenderUser", ".avatarContainerMasked");
-const Typing = findByCodeLazy('"animate-always":"animate-never"');
+const ForumPostUsername = findByCodeLazy("#{intl::FORUM_POST_AUTHOR_A11Y_LABEL}");
+const FacePile = findByCodeLazy("this.props.renderIcon");
+const TypingIndicator = findByCodeLazy('"animate-always":"animate-never"');
 const Idk7 = findByCodeLazy("getUserCombo(", "INTERACTIVE_NORMAL");
 
 const cl = classNameFactory();
@@ -284,12 +284,12 @@ const ForumPostBody = LazyComponent(() =>
         return (
             <>
                 {!isBlocked && (
-                    <Idk5
+                    <ForumPostUsername
                         channel={channel}
                         message={message}
                         renderColon={component}
                         hasUnreads={hasUnreads}
-                    ></Idk5>
+                    ></ForumPostUsername>
                 )}
                 <div className={classes.messageFocusBlock}>{component}</div>
             </>
@@ -340,9 +340,13 @@ function ForumFooter({ channel, facepileRef, firstMessage }: ForumFooterProps) {
             <span className={classes.bullet}>•</span>
             {typingUsers.length > 0 ? (
                 <div className={classes.typing}>
-                    <FacePile channel={channel} userIds={typingUsers} facepileRef={facepileRef} />
+                    <ActiveUsers
+                        channel={channel}
+                        userIds={typingUsers}
+                        facepileRef={facepileRef}
+                    />
                     <div className={classes.dots}>
-                        <Typing themed dotRadius={2}></Typing>
+                        <TypingIndicator themed dotRadius={2}></TypingIndicator>
                     </div>
                     <Idk7 channel={channel} className={classes.typingUsers} renderDots={false} />
                 </div>
@@ -377,7 +381,7 @@ function Activity({ channel }: ActivityProps) {
     );
 }
 
-interface FacePileProps {
+interface ActiveUsersProps {
     channel: Channel;
     userIds: string[];
     facepileRef: any;
@@ -395,11 +399,11 @@ function useUsers(channel: Channel, userIds: string[]) {
     return users;
 }
 
-function FacePile({ channel, userIds, facepileRef }: FacePileProps) {
+function ActiveUsers({ channel, userIds, facepileRef }: ActiveUsersProps) {
     const users = useUsers(channel, userIds);
     return (
         <div ref={facepileRef}>
-            <Face
+            <FacePile
                 className={classes.__invalid_facepile}
                 showDefaultAvatarsForNullUsers={true}
                 guildId={channel.getGuildId()}
