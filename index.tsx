@@ -44,7 +44,6 @@ import {
 import {
     CompareFn,
     deepEqual,
-    useFocus,
     useFormatTimestamp,
     useForumPostState,
     useMessageCount,
@@ -86,7 +85,7 @@ const useForumPostComposerStore: <T>(
     compareFn: CompareFn
 ) => T = findByCodeLazy("[useForumPostComposerStore]", ")}");
 
-const useFacePile: (options: {
+const useForumPostEvents: (options: {
     facepileRef: Ref<unknown>;
     goToThread: ComponentProps["goToThread"];
     channel: Channel;
@@ -95,10 +94,9 @@ const useFacePile: (options: {
     handleRightClick: MouseEventHandler<unknown>;
 } = findByCodeLazy("facepileRef:", "handleLeftClick");
 
-const idk = findByCodeLazy("useLayoutEffect(", 'role:"listitem"', "useState(-1)");
 const classes = findByPropsLazy("obscuredThumbnailPlaceholder", "container"),
     classes2 = findByPropsLazy("slateBlockquoteContainer");
-const C2 = findByCodeLazy(/className:\i,enabled:\i=!0}=\i/);
+
 const useForumPostMetadata: (options: {
     firstMessage: Message | null;
     formatInline?: boolean;
@@ -147,14 +145,11 @@ function ForumPost({
     }, [height, setCardHeight, threadId]);
     const facepileRef = useRef(null);
 
-    const { handleLeftClick, handleRightClick } = useFacePile({
+    const { handleLeftClick, handleRightClick } = useForumPostEvents({
         facepileRef,
         goToThread,
         channel,
     });
-
-    const { role, onFocus, ...rest } = idk(threadId);
-    const { isFocused, handleFocus, handleBlur } = useFocus(onFocus);
 
     return (
         <div
@@ -177,9 +172,6 @@ function ForumPost({
                     count: messageCount,
                 })}
                 className={classes.focusTarget}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                {...rest}
             />
             <div className={classes.left}>
                 <Something
@@ -189,13 +181,11 @@ function ForumPost({
                     hasMediaAttachment={media !== null}
                     containerWidth={containerWidth}
                 ></Something>
-                <C2 enabled={!isFocused}>
-                    <ForumFooter
-                        channel={channel}
-                        firstMessage={firstMessage}
-                        facepileRef={facepileRef}
-                    ></ForumFooter>
-                </C2>
+                <ForumFooter
+                    channel={channel}
+                    firstMessage={firstMessage}
+                    facepileRef={facepileRef}
+                ></ForumFooter>
             </div>
         </div>
     );
@@ -305,7 +295,7 @@ const ForumPostBody = LazyComponent(() =>
                         hasUnreads={hasUnreads}
                     ></Idk5>
                 )}
-                <C2 clasName={classes.messageFocusBlock}>{component}</C2>
+                <div className={classes.messageFocusBlock}>{component}</div>
             </>
         );
     })

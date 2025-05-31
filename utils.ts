@@ -5,15 +5,7 @@
  */
 
 import { findByCodeLazy } from "@webpack";
-import {
-    GuildStore,
-    i18n,
-    SnowflakeUtils,
-    useCallback,
-    useMemo,
-    useState,
-    useStateFromStores,
-} from "@webpack/common";
+import { GuildStore, i18n, SnowflakeUtils, useMemo, useStateFromStores } from "@webpack/common";
 import { Channel, Guild } from "discord-types/general";
 
 import {
@@ -89,22 +81,6 @@ export function useForumPostState(channel: Channel): ForumPostState {
                 ReadStateStore.isForumPostUnread(channel.id),
         };
     });
-}
-
-export function useFocus<T>(callback: (data: T) => void) {
-    const [isFocused, setIsFocused] = useState(false);
-
-    return {
-        isFocused,
-        handleFocus: useCallback(
-            (data: T) => {
-                callback(data);
-                setIsFocused(true);
-            },
-            [callback, setIsFocused]
-        ),
-        handleBlur: () => setIsFocused(false),
-    };
 }
 
 export function useFormatTimestamp(
