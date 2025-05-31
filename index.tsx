@@ -7,13 +7,15 @@
 import { classNameFactory } from "@api/Styles";
 import { LazyComponent } from "@utils/react";
 import definePlugin from "@utils/types";
-import { findByCodeLazy, findByPropsLazy, wreq } from "@webpack";
+import { findByCodeLazy, findByPropsLazy } from "@webpack";
 import {
     ChannelStore,
     Clickable,
     EmojiStore,
+    GuildMemberStore,
     Heading,
     i18n,
+    PermissionStore,
     React,
     RelationshipStore,
     Text,
@@ -36,7 +38,9 @@ import {
     ForumPostMessagesStore,
     ForumSearchStore,
     GuildMemberRequesterStore,
+    GuildVerificationStore,
     LayoutType,
+    LurkingStore,
     SortOrder,
     TagSetting,
     TypingStore,
@@ -50,6 +54,7 @@ import {
 } from "./utils";
 
 let getForumChannelStore: () => ForumChannelStore | null = () => null;
+let ReactionButton: React.FC = () => <></>;
 
 function useForumChannelState(channelId: Channel["id"]): ChannelState {
     const store = getForumChannelStore();
@@ -70,7 +75,6 @@ interface ComponentProps {
     className?: string;
     goToThread: (channel: Channel, _: boolean) => void;
     threadId: string;
-    overrideMedia?: Record<string, unknown> | null;
     containerWidth: number;
 }
 
@@ -107,25 +111,18 @@ const useForumPostMetadata: (options: {
     firstMedia: Record<string, unknown> | null;
     firstMediaIsEmbed: boolean;
 } = findByCodeLazy(/noStyleAndInteraction:\i=!0\}/);
-const idk3 = findByCodeLazy('type:"highlight"');
-const MarkdownParser = findByCodeLazy("hideSimpleEmbedContent:", "1!==");
-const ChannelComponent = findByCodeLazy("remainingTags:", "unsafe_rawColors");
+const getTitlePostprocessor: (query: string) => unknown = findByCodeLazy('type:"highlight"');
+const textHightlightParser = findByCodeLazy("hideSimpleEmbedContent:", "1!==");
+// const ChannelComponent = findByCodeLazy("remainingTags:", "unsafe_rawColors");
 const idk4 = findByCodeLazy("CHANNEL_PINNED_MESSAGE)");
 const Idk5 = findByCodeLazy(".t.CSIeU1");
-const idk6 = findByCodeLazy("isLurking:!1");
 const Face = findByCodeLazy("this.defaultRenderUser", ".avatarContainerMasked");
 const Typing = findByCodeLazy('"animate-always":"animate-never"');
 const Idk7 = findByCodeLazy("getUserCombo(", "INTERACTIVE_NORMAL");
 
 const cl = classNameFactory();
 
-function ForumPost({
-    className,
-    goToThread,
-    threadId,
-    overrideMedia,
-    containerWidth,
-}: ComponentProps) {
+function ForumPost({ className, goToThread, threadId, containerWidth }: ComponentProps) {
     const channel = useStateFromStores([ChannelStore], () => ChannelStore.getChannel(threadId));
     const isOpen = useStateFromStores(
         [ChannelSectionStore],
@@ -133,7 +130,6 @@ function ForumPost({
     );
     const { firstMessage } = useFirstMessage(channel);
     const { content, firstMedia } = useForumPostMetadata({ firstMessage });
-    const media = overrideMedia ?? firstMedia;
     const { messageCountText: messageCount } = useMessageCount(channel);
     const { ref: ringTarget, height } = useFocusRing();
     const setCardHeight = useForumPostComposerStore((store) => store.setCardHeight, deepEqual);
@@ -174,13 +170,13 @@ function ForumPost({
                 className={classes.focusTarget}
             />
             <div className={classes.left}>
-                <Something
+                <ForumBody
                     channel={channel}
                     firstMessage={firstMessage}
                     content={content}
-                    hasMediaAttachment={media !== null}
+                    hasMediaAttachment={firstMedia !== null}
                     containerWidth={containerWidth}
-                ></Something>
+                ></ForumBody>
                 <ForumFooter
                     channel={channel}
                     firstMessage={firstMessage}
@@ -478,23 +474,91 @@ function getDefaultEmoji(channel: Channel) {
     return null;
 }
 
+function useIsActiveChannelOrUnarchivableThread(channel: Channel | null) {
+    const canSendMessagesInThreads = useStateFromStores(
+        [PermissionStore],
+        () => !!channel && PermissionStore.can(1n << 38n, channel)
+    );
+    return (
+        !!channel &&
+        (!channel.isThread() ||
+            channel.isActiveThread() ||
+            (channel.isArchivedThread() &&
+                channel.threadMetadata?.locked !== true &&
+                canSendMessagesInThreads))
+    );
+}
+
+function useCheckPermissions(channel: Channel) {
+    const guildId = channel?.getGuildId();
+    const canChat = useStateFromStores(
+        [GuildVerificationStore],
+        () => !guildId || GuildVerificationStore.canChatInGuild(guildId),
+        [guildId]
+    );
+    const isLurking = useStateFromStores(
+        [LurkingStore],
+        () => !!guildId && LurkingStore.isLurking(guildId),
+        [guildId]
+    );
+    const isGuest = useStateFromStores(
+        [GuildMemberStore],
+        () => !!guildId && GuildMemberStore.isCurrentUserGuest(guildId),
+        [guildId]
+    );
+    const canAddNewReactions = useStateFromStores(
+        [PermissionStore],
+        () => canChat && PermissionStore.can(1n << 6n, channel),
+        [canChat, channel]
+    );
+    const isActiveChannelOrUnarchivableThread = useIsActiveChannelOrUnarchivableThread(channel);
+    if (!channel)
+        return {
+            disableReactionReads: true,
+            disableReactionCreates: true,
+            disableReactionUpdates: true,
+            isLurking: false,
+            isGuest: false,
+            isPendingMember: false,
+        };
+
+    const isPrivate = channel.isPrivate(),
+        isSystemDM = channel.isSystemDM(),
+        idk = (canChat || isPrivate) && isActiveChannelOrUnarchivableThread;
+
+    return {
+        disableReactionReads: false,
+        disableReactionCreates:
+            isLurking ||
+            isGuest ||
+            !idk ||
+            !(
+                (canAddNewReactions === true || isPrivate) &&
+                !isSystemDM &&
+                isActiveChannelOrUnarchivableThread
+            ),
+        disableReactionUpdates: isLurking || isGuest || !idk,
+        isLurking,
+        isGuest,
+        isPendingMember: false,
+    };
+}
+
 interface ReactionProps {
     firstMessage: Message;
     channel: Channel;
 }
 function EmptyReaction({ firstMessage, channel }: ReactionProps) {
-    const R = wreq(287151).le;
-
     const forumChannel = useStateFromStores([ChannelStore], () =>
         ChannelStore.getChannel(channel.parent_id)
     );
     const defaultEmoji = getDefaultEmoji(forumChannel);
-    const { disableReactionCreates, isLurking, isPendingMember } = idk6(channel);
+    const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
 
     if (!defaultEmoji || disableReactionCreates) return null;
 
     return (
-        <R
+        <ReactionButton
             className={classes.updateReactionButton}
             message={firstMessage}
             readOnly={(channel as any).isArchivedLockedThread()}
@@ -515,12 +579,10 @@ function EmptyReaction({ firstMessage, channel }: ReactionProps) {
 }
 
 function Reaction({ firstMessage, channel }: ReactionProps) {
-    const R = wreq(287151).le;
-
-    const { disableReactionCreates, isLurking, isPendingMember } = idk6(channel);
+    const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
 
     return firstMessage.reactions.map((reaction) => (
-        <R
+        <ReactionButton
             className={classes.updateReactionButton}
             message={firstMessage}
             readOnly={disableReactionCreates || (channel as any).isArchivedLockedThread()}
@@ -534,11 +596,11 @@ function Reaction({ firstMessage, channel }: ReactionProps) {
             {...reaction}
         >
             {`${reaction.emoji.id ?? "0"}:${reaction.emoji.name}`}
-        </R>
+        </ReactionButton>
     ));
 }
 
-interface SomethingProps {
+interface ForumBodyProps {
     channel: Channel;
     firstMessage: Message;
     content: string;
@@ -546,19 +608,19 @@ interface SomethingProps {
     containerWidth: number;
 }
 
-function Something({
+function ForumBody({
     channel,
     firstMessage,
     content,
     hasMediaAttachment,
     containerWidth,
-}: SomethingProps) {
+}: ForumBodyProps) {
     const { isNew, hasUnreads } = useForumPostState(channel);
     const channelName = useChannelName(channel);
 
     return (
         <div className={classes.body}>
-            <ChannelComponent channel={channel} />
+            <ForumPostHeader channel={channel} />
             <div className={classes.headerText}>
                 <Heading
                     variant="heading-lg/semibold"
@@ -591,6 +653,87 @@ function Something({
     );
 }
 
+function useTags(channel: Channel) {
+    return useStateFromStores([ChannelStore], () => {
+        const availableTags = (
+            ChannelStore.getChannel(channel.parent_id)?.availableTags ?? []
+        ).reduce((acc, tag) => {
+            acc[tag.id] = tag;
+            return acc;
+        }, {});
+        return (channel.appliedTags ?? []).map((tag) => availableTags[tag]);
+    });
+}
+
+function useForumPostInfo({ channel, isNew }) {
+    const appliedTags = useTags(channel);
+    const shownTags = appliedTags.slice(undefined, 3);
+    const remainingTags = appliedTags.slice(3);
+    const moreTagsCount = appliedTags.length > 3 ? appliedTags.length - 3 : 0;
+    const isPinned = channel.hasFlag(2);
+    const shouldRenderTagsRow = shownTags.length > 0 || isPinned || isNew;
+    return {
+        shownTags,
+        remainingTags,
+        moreTagsCount,
+        isPinned,
+        shouldRenderTagsRow,
+        forumPostContainsTags: appliedTags.length > 0,
+    };
+}
+
+function Tag({ tag: { name }, className, selected }) {
+    return (
+        <div className={className}>
+            <Text variant="text-xs/semibold" lineClamp={1} color="currentColor">
+                {name}
+            </Text>
+        </div>
+    );
+}
+
+function MoreTags({ tags, count, size = 1 }) {
+    return (
+        <Tooltip
+            text={tags.map((tag) => (
+                <Tag tag={tag} key={tag.id} />
+            ))}
+        >
+            {(props) => (
+                <div {...props}>
+                    <Text variant="text-xs/semibold">+{count}</Text>
+                </div>
+            )}
+        </Tooltip>
+    );
+}
+
+function ForumPostHeader({ channel, isNew, tagsClassName, className }: { channel: Channel }) {
+    const { shownTags, remainingTags, moreTagsCount, isPinned, shouldRenderTagsRow } =
+        useForumPostInfo({
+            channel,
+            isNew,
+        });
+    const { tagFilter } = useForumChannelState(channel.id);
+    if (!shouldRenderTagsRow) return null;
+
+    return (
+        <div className={cl("tags", className)}>
+            {isNew ? "new" : ""}
+            {isPinned ? "pinned" : ""}
+            {shownTags.map((tag) => (
+                <Tag
+                    tag={tag}
+                    className={cl(tagsClassName, { filtered: tagFilter.has(tag.id) })}
+                    key={tag.id}
+                    selected
+                />
+            ))}
+            {moreTagsCount > 0 && <MoreTags tags={remainingTags} count={moreTagsCount} size={0} />}
+        </div>
+    );
+}
+
 function useChannelName(channel: Channel) {
     const hasSearchResults = useStateFromStores([ForumSearchStore], () =>
         ForumSearchStore.getHasSearchResults(channel.parent_id)
@@ -601,12 +744,13 @@ function useChannelName(channel: Channel) {
     );
 
     const postProcessor = useMemo(
-        () => idk3(hasSearchResults && searchQuery != null ? searchQuery : ""),
+        () => getTitlePostprocessor(hasSearchResults && searchQuery ? searchQuery : ""),
         [hasSearchResults, searchQuery]
     );
 
     return React.useMemo(
-        () => MarkdownParser({ content: channel.name, embeds: [] }, { postProcessor }).content,
+        () =>
+            textHightlightParser({ content: channel.name, embeds: [] }, { postProcessor }).content,
         [channel.name, postProcessor]
     );
 }
@@ -630,9 +774,19 @@ export default definePlugin({
                 replace: "$&;$self.forumOptions=$2",
             },
         },
+        {
+            find: "this.userCanBurstReact",
+            replacement: {
+                match: /(\i)=(\i)\.memo/,
+                replace: "$1=$self.ReactionButton=$2.memo",
+            },
+        },
     ],
     ForumPost,
     set forumOptions(value: () => ForumChannelStore) {
         getForumChannelStore = value;
+    },
+    set ReactionButton(value: React.FC) {
+        ReactionButton = value;
     },
 });

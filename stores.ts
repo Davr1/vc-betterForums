@@ -101,3 +101,5 @@ export const GuildMemberRequesterStore: GuildMemberRequesterStore = findStoreLaz
 export const TypingStore: TypingStore = findStoreLazy("TypingStore");
 export const ForumSearchStore: ForumSearchStore = findStoreLazy("ForumSearchStore");
 export const ReadStateStore: ReadStateStore = findStoreLazy("ReadStateStore");
+export const GuildVerificationStore = findStoreLazy("GuildVerificationStore");
+export const LurkingStore = findStoreLazy("LurkingStore");
