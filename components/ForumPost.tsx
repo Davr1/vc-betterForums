@@ -7,7 +7,14 @@
 import { getIntlMessage } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
 import { findByCodeLazy } from "@webpack";
-import { ChannelStore, Clickable, useEffect, useRef, useStateFromStores } from "@webpack/common";
+import {
+    ChannelStore,
+    Clickable,
+    Flex,
+    useEffect,
+    useRef,
+    useStateFromStores,
+} from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
 
 import { cl } from "..";
@@ -99,42 +106,41 @@ export const ForumPost = LazyComponent(
             });
 
             return (
-                <div
+                <Flex
                     ref={ringTarget}
                     data-item-id={threadId}
                     onClick={handleLeftClick}
                     onContextMenu={handleRightClick}
-                    className={cl("container", className, {
-                        isOpen: isOpen,
+                    direction={Flex.Direction.VERTICAL}
+                    className={cl("vc-better-forums-thread", {
+                        "vc-better-forums-thread-open": isOpen,
                     })}
                 >
                     <ClickableWithRing
                         onClick={handleLeftClick}
-                        focusProps={{
-                            ringTarget,
-                        }}
+                        focusProps={{ ringTarget }}
                         onContextMenu={handleRightClick}
                         aria-label={getIntlMessage("FORUM_POST_ARIA_LABEL", {
                             title: channel.name,
                             count: messageCount,
                         })}
-                        className={"focusTarget"}
+                        style={{ display: "none" }}
                     />
-                    <div className={"left"}>
+                    <Flex className="vc-better-forums-thread-body-container">
                         <ForumPostBody
                             channel={channel}
                             firstMessage={firstMessage}
                             content={content}
-                            hasMediaAttachment={firstMedia !== null}
+                            hasMediaAttachment={!!firstMedia}
                         />
-                        <ForumPostFooter
-                            channel={channel}
-                            firstMessage={firstMessage}
-                            facepileRef={facepileRef}
-                        />
-                    </div>
-                    {firstMedia && <ForumPostMedia {...firstMedia} />}
-                </div>
+                        {firstMedia && <ForumPostMedia {...firstMedia} />}
+                    </Flex>
+                    <ForumPostFooter
+                        channel={channel}
+                        firstMessage={firstMessage}
+                        facepileRef={facepileRef}
+                    />
+                </Flex>
             );
         }
 );

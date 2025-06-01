@@ -419,7 +419,7 @@ interface ForumPostInfoOptions {
 export function useForumPostInfo({ channel, isNew }: ForumPostInfoOptions) {
     const appliedTags = useTags(channel);
 
-    const shownTags = appliedTags.slice(undefined, 3);
+    const shownTags = appliedTags.slice(0, 3);
     const remainingTags = appliedTags.slice(3);
     const moreTagsCount = appliedTags.length > 3 ? appliedTags.length - 3 : 0;
     const isPinned = channel.hasFlag(2);

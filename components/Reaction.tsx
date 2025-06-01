@@ -18,7 +18,7 @@ enum ReactionType {
     VOTE = 2,
 }
 
-type EmojiSize = "reaction" | "jumbo";
+export type EmojiSize = "reaction" | "jumbo";
 
 interface ReactionButtonProps extends MessageReactionWithBurst {
     className?: string;
@@ -42,6 +42,7 @@ const reactionButtonDefaultProps = {
     useChatFontScaling: false,
     emojiSize: "reaction",
     emojiSizeTooltip: "reaction",
+    className: "vc-better-forums-reaction-button",
 } as const satisfies Partial<ReactionButtonProps>;
 
 interface ReactionProps {
@@ -62,7 +63,6 @@ export function DefaultReaction({ firstMessage, channel }: ReactionProps) {
     return (
         <ReactionButton
             {...reactionButtonDefaultProps}
-            className={"updateReactionButton"}
             message={firstMessage}
             readOnly={channel.isArchivedLockedThread()}
             isLurking={isLurking}
@@ -76,12 +76,11 @@ export function DefaultReaction({ firstMessage, channel }: ReactionProps) {
 
 export function Reaction({ firstMessage, channel }: ReactionProps) {
     const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
-    const reactions = firstMessage.reactions as MessageReactionWithBurst[];
+    const reactions = firstMessage.reactions.slice(0, 3) as MessageReactionWithBurst[];
 
     return reactions.map(reaction => (
         <ReactionButton
             {...reactionButtonDefaultProps}
-            className={"updateReactionButton"}
             message={firstMessage}
             readOnly={disableReactionCreates || channel.isArchivedLockedThread()}
             isLurking={isLurking}

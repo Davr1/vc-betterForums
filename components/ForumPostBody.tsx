@@ -4,13 +4,23 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getIntlMessageFromHash } from "@utils/discord";
-import { Heading } from "@webpack/common";
-import { Message } from "discord-types/general";
+import { findComponentByCodeLazy } from "@webpack";
+import { Flex, Heading, useStateFromStores } from "@webpack/common";
+import { Channel, Message } from "discord-types/general";
 
+import { RelationshipStore } from "../stores";
 import { ThreadChannel, useChannelName, useForumPostState } from "../utils";
 import { ForumPostContent } from "./ForumPostContent";
-import { ForumPostHeader } from "./ForumPostHeader";
+import { ForumPostTags } from "./ForumPostTags";
+import { ForumPostTimestamp } from "./ForumPostTimestamp";
+
+interface UsernameProps {
+    message: Message | null;
+    channel: Channel;
+    renderColon?: boolean;
+    hasUnreads?: boolean;
+}
+const Username = findComponentByCodeLazy<UsernameProps>("#{intl::FORUM_POST_AUTHOR_A11Y_LABEL}");
 
 interface ForumPostBodyProps {
     channel: ThreadChannel;
@@ -28,37 +38,49 @@ export function ForumPostBody({
     const { isNew, hasUnreads } = useForumPostState(channel);
     const channelName = useChannelName(channel);
 
+    const { isBlocked, isIgnored } = useStateFromStores([RelationshipStore], () => ({
+        isBlocked: !!firstMessage && RelationshipStore.isBlockedForMessage(firstMessage),
+        isIgnored: !!firstMessage && RelationshipStore.isIgnoredForMessage(firstMessage),
+    }));
+
     return (
-        <div className={"body"}>
-            <ForumPostHeader channel={channel} />
+        <Flex className="vc-better-forums-thread-body" direction={Flex.Direction.VERTICAL}>
+            <Flex className="vc-better-forums-thread-header" align={Flex.Align.CENTER} grow={0}>
+                <Username
+                    channel={channel}
+                    message={firstMessage}
+                    renderColon={false}
+                    hasUnreads={hasUnreads}
+                />
+                <ForumPostTimestamp channel={channel} />
+            </Flex>
             <div className={"headerText"}>
                 <Heading
                     variant="heading-lg/semibold"
-                    color={hasUnreads ? "header-primary" : "text-muted"}
+                    color="header-primary"
                     lineClamp={2}
-                    className={"postTitleText"}
+                    className="vc-better-forums-thread-title-container"
                 >
-                    <span>
-                        {channelName}
-                        {isNew && (
+                    {channelName}
+                    <ForumPostTags channel={channel} isNew={isNew} />
+                    {/* {isNew && (
                             <span className={"newBadgeWrapper"}>
                                 <span className={"newBadge"}>
                                     {getIntlMessageFromHash("y2b7CA")}
                                 </span>
                             </span>
-                        )}
-                    </span>
+                        )} */}
                 </Heading>
             </div>
-            <div className={"message"}>
-                <ForumPostContent
-                    channel={channel}
-                    message={firstMessage}
-                    content={content}
-                    hasMediaAttachment={hasMediaAttachment}
-                    hasUnreads={hasUnreads}
-                />
-            </div>
-        </div>
+            <ForumPostContent
+                channel={channel}
+                message={firstMessage}
+                content={content}
+                hasMediaAttachment={hasMediaAttachment}
+                hasUnreads={hasUnreads}
+                isAuthorBlocked={isBlocked}
+                isAuthorIgnored={isIgnored}
+            />
+        </Flex>
     );
 }

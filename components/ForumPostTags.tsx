@@ -8,19 +8,14 @@ import { cl } from "..";
 import { ThreadChannel, useForumChannelState, useForumPostInfo } from "../utils";
 import { MoreTags, Tag } from "./Tags";
 
-interface ForumPostHeaderProps {
+interface ForumPostTagsProps {
     channel: ThreadChannel;
     isNew?: boolean;
     tagsClassName?: string;
     className?: string;
 }
 
-export function ForumPostHeader({
-    channel,
-    isNew,
-    tagsClassName,
-    className,
-}: ForumPostHeaderProps) {
+export function ForumPostTags({ channel, isNew, tagsClassName }: ForumPostTagsProps) {
     const { shownTags, remainingTags, moreTagsCount, isPinned, shouldRenderTagsRow } =
         useForumPostInfo({ channel, isNew });
 
@@ -28,17 +23,19 @@ export function ForumPostHeader({
     if (!shouldRenderTagsRow) return null;
 
     return (
-        <div className={cl("tags", className)}>
+        <>
             {isNew ? "new" : ""}
             {isPinned ? "pinned" : ""}
             {shownTags.map(tag => (
                 <Tag
                     tag={tag}
-                    className={cl(tagsClassName, { filtered: tagFilter.has(tag.id) })}
+                    className={cl("vc-better-forums-tag", tagsClassName, {
+                        "vc-better-forums-tag-filtered": tagFilter.has(tag.id),
+                    })}
                     key={tag.id}
                 />
             ))}
             {moreTagsCount > 0 && <MoreTags tags={remainingTags} count={moreTagsCount} />}
-        </div>
+        </>
     );
 }

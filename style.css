@@ -1,0 +1,75 @@
+.vc-better-forums-thread {
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    background-color: var(--background-base-low);
+    border: 1px solid var(--border-subtle);
+    transition: box-shadow 0.2s ease-out, transform 0.2s ease-out, background 0.2s ease-out,
+        border 0.2s ease-out;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+
+    &:hover,
+    &:active {
+        background-color: var(--background-modifier-hover);
+        border-color: var(--background-modifier-hover);
+        box-shadow: var(--elevation-high);
+        transform: translateY(-2px);
+    }
+
+    &.vc-better-forums-thread-open {
+        border-color: var(--background-modifier-selected);
+        background-color: var(--background-modifier-selected);
+        box-shadow: none;
+        transform: none;
+    }
+}
+
+.vc-better-forums-thread-body-container,
+.vc-better-forums-thread-body,
+.vc-better-forums-thread-header,
+.vc-better-forums-footer {
+    gap: var(--space-6);
+}
+
+.vc-better-forums-thread-title-container {
+    display: flex;
+    flex-grow: 0;
+    gap: var(--space-xs);
+    align-items: center;
+}
+
+.vc-better-forums-tag {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 2px 6px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    background: var(--button-secondary-background);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    height: var(--size-md);
+    letter-spacing: 0.02rem;
+}
+
+.vc-better-forums-tag-emoji {
+    width: var(--size-sm);
+    height: var(--size-sm);
+    object-fit: contain;
+}
+
+.vc-better-forums-message-block {
+    margin-bottom: var(--space-xxs);
+}
+
+.vc-better-forums-message-block-content {
+    color: inherit;
+    font: inherit;
+    line-height: 1.5;
+}
+
+.vc-better-forums-reaction-button {
+    margin: 0;
+}

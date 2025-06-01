@@ -9,11 +9,11 @@ import { Channel } from "discord-types/general";
 
 import { useFormatTimestamp, useForumChannelState } from "../utils";
 
-interface ActivityProps {
+interface ForumPostTimestampProps {
     channel: Channel;
 }
 
-export function Activity({ channel }: ActivityProps) {
+export function ForumPostTimestamp({ channel }: ForumPostTimestampProps) {
     const { sortOrder } = useForumChannelState(channel.parent_id);
     const children = useFormatTimestamp(channel, sortOrder);
     const createTimestamp = channel.threadMetadata?.createTimestamp ?? "";

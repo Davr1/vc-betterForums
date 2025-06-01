@@ -5,11 +5,11 @@
  */
 
 import { findComponentByCodeLazy } from "@webpack";
+import { Flex } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
 
 import { ThreadChannel, useTypingUsers } from "../utils";
 import { ActiveUsers } from "./ActiveUsers";
-import { Activity } from "./Activity";
 import { Message as MessageComponent } from "./Message";
 import { DefaultReaction, Reaction } from "./Reaction";
 
@@ -42,14 +42,14 @@ export function ForumPostFooter({ channel, facepileRef, firstMessage }: ForumPos
     const hasReactions = firstMessage?.reactions && firstMessage.reactions.length > 0;
 
     return (
-        <div className={"footer"}>
+        <Flex className="vc-better-forums-footer">
             {hasReactions || !firstMessage ? null : (
                 <DefaultReaction firstMessage={firstMessage} channel={channel} />
             )}
             {!firstMessage ? null : <Reaction firstMessage={firstMessage} channel={channel} />}
             <MessageComponent channel={channel} iconSize={14} />
             <span className={"bullet"}>•</span>
-            {typingUsers.length > 0 ? (
+            {typingUsers.length > 0 && (
                 <div className={"typing"}>
                     <ActiveUsers
                         channel={channel}
@@ -61,9 +61,7 @@ export function ForumPostFooter({ channel, facepileRef, firstMessage }: ForumPos
                     </div>
                     <TypingText channel={channel} className={"typingUsers"} renderDots={false} />
                 </div>
-            ) : (
-                <Activity channel={channel} />
             )}
-        </div>
+        </Flex>
     );
 }
