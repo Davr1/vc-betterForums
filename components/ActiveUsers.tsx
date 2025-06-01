@@ -29,7 +29,7 @@ const FacePile = findComponentByCodeLazy<FacePileProps>("this.props.renderIcon")
 
 interface ActiveUsersProps {
     channel: Channel;
-    userIds: string[];
+    userIds: User["id"][];
     facepileRef: React.Ref<HTMLDivElement>;
 }
 

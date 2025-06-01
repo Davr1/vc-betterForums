@@ -16,7 +16,6 @@ import {
     SnowflakeUtils,
     useEffect,
     useMemo,
-    useRef,
     UserStore,
     useStateFromStores,
 } from "@webpack/common";
@@ -229,12 +228,11 @@ export function useTypingUsers(
             for (const userId in typingUsers) {
                 if (users.length >= limit) break;
                 const user = UserStore.getUser(userId);
-                if (
-                    user &&
-                    user.id !== currentUserId &&
-                    !RelationshipStore.isBlockedOrIgnored(user.id)
-                )
+                if (!user || user.id === currentUserId) continue;
+
+                if (!RelationshipStore.isBlockedOrIgnored(user.id)) {
                     users.push(user.id);
+                }
             }
 
             return users;
@@ -243,14 +241,15 @@ export function useTypingUsers(
     );
 }
 
-export function useUsers(channel: Channel, userIds: string[]) {
+export function useUsers(channel: Channel, userIds: User["id"][]) {
     const users = useStateFromStores([UserStore], () =>
-        userIds.map(id => UserStore.getUser(id)).filter(Boolean)
+        userIds.map(UserStore.getUser).filter(Boolean)
     );
-    const ref = useRef(() => {
-        users.forEach(user => GuildMemberRequesterStore.requestMember(channel.guild_id, user.id));
-    });
-    useEffect(() => ref.current(), []);
+    useEffect(() => {
+        users.forEach(user => {
+            GuildMemberRequesterStore.requestMember(channel.guild_id, user.id);
+        });
+    }, []);
 
     return users;
 }

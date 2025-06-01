@@ -17,6 +17,12 @@ import { ForumPostBody } from "./ForumPostBody";
 import { ForumPostFooter } from "./ForumPostFooters";
 import { Attachment, ForumPostMedia } from "./ForumPostMedia";
 
+const ClickableWithRing: React.FC<
+    React.ComponentProps<typeof Clickable> & {
+        focusProps: { ringTarget: React.Ref<HTMLElement> };
+    }
+> = Clickable;
+
 const useFirstMessage: (channel: Channel) => { loaded: boolean; firstMessage: Message | null } =
     findByCodeLazy("loaded:", "firstMessage:", "getChannel", "getMessage");
 
@@ -102,7 +108,7 @@ export const ForumPost = LazyComponent(
                         isOpen: isOpen,
                     })}
                 >
-                    <Clickable
+                    <ClickableWithRing
                         onClick={handleLeftClick}
                         focusProps={{
                             ringTarget,

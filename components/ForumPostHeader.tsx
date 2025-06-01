@@ -22,10 +22,8 @@ export function ForumPostHeader({
     className,
 }: ForumPostHeaderProps) {
     const { shownTags, remainingTags, moreTagsCount, isPinned, shouldRenderTagsRow } =
-        useForumPostInfo({
-            channel,
-            isNew,
-        });
+        useForumPostInfo({ channel, isNew });
+
     const { tagFilter } = useForumChannelState(channel.id);
     if (!shouldRenderTagsRow) return null;
 
