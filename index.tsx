@@ -8,7 +8,6 @@ import { classNameFactory } from "@api/Styles";
 import definePlugin from "@utils/types";
 
 import { ForumPost } from "./components/ForumPost";
-import { setReactionButton } from "./components/Reaction";
 import { ForumChannelStore } from "./stores";
 import { setForumChannelStore } from "./utils";
 
@@ -30,22 +29,12 @@ export default definePlugin({
             find: "this.toggleTagFilter",
             replacement: {
                 match: /(\i)=(\i)\(\)/,
-                replace: "$&;$self.forumOptions=$2",
-            },
-        },
-        {
-            find: "this.userCanBurstReact",
-            replacement: {
-                match: /(\i)=(\i)\.memo/,
-                replace: "$1=$self.ReactionButton=$2.memo",
+                replace: "$&;$self.ForumChannelStore=$2",
             },
         },
     ],
     ForumPost,
-    set forumOptions(value: () => ForumChannelStore) {
+    set ForumChannelStore(value: () => ForumChannelStore) {
         setForumChannelStore(value());
-    },
-    set ReactionButton(value: React.FC) {
-        setReactionButton(value);
     },
 });

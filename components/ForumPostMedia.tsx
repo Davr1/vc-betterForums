@@ -4,38 +4,63 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByCodeLazy } from "@webpack";
+import { findComponentByCodeLazy } from "@webpack";
 import { useMemo, useStateFromStores, WindowStore } from "@webpack/common";
 
-const MediaMosaic = findByCodeLazy("mediaMosaicAltTextPopoutDescription");
-
-export function ForumPostMedia({ firstMedia }) {
-    return (
-        <div className={"bodyMedia"} onClick={e => e.stopPropagation()}>
-            <MediaEmbed firstMedia={firstMedia} />
-        </div>
-    );
+export interface Attachment {
+    type: "embed" | "attachment";
+    src: string;
+    width: number;
+    height: number;
+    spoiler?: boolean;
+    contentScanVersion?: number;
+    isVideo?: boolean;
+    isThumbnail?: boolean;
+    attachmentId?: string;
+    mediaIndex?: number;
+    srcIsAnimated?: boolean;
+    alt?: string;
 }
+
+interface MediaMosaicProps {
+    src: string;
+    width?: number;
+    height?: number;
+    minWidth?: number;
+    minHeight?: number;
+    alt?: string;
+    animated?: boolean;
+    srcIsAnimated?: boolean;
+    containerClassName?: string;
+    imageClassName?: string;
+}
+
+const MediaMosaic = findComponentByCodeLazy<MediaMosaicProps>(
+    "mediaMosaicAltTextPopoutDescription"
+);
+
+interface ForumPostMediaProps extends Attachment {}
 
 const animatedMediaRegex = /\.(webp|gif|avif)$/i;
 
-function MediaEmbed({ firstMedia }) {
+export function ForumPostMedia({ src, width, height, alt, srcIsAnimated }: ForumPostMediaProps) {
     const isFocused = useStateFromStores([WindowStore], () => WindowStore.isFocused());
-    const { src, width, height, alt } = firstMedia;
     const isAnimated = useMemo(() => !src || animatedMediaRegex.test(src.split(/\?/, 1)[0]), [src]);
 
     return (
-        <MediaMosaic
-            src={src}
-            width={width}
-            height={height}
-            minWidth={72}
-            minHeight={72}
-            alt={alt}
-            animated={isAnimated && isFocused}
-            srcIsAnimated={firstMedia.srcIsAnimated}
-            containerClassName={"thumbnailContainer"}
-            imageClassName={"thumbnailOverride"}
-        />
+        <div className={"bodyMedia"} onClick={e => e.stopPropagation()}>
+            <MediaMosaic
+                src={src}
+                width={width}
+                height={height}
+                minWidth={72}
+                minHeight={72}
+                alt={alt}
+                animated={isAnimated && isFocused}
+                srcIsAnimated={srcIsAnimated}
+                containerClassName={"thumbnailContainer"}
+                imageClassName={"thumbnailOverride"}
+            />
+        </div>
     );
 }

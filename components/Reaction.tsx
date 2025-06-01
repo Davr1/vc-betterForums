@@ -4,22 +4,52 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { findComponentByCodeLazy } from "@webpack";
 import { ChannelStore, useStateFromStores } from "@webpack/common";
-import { Channel, Message } from "discord-types/general";
+import { Message, MessageReaction } from "discord-types/general";
 
-import { ForumChannel, useCheckPermissions, useDefaultEmoji } from "../utils";
+import { ForumChannel, ThreadChannel, useCheckPermissions, useDefaultEmoji } from "../utils";
 
-let ReactionButton: React.FC<any> = () => <></>;
+type MessageReactionWithBurst = MessageReaction & { burst_count: number; me_burst: boolean };
 
-export function setReactionButton(button: React.FC) {
-    ReactionButton = button;
+enum ReactionType {
+    NORMAL = 0,
+    BURST = 1,
+    VOTE = 2,
 }
+
+type EmojiSize = "reaction" | "jumbo";
+
+interface ReactionButtonProps extends MessageReactionWithBurst {
+    className?: string;
+    message: Message;
+    readOnly?: boolean;
+    useChatFontScaling?: boolean;
+    isLurking?: boolean;
+    isPendingMember?: boolean;
+    hideCount?: boolean;
+    type?: ReactionType;
+    emojiSize?: EmojiSize;
+    emojiSizeTooltip?: EmojiSize;
+}
+const ReactionButton = findComponentByCodeLazy<ReactionButtonProps>("getReactionPickerAnimation");
+
+const reactionButtonDefaultProps = {
+    count: 0,
+    burst_count: 0,
+    me: false,
+    me_burst: false,
+    useChatFontScaling: false,
+    emojiSize: "reaction",
+    emojiSizeTooltip: "reaction",
+} as const satisfies Partial<ReactionButtonProps>;
 
 interface ReactionProps {
     firstMessage: Message;
-    channel: Channel;
+    channel: ThreadChannel;
 }
-export function EmptyReaction({ firstMessage, channel }: ReactionProps) {
+
+export function DefaultReaction({ firstMessage, channel }: ReactionProps) {
     const forumChannel = useStateFromStores(
         [ChannelStore],
         () => ChannelStore.getChannel(channel.parent_id) as ForumChannel
@@ -31,43 +61,34 @@ export function EmptyReaction({ firstMessage, channel }: ReactionProps) {
 
     return (
         <ReactionButton
+            {...reactionButtonDefaultProps}
             className={"updateReactionButton"}
             message={firstMessage}
-            readOnly={(channel as any).isArchivedLockedThread()}
-            useChatFontScaling={false}
+            readOnly={channel.isArchivedLockedThread()}
             isLurking={isLurking}
             isPendingMember={isPendingMember}
             emoji={defaultEmoji}
-            hideCount={true}
-            count={0}
-            burst_count={0}
-            me={false}
-            me_burst={false}
-            type={0}
-            emojiSize="reaction"
-            emojiSizeTooltip="reaction"
+            hideCount
+            type={ReactionType.NORMAL}
         />
     );
 }
 
 export function Reaction({ firstMessage, channel }: ReactionProps) {
     const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
+    const reactions = firstMessage.reactions as MessageReactionWithBurst[];
 
-    return firstMessage.reactions.map(reaction => (
+    return reactions.map(reaction => (
         <ReactionButton
+            {...reactionButtonDefaultProps}
             className={"updateReactionButton"}
             message={firstMessage}
-            readOnly={disableReactionCreates || (channel as any).isArchivedLockedThread()}
+            readOnly={disableReactionCreates || channel.isArchivedLockedThread()}
             isLurking={isLurking}
             isPendingMember={isPendingMember}
-            useChatFontScaling={false}
-            type={(reaction as any).burst_count >= reaction.count ? 1 : 0}
-            emojiSize="reaction"
-            emojiSizeTooltip="reaction"
+            type={reaction.burst_count >= reaction.count ? ReactionType.BURST : ReactionType.NORMAL}
             key={reaction.emoji.id}
             {...reaction}
-        >
-            {`${reaction.emoji.id ?? "0"}:${reaction.emoji.name}`}
-        </ReactionButton>
+        />
     ));
 }

@@ -20,7 +20,7 @@ import {
     UserStore,
     useStateFromStores,
 } from "@webpack/common";
-import { Channel, Guild, User } from "discord-types/general";
+import { Channel, Guild, ReactionEmoji, User } from "discord-types/general";
 
 import {
     ChannelState,
@@ -44,6 +44,12 @@ import {
 
 export interface ForumChannel extends Channel {
     defaultReactionEmoji: Record<"emojiId" | "emojiName", string | null> | null;
+    availableTags: Tag[] | null;
+}
+
+export interface ThreadChannel extends Channel {
+    appliedTags: Tag["id"][] | null;
+    isArchivedLockedThread(): boolean;
 }
 
 type TimeFormatterOptions = Record<
@@ -249,13 +255,7 @@ export function useUsers(channel: Channel, userIds: string[]) {
     return users;
 }
 
-interface BasicEmoji {
-    id: string | null;
-    name: string;
-    animated: boolean;
-}
-
-export function useDefaultEmoji(channel: ForumChannel): BasicEmoji | null {
+export function useDefaultEmoji(channel: ForumChannel): ReactionEmoji | null {
     const emoji = channel.defaultReactionEmoji;
     if (!emoji) return null;
 
@@ -271,7 +271,7 @@ export function useDefaultEmoji(channel: ForumChannel): BasicEmoji | null {
         };
     if (emoji.emojiName)
         return {
-            id: emoji.emojiId,
+            id: emoji.emojiId ?? undefined,
             name: emoji.emojiName,
             animated: false,
         };
@@ -391,25 +391,41 @@ export function useChannelName(channel: Channel): React.ReactNode {
     );
 }
 
-function useTags(channel: Channel) {
+export interface Tag {
+    id: string;
+    name: string;
+    emojiId: null | string;
+    emojiName: null | string;
+    moderated: boolean;
+}
+
+function useTags(channel: ThreadChannel): Tag[] {
     return useStateFromStores([ChannelStore], () => {
-        const availableTags = (
-            ChannelStore.getChannel(channel.parent_id)?.availableTags ?? []
-        ).reduce((acc, tag) => {
+        const forumChannel = ChannelStore.getChannel(channel.parent_id) as ForumChannel | null;
+
+        const availableTags = (forumChannel?.availableTags ?? []).reduce((acc, tag) => {
             acc[tag.id] = tag;
             return acc;
-        }, {});
+        }, {} as Record<Tag["id"], Tag>);
+
         return (channel.appliedTags ?? []).map(tag => availableTags[tag]);
     });
 }
 
-export function useForumPostInfo({ channel, isNew }) {
+interface ForumPostInfoOptions {
+    channel: ThreadChannel;
+    isNew?: boolean;
+}
+
+export function useForumPostInfo({ channel, isNew }: ForumPostInfoOptions) {
     const appliedTags = useTags(channel);
+
     const shownTags = appliedTags.slice(undefined, 3);
     const remainingTags = appliedTags.slice(3);
     const moreTagsCount = appliedTags.length > 3 ? appliedTags.length - 3 : 0;
     const isPinned = channel.hasFlag(2);
-    const shouldRenderTagsRow = shownTags.length > 0 || isPinned || isNew;
+    const shouldRenderTagsRow = shownTags.length > 0 || isPinned || !!isNew;
+
     return {
         shownTags,
         remainingTags,

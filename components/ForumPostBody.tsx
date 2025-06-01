@@ -6,18 +6,17 @@
 
 import { getIntlMessageFromHash } from "@utils/discord";
 import { Heading } from "@webpack/common";
-import { Channel, Message } from "discord-types/general";
+import { Message } from "discord-types/general";
 
-import { useChannelName, useForumPostState } from "../utils";
+import { ThreadChannel, useChannelName, useForumPostState } from "../utils";
 import { ForumPostContent } from "./ForumPostContent";
 import { ForumPostHeader } from "./ForumPostHeader";
 
 interface ForumPostBodyProps {
-    channel: Channel;
-    firstMessage: Message;
-    content: string;
+    channel: ThreadChannel;
+    firstMessage: Message | null;
+    content: React.ReactNode;
     hasMediaAttachment: boolean;
-    containerWidth: number;
 }
 
 export function ForumPostBody({
@@ -25,7 +24,6 @@ export function ForumPostBody({
     firstMessage,
     content,
     hasMediaAttachment,
-    containerWidth,
 }: ForumPostBodyProps) {
     const { isNew, hasUnreads } = useForumPostState(channel);
     const channelName = useChannelName(channel);

@@ -4,17 +4,33 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByCodeLazy } from "@webpack";
-import { Channel } from "discord-types/general";
+import { findComponentByCodeLazy } from "@webpack";
+import { Channel, Guild, User } from "discord-types/general";
 
 import { useUsers } from "../utils";
 
-const FacePile = findByCodeLazy("this.props.renderIcon");
+interface FacePileProps {
+    users: User[];
+    guildId: Guild["id"];
+    className?: string;
+    count?: number;
+    max?: number;
+    hideMoreUsers?: boolean;
+    renderMoreUsers?: boolean;
+    showDefaultAvatarsForNullUsers?: boolean;
+    size?: 16 | 24 | 32 | 56;
+    showUserPopout?: boolean;
+    useFallbackUserForPopout?: boolean;
+    renderIcon?: boolean;
+    renderUser?: React.FC<Omit<FacePileProps, "renderUser">>;
+}
+
+const FacePile = findComponentByCodeLazy<FacePileProps>("this.props.renderIcon");
 
 interface ActiveUsersProps {
     channel: Channel;
     userIds: string[];
-    facepileRef: any;
+    facepileRef: React.Ref<HTMLDivElement>;
 }
 
 export function ActiveUsers({ channel, userIds, facepileRef }: ActiveUsersProps) {

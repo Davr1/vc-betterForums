@@ -12,10 +12,10 @@ import { Channel, Message } from "discord-types/general";
 
 import { cl } from "..";
 import { ChannelSectionStore, ForumPostComposerStore } from "../stores";
-import { CompareFn, deepEqual, useMessageCount } from "../utils";
+import { CompareFn, deepEqual, ThreadChannel, useMessageCount } from "../utils";
 import { ForumPostBody } from "./ForumPostBody";
 import { ForumPostFooter } from "./ForumPostFooters";
-import { ForumPostMedia } from "./ForumPostMedia";
+import { Attachment, ForumPostMedia } from "./ForumPostMedia";
 
 const useFirstMessage: (channel: Channel) => { loaded: boolean; firstMessage: Message | null } =
     findByCodeLazy("loaded:", "firstMessage:", "getChannel", "getMessage");
@@ -47,7 +47,7 @@ const useForumPostMetadata: (options: {
 }) => {
     hasSpoilerEmbeds: boolean;
     content: React.ReactNode | null;
-    firstMedia: Record<string, unknown> | null;
+    firstMedia: Attachment | null;
     firstMediaIsEmbed: boolean;
 } = findByCodeLazy(/noStyleAndInteraction:\i=!0\}/);
 
@@ -55,14 +55,14 @@ interface ForumPostProps {
     className?: string;
     goToThread: (channel: Channel, _: boolean) => void;
     threadId: string;
-    containerWidth: number;
 }
 
 export const ForumPost = LazyComponent(
     () =>
-        function ForumPost({ className, goToThread, threadId, containerWidth }: ForumPostProps) {
-            const channel = useStateFromStores([ChannelStore], () =>
-                ChannelStore.getChannel(threadId)
+        function ForumPost({ className, goToThread, threadId }: ForumPostProps) {
+            const channel = useStateFromStores(
+                [ChannelStore],
+                () => ChannelStore.getChannel(threadId) as ThreadChannel
             );
             const isOpen = useStateFromStores(
                 [ChannelSectionStore],
@@ -83,7 +83,8 @@ export const ForumPost = LazyComponent(
                     setCardHeight(threadId, height);
                 }
             }, [height, setCardHeight, threadId]);
-            const facepileRef = useRef<HTMLElement>(null);
+
+            const facepileRef = useRef<HTMLDivElement>(null);
 
             const { handleLeftClick, handleRightClick } = useForumPostEvents({
                 facepileRef,
@@ -119,7 +120,6 @@ export const ForumPost = LazyComponent(
                             firstMessage={firstMessage}
                             content={content}
                             hasMediaAttachment={firstMedia !== null}
-                            containerWidth={containerWidth}
                         />
                         <ForumPostFooter
                             channel={channel}
@@ -127,7 +127,7 @@ export const ForumPost = LazyComponent(
                             facepileRef={facepileRef}
                         />
                     </div>
-                    {firstMedia && <ForumPostMedia firstMedia={firstMedia} />}
+                    {firstMedia && <ForumPostMedia {...firstMedia} />}
                 </div>
             );
         }

@@ -4,22 +4,37 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByCodeLazy } from "@webpack";
+import { findComponentByCodeLazy } from "@webpack";
 import { Channel, Message } from "discord-types/general";
 
-import { useTypingUsers } from "../utils";
+import { ThreadChannel, useTypingUsers } from "../utils";
 import { ActiveUsers } from "./ActiveUsers";
 import { Activity } from "./Activity";
 import { Message as MessageComponent } from "./Message";
-import { EmptyReaction, Reaction } from "./Reaction";
+import { DefaultReaction, Reaction } from "./Reaction";
 
-const TypingIndicator = findByCodeLazy('"animate-always":"animate-never"');
-const TypingText = findByCodeLazy("getUserCombo(", "INTERACTIVE_NORMAL");
+interface TypingIndicatorProps {
+    dotRadius?: number;
+    x?: number;
+    y?: number;
+    themed?: boolean;
+    hide?: boolean;
+    className?: string;
+}
+
+interface TypingTextProps {
+    channel: Channel;
+    className?: string;
+    renderDots?: boolean;
+}
+
+const ThreeDots = findComponentByCodeLazy<TypingIndicatorProps>(".dots,", "dotRadius:");
+const TypingText = findComponentByCodeLazy<TypingTextProps>("getTypingUsers", "INTERACTIVE_NORMAL");
 
 interface ForumPostFooterProps {
-    channel: Channel;
-    facepileRef: React.Ref<unknown>;
-    firstMessage: Message;
+    channel: ThreadChannel;
+    facepileRef: React.Ref<HTMLDivElement>;
+    firstMessage: Message | null;
 }
 
 export function ForumPostFooter({ channel, facepileRef, firstMessage }: ForumPostFooterProps) {
@@ -29,7 +44,7 @@ export function ForumPostFooter({ channel, facepileRef, firstMessage }: ForumPos
     return (
         <div className={"footer"}>
             {hasReactions || !firstMessage ? null : (
-                <EmptyReaction firstMessage={firstMessage} channel={channel} />
+                <DefaultReaction firstMessage={firstMessage} channel={channel} />
             )}
             {!firstMessage ? null : <Reaction firstMessage={firstMessage} channel={channel} />}
             <MessageComponent channel={channel} iconSize={14} />
@@ -42,7 +57,7 @@ export function ForumPostFooter({ channel, facepileRef, firstMessage }: ForumPos
                         facepileRef={facepileRef}
                     />
                     <div className={"dots"}>
-                        <TypingIndicator themed dotRadius={2} />
+                        <ThreeDots themed dotRadius={2} />
                     </div>
                     <TypingText channel={channel} className={"typingUsers"} renderDots={false} />
                 </div>

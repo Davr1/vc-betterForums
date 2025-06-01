@@ -6,20 +6,37 @@
 
 import { getIntlMessage, getIntlMessageFromHash } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
-import { findByCodeLazy } from "@webpack";
+import { findByCodeLazy, findComponentByCodeLazy } from "@webpack";
 import { React, Text, useStateFromStores } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
 
 import { cl } from "..";
 import { ForumPostMessagesStore, RelationshipStore } from "../stores";
 
-const getMessageContent = findByCodeLazy("#{intl::MESSAGE_PINNED}");
-const Username = findByCodeLazy("#{intl::FORUM_POST_AUTHOR_A11Y_LABEL}");
+const getMessageContent: (
+    message: Message,
+    content: React.ReactNode,
+    isBlocked?: boolean,
+    isIgnored?: boolean,
+    className?: string,
+    props?: { trailingIconClass?: string; leadingIconClass?: string; iconSize?: number }
+) => Record<
+    "contentPlaceholder" | "renderedContent" | "trailingIcon" | "leadingIcon",
+    React.ReactNode
+> = findByCodeLazy("#{intl::MESSAGE_PINNED}");
+
+interface UsernameProps {
+    message: Message | null;
+    channel: Channel;
+    renderColon?: boolean;
+    hasUnreads?: boolean;
+}
+const Username = findComponentByCodeLazy<UsernameProps>("#{intl::FORUM_POST_AUTHOR_A11Y_LABEL}");
 
 interface ForumPostContentProps {
-    message: Message;
+    message: Message | null;
     channel: Channel;
-    content: string;
+    content: React.ReactNode;
     hasMediaAttachment: boolean;
     hasUnreads: boolean;
 }
@@ -33,46 +50,37 @@ export const ForumPostContent = LazyComponent(() =>
         hasUnreads,
     }: ForumPostContentProps) {
         const { isBlocked, isIgnored } = useStateFromStores([RelationshipStore], () => ({
-            isBlocked: message && RelationshipStore.isBlockedForMessage(message),
-            isIgnored: message && RelationshipStore.isIgnoredForMessage(message),
+            isBlocked: !!message && RelationshipStore.isBlockedForMessage(message),
+            isIgnored: !!message && RelationshipStore.isIgnoredForMessage(message),
         }));
 
         const isLoading = useStateFromStores([ForumPostMessagesStore], () =>
-            (ForumPostMessagesStore as any).isLoading(channel.id)
+            ForumPostMessagesStore.isLoading(channel.id)
         );
 
         let component: React.ReactNode | null = null;
 
-        if (isBlocked)
+        if (isBlocked || isIgnored)
             component = (
                 <Text className={"blockedMessage"} variant="text-sm/medium" color="text-muted">
-                    {getIntlMessage("FORUM_POST_BLOCKED_FIRST_MESSAGE")}
-                </Text>
-            );
-        else if (isIgnored)
-            component = (
-                <Text className={"blockedMessage"} variant="text-sm/medium" color="text-muted">
-                    {getIntlMessage("FORUM_POST_IGNORED_FIRST_MESSAGE")}
+                    {getIntlMessage(
+                        isBlocked
+                            ? "FORUM_POST_BLOCKED_FIRST_MESSAGE"
+                            : "FORUM_POST_IGNORED_FIRST_MESSAGE"
+                    )}
                 </Text>
             );
         else {
+            const className = cl("messageContent", "inlineFormat", "__invalid_smallFontSize");
+            const props = {
+                leadingIconClass: "messageContentLeadingIcon",
+                trailingIconClass: "messageContentTrailingIcon",
+                iconSize: 20,
+            };
+
             const { contentPlaceholder, renderedContent } = !message
-                ? {
-                      contentPlaceholder: null,
-                      renderedContent: null,
-                  }
-                : getMessageContent(
-                      message,
-                      content,
-                      isBlocked,
-                      isIgnored,
-                      cl("messageContent", "inlineFormat", "__invalid_smallFontSize"),
-                      {
-                          leadingIconClass: "messageContentLeadingIcon",
-                          trailingIconClass: "messageContentTrailingIcon",
-                          iconSize: 20,
-                      }
-                  );
+                ? { contentPlaceholder: null, renderedContent: null }
+                : getMessageContent(message, content, isBlocked, isIgnored, className, props);
 
             component = renderedContent ? (
                 <Text
@@ -103,7 +111,7 @@ export const ForumPostContent = LazyComponent(() =>
                     <Username
                         channel={channel}
                         message={message}
-                        renderColon={component}
+                        renderColon={!!component}
                         hasUnreads={hasUnreads}
                     />
                 )}

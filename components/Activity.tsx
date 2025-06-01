@@ -12,10 +12,11 @@ import { useFormatTimestamp, useForumChannelState } from "../utils";
 interface ActivityProps {
     channel: Channel;
 }
+
 export function Activity({ channel }: ActivityProps) {
     const { sortOrder } = useForumChannelState(channel.parent_id);
     const children = useFormatTimestamp(channel, sortOrder);
-    const createTimestamp = channel.threadMetadata?.createTimestamp ?? ""; // TODO: different timestamp based on sortOrder
+    const createTimestamp = channel.threadMetadata?.createTimestamp ?? "";
 
     return (
         <Tooltip text={<Timestamp timestamp={new Date(createTimestamp)} />}>

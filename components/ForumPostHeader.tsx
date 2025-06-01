@@ -4,14 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Channel } from "discord-types/general";
-
 import { cl } from "..";
-import { useForumChannelState, useForumPostInfo } from "../utils";
+import { ThreadChannel, useForumChannelState, useForumPostInfo } from "../utils";
 import { MoreTags, Tag } from "./Tags";
 
 interface ForumPostHeaderProps {
-    channel: Channel;
+    channel: ThreadChannel;
     isNew?: boolean;
     tagsClassName?: string;
     className?: string;
@@ -40,10 +38,9 @@ export function ForumPostHeader({
                     tag={tag}
                     className={cl(tagsClassName, { filtered: tagFilter.has(tag.id) })}
                     key={tag.id}
-                    selected
                 />
             ))}
-            {moreTagsCount > 0 && <MoreTags tags={remainingTags} count={moreTagsCount} size={0} />}
+            {moreTagsCount > 0 && <MoreTags tags={remainingTags} count={moreTagsCount} />}
         </div>
     );
 }

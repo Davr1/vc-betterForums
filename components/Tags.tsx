@@ -6,7 +6,14 @@
 
 import { Text, Tooltip } from "@webpack/common";
 
-export function Tag({ tag: { name }, className, selected }) {
+import { Tag as TagType } from "../utils";
+
+interface TagProps {
+    tag: TagType;
+    className?: string;
+}
+
+export function Tag({ tag: { name }, className }: TagProps) {
     return (
         <div className={className}>
             <Text variant="text-xs/semibold" lineClamp={1} color="currentColor">
@@ -16,7 +23,12 @@ export function Tag({ tag: { name }, className, selected }) {
     );
 }
 
-export function MoreTags({ tags, count, size = 1 }) {
+interface MoreTagsProps {
+    tags: TagType[];
+    count: number;
+}
+
+export function MoreTags({ tags, count }: MoreTagsProps) {
     return (
         <Tooltip
             text={tags.map(tag => (
