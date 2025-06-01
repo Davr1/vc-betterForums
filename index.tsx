@@ -26,6 +26,7 @@ import {
     useRef,
     UserStore,
     useStateFromStores,
+    WindowStore,
 } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
 import { MouseEventHandler, ReactNode, Ref } from "react";
@@ -81,9 +82,8 @@ interface ComponentProps {
 const useFirstMessage: (channel: Channel) => { loaded: boolean; firstMessage: Message | null } =
     findByCodeLazy("loaded:", "firstMessage:", "getChannel", "getMessage");
 
-const useFocusRing: () => { ref: Ref<unknown>; width: number; height: number } = findByCodeLazy(
-    /,\{ref:\i,width:\i,height:\i\}\}/
-);
+const useFocusRing: () => { ref: Ref<unknown>; width: number; height: number | null } =
+    findByCodeLazy(/,\{ref:\i,width:\i,height:\i\}\}/);
 const useForumPostComposerStore: <T>(
     selector: (store: ForumPostComposerStore) => T,
     compareFn: CompareFn
@@ -113,12 +113,12 @@ const useForumPostMetadata: (options: {
 } = findByCodeLazy(/noStyleAndInteraction:\i=!0\}/);
 const getTitlePostprocessor: (query: string) => unknown = findByCodeLazy('type:"highlight"');
 const textHightlightParser = findByCodeLazy("hideSimpleEmbedContent:", "1!==");
-// const ChannelComponent = findByCodeLazy("remainingTags:", "unsafe_rawColors");
-const idk4 = findByCodeLazy("CHANNEL_PINNED_MESSAGE)");
+const getMessageContent = findByCodeLazy("#{intl::MESSAGE_PINNED}");
 const ForumPostUsername = findByCodeLazy("#{intl::FORUM_POST_AUTHOR_A11Y_LABEL}");
 const FacePile = findByCodeLazy("this.props.renderIcon");
 const TypingIndicator = findByCodeLazy('"animate-always":"animate-never"');
-const Idk7 = findByCodeLazy("getUserCombo(", "INTERACTIVE_NORMAL");
+const TypingText = findByCodeLazy("getUserCombo(", "INTERACTIVE_NORMAL");
+const MediaMosaic = findByCodeLazy("mediaMosaicAltTextPopoutDescription");
 
 const cl = classNameFactory();
 
@@ -183,7 +183,37 @@ function ForumPost({ className, goToThread, threadId, containerWidth }: Componen
                     facepileRef={facepileRef}
                 ></ForumFooter>
             </div>
+            <ForumPostMedia firstMedia={firstMedia} />
         </div>
+    );
+}
+
+function ForumPostMedia({ firstMedia }) {
+    return (
+        <div className={classes.bodyMedia} onClick={(e) => e.stopPropagation()}>
+            {firstMedia && <MediaEmbed firstMedia={firstMedia} />}
+        </div>
+    );
+}
+
+function MediaEmbed({ firstMedia }) {
+    const isFocused = useStateFromStores([WindowStore], () => WindowStore.isFocused());
+    const { src, width, height, alt } = firstMedia;
+    const isAnimated = !src || /\.(webp|gif|avif)$/i.test(src.split(/\?/, 1)[0]);
+
+    return (
+        <MediaMosaic
+            src={src}
+            width={width}
+            height={height}
+            minWidth={72}
+            minHeight={72}
+            alt={alt}
+            animated={isAnimated && isFocused}
+            srcIsAnimated={firstMedia.srcIsAnimated}
+            containerClassName={classes.thumbnailContainer}
+            imageClassName={cl(classes.thumbnailOverride)}
+        />
     );
 }
 
@@ -235,28 +265,27 @@ const ForumPostBody = LazyComponent(() =>
                 </Text>
             );
         else {
-            const { contentPlaceholder, renderedContent } =
-                message == null
-                    ? {
-                          contentPlaceholder: null,
-                          renderedContent: null,
+            const { contentPlaceholder, renderedContent } = !message
+                ? {
+                      contentPlaceholder: null,
+                      renderedContent: null,
+                  }
+                : getMessageContent(
+                      message,
+                      content,
+                      isBlocked,
+                      isIgnored,
+                      cl(
+                          classes.messageContent,
+                          classes2.inlineFormat,
+                          classes2.__invalid_smallFontSize
+                      ),
+                      {
+                          leadingIconClass: classes.messageContentLeadingIcon,
+                          trailingIconClass: classes.messageContentTrailingIcon,
+                          iconSize: 20,
                       }
-                    : idk4(
-                          message,
-                          content,
-                          isBlocked,
-                          isIgnored,
-                          cl(
-                              classes.messageContent,
-                              classes2.inlineFormat,
-                              classes2.__invalid_smallFontSize
-                          ),
-                          {
-                              leadingIconClass: classes.messageContentLeadingIcon,
-                              trailingIconClass: classes.messageContentTrailingIcon,
-                              iconSize: 20,
-                          }
-                      );
+                  );
 
             component = renderedContent ? (
                 <Text
@@ -272,7 +301,7 @@ const ForumPostBody = LazyComponent(() =>
                     color={hasUnreads ? "header-secondary" : "text-muted"}
                     className={classes.messageContent}
                 >
-                    {message == null
+                    {!message
                         ? isLoading
                             ? null
                             : i18n.intl.string(i18n.t.mE3KJC)
@@ -348,7 +377,11 @@ function ForumFooter({ channel, facepileRef, firstMessage }: ForumFooterProps) {
                     <div className={classes.dots}>
                         <TypingIndicator themed dotRadius={2}></TypingIndicator>
                     </div>
-                    <Idk7 channel={channel} className={classes.typingUsers} renderDots={false} />
+                    <TypingText
+                        channel={channel}
+                        className={classes.typingUsers}
+                        renderDots={false}
+                    />
                 </div>
             ) : (
                 <Activity channel={channel} />
