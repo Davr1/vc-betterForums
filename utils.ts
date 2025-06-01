@@ -8,6 +8,7 @@ import { getIntlMessage } from "@utils/discord";
 import { runtimeHashMessageKey } from "@utils/intlHash";
 import { findByCodeLazy } from "@webpack";
 import {
+    ChannelStore,
     EmojiStore,
     GuildStore,
     i18n,
@@ -22,17 +23,21 @@ import {
 import { Channel, Guild, User } from "discord-types/general";
 
 import {
+    ChannelState,
     Duration,
+    ForumChannelStore,
     ForumPostUnreadCountStore,
     ForumSearchStore,
     GuildMemberRequesterStore,
     GuildMemberStore,
     GuildVerificationStore,
+    LayoutType,
     LurkingStore,
     PermissionStore,
     ReadStateStore,
     RelationshipStore,
     SortOrder,
+    TagSetting,
     ThreadMessageStore,
     TypingStore,
 } from "./stores";
@@ -234,10 +239,10 @@ export function useTypingUsers(
 
 export function useUsers(channel: Channel, userIds: string[]) {
     const users = useStateFromStores([UserStore], () =>
-        userIds.map((id) => UserStore.getUser(id)).filter(Boolean)
+        userIds.map(id => UserStore.getUser(id)).filter(Boolean)
     );
     const ref = useRef(() => {
-        users.forEach((user) => GuildMemberRequesterStore.requestMember(channel.guild_id, user.id));
+        users.forEach(user => GuildMemberRequesterStore.requestMember(channel.guild_id, user.id));
     });
     useEffect(() => ref.current(), []);
 
@@ -384,4 +389,52 @@ export function useChannelName(channel: Channel): React.ReactNode {
             textHightlightParser({ content: channel.name, embeds: [] }, { postProcessor }).content,
         [channel.name, postProcessor]
     );
+}
+
+function useTags(channel: Channel) {
+    return useStateFromStores([ChannelStore], () => {
+        const availableTags = (
+            ChannelStore.getChannel(channel.parent_id)?.availableTags ?? []
+        ).reduce((acc, tag) => {
+            acc[tag.id] = tag;
+            return acc;
+        }, {});
+        return (channel.appliedTags ?? []).map(tag => availableTags[tag]);
+    });
+}
+
+export function useForumPostInfo({ channel, isNew }) {
+    const appliedTags = useTags(channel);
+    const shownTags = appliedTags.slice(undefined, 3);
+    const remainingTags = appliedTags.slice(3);
+    const moreTagsCount = appliedTags.length > 3 ? appliedTags.length - 3 : 0;
+    const isPinned = channel.hasFlag(2);
+    const shouldRenderTagsRow = shownTags.length > 0 || isPinned || isNew;
+    return {
+        shownTags,
+        remainingTags,
+        moreTagsCount,
+        isPinned,
+        shouldRenderTagsRow,
+        forumPostContainsTags: appliedTags.length > 0,
+    };
+}
+
+let ForumChannelStore: ForumChannelStore | null = null;
+export function setForumChannelStore(store: ForumChannelStore) {
+    ForumChannelStore = store;
+}
+
+export function useForumChannelState(channelId: Channel["id"]): ChannelState {
+    const channel = useStateFromStores([ChannelStore], () => ChannelStore.getChannel(channelId));
+
+    return !channel || !ForumChannelStore
+        ? {
+              layoutType: LayoutType.LIST,
+              sortOrder: SortOrder.CREATION_DATE,
+              tagFilter: new Set(),
+              scrollPosition: 0,
+              tagSetting: TagSetting.MATCH_SOME,
+          }
+        : ForumChannelStore.getChannelState(channelId)!;
 }

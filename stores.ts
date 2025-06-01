@@ -54,6 +54,8 @@ interface ReadStateStore extends FluxStore {
 
 interface RelationshipStore extends FluxStore, Stores.RelationshipStore {
     isBlockedOrIgnored(userId: User["id"]): boolean;
+    isBlockedForMessage(message: Message): boolean;
+    isIgnoredForMessage(message: Message): boolean;
 }
 
 interface GuildMemberStore extends FluxStore, Stores.GuildMemberStore {
