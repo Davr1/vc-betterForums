@@ -7,6 +7,7 @@
 import { findStoreLazy } from "@webpack";
 import { FluxStore } from "@webpack/types";
 import { Channel, Guild, Message, User } from "discord-types/general";
+import * as Stores from "discord-types/stores";
 
 interface ChannelSectionStore extends FluxStore {
     getCurrentSidebarChannelId: (parentChannelId: Channel["id"]) => Channel["id"] | null;
@@ -49,6 +50,26 @@ interface ReadStateStore extends FluxStore {
     ): boolean;
     isForumPostUnread(channelId: Channel["id"]): boolean;
     lastMessageId(channelId: Channel["id"]): Message["id"] | null;
+}
+
+interface RelationshipStore extends FluxStore, Stores.RelationshipStore {
+    isBlockedOrIgnored(userId: User["id"]): boolean;
+}
+
+interface GuildMemberStore extends FluxStore, Stores.GuildMemberStore {
+    isCurrentUserGuest(guildId: Guild["id"]): boolean;
+}
+
+interface LurkingStore extends FluxStore {
+    isLurking(guildId: Guild["id"]): boolean;
+}
+
+interface PermissionStore extends FluxStore {
+    can(permission: BigInt, channel: Channel): boolean;
+}
+
+interface GuildVerificationStore extends FluxStore {
+    canChatInGuild(guildId: Guild["id"]): boolean;
 }
 
 export enum LayoutType {
@@ -101,5 +122,9 @@ export const GuildMemberRequesterStore: GuildMemberRequesterStore = findStoreLaz
 export const TypingStore: TypingStore = findStoreLazy("TypingStore");
 export const ForumSearchStore: ForumSearchStore = findStoreLazy("ForumSearchStore");
 export const ReadStateStore: ReadStateStore = findStoreLazy("ReadStateStore");
-export const GuildVerificationStore = findStoreLazy("GuildVerificationStore");
-export const LurkingStore = findStoreLazy("LurkingStore");
+export const GuildVerificationStore: GuildVerificationStore =
+    findStoreLazy("GuildVerificationStore");
+export const LurkingStore: LurkingStore = findStoreLazy("LurkingStore");
+export const RelationshipStore: RelationshipStore = findStoreLazy("RelationshipStore");
+export const GuildMemberStore: GuildMemberStore = findStoreLazy("GuildMemberStore");
+export const PermissionStore: PermissionStore = findStoreLazy("PermissionStore");

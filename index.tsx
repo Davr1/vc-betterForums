@@ -5,26 +5,21 @@
  */
 
 import { classNameFactory } from "@api/Styles";
+import { getIntlMessage, getIntlMessageFromHash } from "@utils/discord";
 import { LazyComponent } from "@utils/react";
 import definePlugin from "@utils/types";
 import { findByCodeLazy, findByPropsLazy } from "@webpack";
 import {
     ChannelStore,
     Clickable,
-    EmojiStore,
-    GuildMemberStore,
     Heading,
-    i18n,
-    PermissionStore,
     React,
     RelationshipStore,
     Text,
     Timestamp,
     Tooltip,
     useEffect,
-    useMemo,
     useRef,
-    UserStore,
     useStateFromStores,
     WindowStore,
 } from "@webpack/common";
@@ -37,21 +32,22 @@ import {
     ForumChannelStore,
     ForumPostComposerStore,
     ForumPostMessagesStore,
-    ForumSearchStore,
-    GuildMemberRequesterStore,
-    GuildVerificationStore,
     LayoutType,
-    LurkingStore,
     SortOrder,
     TagSetting,
-    TypingStore,
 } from "./stores";
 import {
     CompareFn,
     deepEqual,
+    ForumChannel,
+    useChannelName,
+    useCheckPermissions,
+    useDefaultEmoji,
     useFormatTimestamp,
     useForumPostState,
     useMessageCount,
+    useTypingUsers,
+    useUsers,
 } from "./utils";
 
 let getForumChannelStore: () => ForumChannelStore | null = () => null;
@@ -72,7 +68,7 @@ function useForumChannelState(channelId: Channel["id"]): ChannelState {
         : store.getChannelState(channelId)!;
 }
 
-interface ComponentProps {
+interface ForumPostProps {
     className?: string;
     goToThread: (channel: Channel, _: boolean) => void;
     threadId: string;
@@ -82,16 +78,19 @@ interface ComponentProps {
 const useFirstMessage: (channel: Channel) => { loaded: boolean; firstMessage: Message | null } =
     findByCodeLazy("loaded:", "firstMessage:", "getChannel", "getMessage");
 
-const useFocusRing: () => { ref: Ref<unknown>; width: number; height: number | null } =
-    findByCodeLazy(/,\{ref:\i,width:\i,height:\i\}\}/);
+const useFocusRing: <T extends HTMLElement = HTMLElement>() => {
+    ref: Ref<T>;
+    width: number;
+    height: number | null;
+} = findByCodeLazy(/,\{ref:\i,width:\i,height:\i\}\}/);
 const useForumPostComposerStore: <T>(
     selector: (store: ForumPostComposerStore) => T,
     compareFn: CompareFn
 ) => T = findByCodeLazy("[useForumPostComposerStore]", ")}");
 
 const useForumPostEvents: (options: {
-    facepileRef: Ref<unknown>;
-    goToThread: ComponentProps["goToThread"];
+    facepileRef: Ref<HTMLElement>;
+    goToThread: ForumPostProps["goToThread"];
     channel: Channel;
 }) => {
     handleLeftClick: MouseEventHandler<unknown>;
@@ -111,8 +110,6 @@ const useForumPostMetadata: (options: {
     firstMedia: Record<string, unknown> | null;
     firstMediaIsEmbed: boolean;
 } = findByCodeLazy(/noStyleAndInteraction:\i=!0\}/);
-const getTitlePostprocessor: (query: string) => unknown = findByCodeLazy('type:"highlight"');
-const textHightlightParser = findByCodeLazy("hideSimpleEmbedContent:", "1!==");
 const getMessageContent = findByCodeLazy("#{intl::MESSAGE_PINNED}");
 const ForumPostUsername = findByCodeLazy("#{intl::FORUM_POST_AUTHOR_A11Y_LABEL}");
 const FacePile = findByCodeLazy("this.props.renderIcon");
@@ -122,7 +119,7 @@ const MediaMosaic = findByCodeLazy("mediaMosaicAltTextPopoutDescription");
 
 const cl = classNameFactory();
 
-function ForumPost({ className, goToThread, threadId, containerWidth }: ComponentProps) {
+function ForumPost({ className, goToThread, threadId, containerWidth }: ForumPostProps) {
     const channel = useStateFromStores([ChannelStore], () => ChannelStore.getChannel(threadId));
     const isOpen = useStateFromStores(
         [ChannelSectionStore],
@@ -131,7 +128,7 @@ function ForumPost({ className, goToThread, threadId, containerWidth }: Componen
     const { firstMessage } = useFirstMessage(channel);
     const { content, firstMedia } = useForumPostMetadata({ firstMessage });
     const { messageCountText: messageCount } = useMessageCount(channel);
-    const { ref: ringTarget, height } = useFocusRing();
+    const { ref: ringTarget, height } = useFocusRing<HTMLDivElement>();
     const setCardHeight = useForumPostComposerStore((store) => store.setCardHeight, deepEqual);
 
     useEffect(() => {
@@ -139,7 +136,7 @@ function ForumPost({ className, goToThread, threadId, containerWidth }: Componen
             setCardHeight(threadId, height);
         }
     }, [height, setCardHeight, threadId]);
-    const facepileRef = useRef(null);
+    const facepileRef = useRef<HTMLElement>(null);
 
     const { handleLeftClick, handleRightClick } = useForumPostEvents({
         facepileRef,
@@ -163,7 +160,7 @@ function ForumPost({ className, goToThread, threadId, containerWidth }: Componen
                     ringTarget,
                 }}
                 onContextMenu={handleRightClick}
-                aria-label={i18n.intl.formatToPlainString(i18n.t.pgYN6e, {
+                aria-label={getIntlMessage("FORUM_POST_ARIA_LABEL", {
                     title: channel.name,
                     count: messageCount,
                 })}
@@ -183,7 +180,7 @@ function ForumPost({ className, goToThread, threadId, containerWidth }: Componen
                     facepileRef={facepileRef}
                 ></ForumFooter>
             </div>
-            <ForumPostMedia firstMedia={firstMedia} />
+            {firstMedia && <ForumPostMedia firstMedia={firstMedia} />}
         </div>
     );
 }
@@ -191,7 +188,7 @@ function ForumPost({ className, goToThread, threadId, containerWidth }: Componen
 function ForumPostMedia({ firstMedia }) {
     return (
         <div className={classes.bodyMedia} onClick={(e) => e.stopPropagation()}>
-            {firstMedia && <MediaEmbed firstMedia={firstMedia} />}
+            <MediaEmbed firstMedia={firstMedia} />
         </div>
     );
 }
@@ -251,7 +248,7 @@ const ForumPostBody = LazyComponent(() =>
                     variant="text-sm/medium"
                     color="text-muted"
                 >
-                    {i18n.intl.string(i18n.t.Lkp2fH)}
+                    {getIntlMessage("FORUM_POST_BLOCKED_FIRST_MESSAGE")}
                 </Text>
             );
         else if (isIgnored)
@@ -261,7 +258,7 @@ const ForumPostBody = LazyComponent(() =>
                     variant="text-sm/medium"
                     color="text-muted"
                 >
-                    {i18n.intl.string(i18n.t.yWK7ZG)}
+                    {getIntlMessage("FORUM_POST_IGNORED_FIRST_MESSAGE")}
                 </Text>
             );
         else {
@@ -304,7 +301,7 @@ const ForumPostBody = LazyComponent(() =>
                     {!message
                         ? isLoading
                             ? null
-                            : i18n.intl.string(i18n.t.mE3KJC)
+                            : getIntlMessageFromHash("mE3KJC")
                         : contentPlaceholder}
                 </Text>
             );
@@ -325,29 +322,6 @@ const ForumPostBody = LazyComponent(() =>
         );
     })
 );
-
-function useTypingUsers(channelId: Channel["id"], limit: number = Number.MAX_SAFE_INTEGER) {
-    return useStateFromStores(
-        [UserStore, TypingStore, RelationshipStore],
-        () => {
-            const currentUserId = UserStore.getCurrentUser()?.id;
-            const typingUsers = TypingStore.getTypingUsers(channelId);
-            const users: string[] = [];
-            for (const userId in typingUsers) {
-                if (users.length >= limit) break;
-                const user = UserStore.getUser(userId);
-                if (
-                    user &&
-                    user.id !== currentUserId &&
-                    !(RelationshipStore as any).isBlockedOrIgnored(user.id)
-                )
-                    users.push(user.id);
-            }
-            return users;
-        },
-        [channelId, limit]
-    );
-}
 
 interface ForumFooterProps {
     channel: Channel;
@@ -420,18 +394,6 @@ interface ActiveUsersProps {
     facepileRef: any;
 }
 
-function useUsers(channel: Channel, userIds: string[]) {
-    const users = useStateFromStores([UserStore], () =>
-        userIds.map((id) => UserStore.getUser(id)).filter(Boolean)
-    );
-    const ref = useRef(() => {
-        users.forEach((user) => GuildMemberRequesterStore.requestMember(channel.guild_id, user.id));
-    });
-    useEffect(() => ref.current(), []);
-
-    return users;
-}
-
 function ActiveUsers({ channel, userIds, facepileRef }: ActiveUsersProps) {
     const users = useUsers(channel, userIds);
     return (
@@ -477,7 +439,7 @@ function Messages({ channel, iconSize, showReadState = false }: MessagesProps) {
                     color="text-brand"
                 >
                     {"(" +
-                        i18n.intl.format(i18n.t.z3PEtr, {
+                        getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
                             count: unreadCount,
                         }) +
                         ")"}
@@ -487,109 +449,16 @@ function Messages({ channel, iconSize, showReadState = false }: MessagesProps) {
     );
 }
 
-function getDefaultEmoji(channel: Channel) {
-    const emoji = (channel as any).defaultReactionEmoji;
-    if (!emoji) return null;
-
-    const customEmoji = useStateFromStores([EmojiStore], () =>
-        EmojiStore.getUsableCustomEmojiById(emoji.emojiId)
-    );
-
-    if (emoji.emojiId && customEmoji)
-        return {
-            id: emoji.emojiId,
-            name: customEmoji.name,
-            animated: customEmoji.animated,
-        };
-    if (emoji.emojiName)
-        return {
-            id: emoji.emojiId,
-            name: emoji.emojiName,
-            animated: false,
-        };
-
-    return null;
-}
-
-function useIsActiveChannelOrUnarchivableThread(channel: Channel | null) {
-    const canSendMessagesInThreads = useStateFromStores(
-        [PermissionStore],
-        () => !!channel && PermissionStore.can(1n << 38n, channel)
-    );
-    return (
-        !!channel &&
-        (!channel.isThread() ||
-            channel.isActiveThread() ||
-            (channel.isArchivedThread() &&
-                channel.threadMetadata?.locked !== true &&
-                canSendMessagesInThreads))
-    );
-}
-
-function useCheckPermissions(channel: Channel) {
-    const guildId = channel?.getGuildId();
-    const canChat = useStateFromStores(
-        [GuildVerificationStore],
-        () => !guildId || GuildVerificationStore.canChatInGuild(guildId),
-        [guildId]
-    );
-    const isLurking = useStateFromStores(
-        [LurkingStore],
-        () => !!guildId && LurkingStore.isLurking(guildId),
-        [guildId]
-    );
-    const isGuest = useStateFromStores(
-        [GuildMemberStore],
-        () => !!guildId && GuildMemberStore.isCurrentUserGuest(guildId),
-        [guildId]
-    );
-    const canAddNewReactions = useStateFromStores(
-        [PermissionStore],
-        () => canChat && PermissionStore.can(1n << 6n, channel),
-        [canChat, channel]
-    );
-    const isActiveChannelOrUnarchivableThread = useIsActiveChannelOrUnarchivableThread(channel);
-    if (!channel)
-        return {
-            disableReactionReads: true,
-            disableReactionCreates: true,
-            disableReactionUpdates: true,
-            isLurking: false,
-            isGuest: false,
-            isPendingMember: false,
-        };
-
-    const isPrivate = channel.isPrivate(),
-        isSystemDM = channel.isSystemDM(),
-        idk = (canChat || isPrivate) && isActiveChannelOrUnarchivableThread;
-
-    return {
-        disableReactionReads: false,
-        disableReactionCreates:
-            isLurking ||
-            isGuest ||
-            !idk ||
-            !(
-                (canAddNewReactions === true || isPrivate) &&
-                !isSystemDM &&
-                isActiveChannelOrUnarchivableThread
-            ),
-        disableReactionUpdates: isLurking || isGuest || !idk,
-        isLurking,
-        isGuest,
-        isPendingMember: false,
-    };
-}
-
 interface ReactionProps {
     firstMessage: Message;
     channel: Channel;
 }
 function EmptyReaction({ firstMessage, channel }: ReactionProps) {
-    const forumChannel = useStateFromStores([ChannelStore], () =>
-        ChannelStore.getChannel(channel.parent_id)
+    const forumChannel = useStateFromStores(
+        [ChannelStore],
+        () => ChannelStore.getChannel(channel.parent_id) as ForumChannel
     );
-    const defaultEmoji = getDefaultEmoji(forumChannel);
+    const defaultEmoji = useDefaultEmoji(forumChannel);
     const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
 
     if (!defaultEmoji || disableReactionCreates) return null;
@@ -670,7 +539,7 @@ function ForumBody({
                         {isNew && (
                             <span className={classes.newBadgeWrapper}>
                                 <span className={classes.newBadge}>
-                                    {i18n.intl.string(i18n.t.y2b7CA)}
+                                    {getIntlMessageFromHash("y2b7CA")}
                                 </span>
                             </span>
                         )}
@@ -768,27 +637,6 @@ function ForumPostHeader({ channel, isNew, tagsClassName, className }: { channel
             ))}
             {moreTagsCount > 0 && <MoreTags tags={remainingTags} count={moreTagsCount} size={0} />}
         </div>
-    );
-}
-
-function useChannelName(channel: Channel) {
-    const hasSearchResults = useStateFromStores([ForumSearchStore], () =>
-        ForumSearchStore.getHasSearchResults(channel.parent_id)
-    );
-
-    const searchQuery = useStateFromStores([ForumSearchStore], () =>
-        ForumSearchStore.getSearchQuery(channel.parent_id)
-    );
-
-    const postProcessor = useMemo(
-        () => getTitlePostprocessor(hasSearchResults && searchQuery ? searchQuery : ""),
-        [hasSearchResults, searchQuery]
-    );
-
-    return React.useMemo(
-        () =>
-            textHightlightParser({ content: channel.name, embeds: [] }, { postProcessor }).content,
-        [channel.name, postProcessor]
     );
 }
 
