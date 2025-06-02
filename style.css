@@ -1,5 +1,5 @@
 .vc-better-forums-thread {
-    gap: var(--space-xs);
+    gap: var(--space-10);
     padding: var(--space-sm);
     background-color: var(--background-base-low);
     border: 1px solid var(--border-subtle);
@@ -43,12 +43,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--space-4);
+    gap: var(--space-xxs);
     padding: 2px 6px;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-subtle);
     background: var(--button-secondary-background);
-    color: var(--text-muted);
+    color: var(--text-secondary);
     text-transform: uppercase;
     height: var(--size-md);
     letter-spacing: 0.02rem;
@@ -60,10 +60,6 @@
     object-fit: contain;
 }
 
-.vc-better-forums-message-block {
-    margin-bottom: var(--space-xxs);
-}
-
 .vc-better-forums-message-block-content {
     color: inherit;
     font: inherit;
@@ -72,4 +68,31 @@
 
 .vc-better-forums-reaction-button {
     margin: 0;
+    display: flex;
+
+    :has(> &) {
+        display: flex;
+    }
+}
+
+.vc-better-forums-footer-section {
+    display: flex;
+    align-items: center;
+    padding: var(--size-xs);
+    gap: var(--space-xxs);
+    border-radius: var(--radius-sm);
+    background-color: var(--background-mod-subtle);
+    color: var(--text-secondary);
+}
+
+.vc-better-forums-latest-message,
+.vc-better-forum-latest-message-content {
+    flex-grow: 1;
+}
+
+.vc-better-forums-unread {
+    color: var(--text-brand);
+    background-color: var(--opacity-blurple-24);
+    outline: 1px solid var(--blurple-50);
+    outline-offset: -1px;
 }

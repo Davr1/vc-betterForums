@@ -4,13 +4,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { getIntlMessage } from "@utils/discord";
 import { findComponentByCodeLazy } from "@webpack";
-import { Flex } from "@webpack/common";
+import { Flex, Text, useStateFromStores } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
 
-import { ThreadChannel, useTypingUsers } from "../utils";
-import { ActiveUsers } from "./ActiveUsers";
-import { Message as MessageComponent } from "./Message";
+import { cl } from "..";
+import { ThreadMessageStore } from "../stores";
+import { ThreadChannel, useMessageCount, useTypingUsers } from "../utils";
+import { ChatIcon, UsersIcon } from "./icons";
 import { DefaultReaction, Reaction } from "./Reaction";
 
 interface TypingIndicatorProps {
@@ -41,15 +43,51 @@ export function ForumPostFooter({ channel, facepileRef, firstMessage }: ForumPos
     const typingUsers = useTypingUsers(channel.id);
     const hasReactions = firstMessage?.reactions && firstMessage.reactions.length > 0;
 
+    const mostRecentMessage = useStateFromStores(
+        [ThreadMessageStore],
+        () => ThreadMessageStore.getMostRecentMessage(channel.id) ?? firstMessage
+    );
+    const { messageCountText, unreadCount } = useMessageCount(channel);
+
     return (
         <Flex className="vc-better-forums-footer">
+            <ForumPostFooterSection>
+                <UsersIcon />
+                <Text variant="text-sm/semibold" color="currentColor">
+                    7
+                </Text>
+            </ForumPostFooterSection>
+            <ForumPostFooterSection
+                className={cl("vc-better-forums-latest-message", {
+                    "vc-better-forums-unread": unreadCount,
+                })}
+            >
+                <ChatIcon />
+                <Text variant="text-sm/semibold" color="currentColor">
+                    {messageCountText}
+                </Text>
+                <Text
+                    variant="text-sm/semibold"
+                    color="currentColor"
+                    className="vc-better-forum-latest-message-content"
+                >
+                    {mostRecentMessage?.author.username}: {mostRecentMessage?.content}
+                </Text>
+                {unreadCount && (
+                    <Text variant="text-sm/semibold" color="text-brand">
+                        {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
+                            count: unreadCount,
+                        })}
+                    </Text>
+                )}
+            </ForumPostFooterSection>
             {hasReactions || !firstMessage ? null : (
                 <DefaultReaction firstMessage={firstMessage} channel={channel} />
             )}
             {!firstMessage ? null : <Reaction firstMessage={firstMessage} channel={channel} />}
-            <MessageComponent channel={channel} iconSize={14} />
-            <span className={"bullet"}>•</span>
-            {typingUsers.length > 0 && (
+            {/* <MessageComponent channel={channel} iconSize={14} /> */}
+            {/* <span className={"bullet"}>•</span> */}
+            {/* {typingUsers.length > 0 && (
                 <div className={"typing"}>
                     <ActiveUsers
                         channel={channel}
@@ -61,7 +99,16 @@ export function ForumPostFooter({ channel, facepileRef, firstMessage }: ForumPos
                     </div>
                     <TypingText channel={channel} className={"typingUsers"} renderDots={false} />
                 </div>
-            )}
+            )} */}
         </Flex>
     );
+}
+
+interface ForumPostFooterSectionProps {
+    children?: React.ReactNode;
+    className?: string;
+}
+
+function ForumPostFooterSection({ children, className }: ForumPostFooterSectionProps) {
+    return <div className={cl("vc-better-forums-footer-section", className)}>{children}</div>;
 }

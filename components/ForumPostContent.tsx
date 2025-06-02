@@ -91,7 +91,7 @@ export const ForumPostContent = LazyComponent(() =>
 
         return (
             <div className="vc-better-forums-message-block">
-                <Text variant="text-sm/normal" color="text-muted" lineClamp={3}>
+                <Text variant="text-sm/normal" color="text-secondary" lineClamp={3}>
                     {messageContent}
                 </Text>
             </div>
