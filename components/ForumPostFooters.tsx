@@ -91,10 +91,7 @@ const ForumPostMembersSection = memoizedComponent<ForumPostMembersSectionProps>(
                     guildId={channel.getGuildId()}
                     userIds={channel.memberIdsPreview}
                     size={16}
-                    renderIcon
-                    renderMoreUsers={(_, a) => <div>{a}</div>}
-                    hideMoreUsers={false}
-                    max={10}
+                    count={channel.memberCount}
                 />
             </ForumPostFooterSection>
         );

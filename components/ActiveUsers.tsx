@@ -27,11 +27,24 @@ interface FacePileProps {
 
 const FacePile = findComponentByCodeLazy<FacePileProps>("this.props.renderIcon");
 
-interface AvatarPileProps extends Omit<FacePileProps, "users"> {
+interface AvatarPileProps extends Omit<FacePileProps, "users" | "renderMoreUsers"> {
     userIds: User["id"][];
 }
 
-export function AvatarPile({ guildId, userIds, max, ...props }: AvatarPileProps) {
-    const users = useUsers(guildId, userIds.slice(0, max));
-    return <FacePile guildId={guildId} users={users} max={max} count={userIds.length} {...props} />;
+function renderMoreUsers(text: string) {
+    return <div className="vc-better-forums-extra-member-count">{text}</div>;
+}
+
+export function AvatarPile({ guildId, userIds, max = 99, ...props }: AvatarPileProps) {
+    const users = useUsers(guildId, userIds.slice(0, 5));
+    return (
+        <FacePile
+            guildId={guildId}
+            users={users}
+            max={max}
+            count={userIds.length}
+            renderMoreUsers={renderMoreUsers}
+            {...props}
+        />
+    );
 }

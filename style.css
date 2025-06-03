@@ -99,6 +99,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-right: 2px;
 }
 
 .vc-better-forums-unread {
@@ -111,4 +112,18 @@
 .vc-better-forums-icon {
     flex-shrink: 0;
     object-fit: contain;
+}
+
+.vc-better-forums-extra-member-count {
+    background-color: var(--background-base-lower);
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 18px;
+    padding-inline: 4px;
+    border-radius: var(--radius-round);
+    overflow: hidden;
+    font-weight: 700;
+    line-height: 0;
 }
