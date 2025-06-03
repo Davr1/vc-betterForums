@@ -29,7 +29,7 @@ export function ForumPostTags({ channel, isNew, tagsClassName }: ForumPostTagsPr
             {shownTags.map(tag => (
                 <Tag
                     tag={tag}
-                    className={cl("vc-better-forums-tag", tagsClassName, {
+                    className={cl(tagsClassName, {
                         "vc-better-forums-tag-filtered": tagFilter.has(tag.id),
                     })}
                     key={tag.id}

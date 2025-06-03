@@ -74,6 +74,24 @@ interface GuildVerificationStore extends FluxStore {
     canChatInGuild(guildId: Guild["id"]): boolean;
 }
 
+interface BasicUser {
+    userId: User["id"];
+    displayName: User["username"];
+    canViewChannel?: boolean;
+}
+
+interface Section {
+    sectionId: "online" | "offline" | (string & {});
+    userIds: BasicUser["userId"][];
+    usersById: Record<BasicUser["userId"], BasicUser>;
+}
+
+interface ThreadMemberListStore extends FluxStore {
+    getMemberListSections(
+        channelId: Channel["id"]
+    ): Record<Section["sectionId"], Section> | undefined;
+}
+
 export enum LayoutType {
     DEFAULT = 0,
     LIST = 1,
@@ -130,3 +148,5 @@ export const LurkingStore: LurkingStore = findStoreLazy("LurkingStore");
 export const RelationshipStore: RelationshipStore = findStoreLazy("RelationshipStore");
 export const GuildMemberStore: GuildMemberStore = findStoreLazy("GuildMemberStore");
 export const PermissionStore: PermissionStore = findStoreLazy("PermissionStore");
+export const ChannelMemberCountStore = findStoreLazy("ChannelMemberCountStore");
+export const ThreadMemberListStore: ThreadMemberListStore = findStoreLazy("ThreadMemberListStore");

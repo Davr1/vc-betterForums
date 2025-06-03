@@ -7,14 +7,7 @@
 import { getIntlMessage } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
 import { findByCodeLazy } from "@webpack";
-import {
-    ChannelStore,
-    Clickable,
-    Flex,
-    useEffect,
-    useRef,
-    useStateFromStores,
-} from "@webpack/common";
+import { ChannelStore, Clickable, Flex, useEffect, useStateFromStores } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
 
 import { cl } from "..";
@@ -45,7 +38,7 @@ const useForumPostComposerStore: <T>(
 ) => T = findByCodeLazy("[useForumPostComposerStore]", ")}");
 
 const useForumPostEvents: (options: {
-    facepileRef: React.Ref<HTMLElement>;
+    facepileRef?: React.Ref<HTMLElement>;
     goToThread: ForumPostProps["goToThread"];
     channel: Channel;
 }) => {
@@ -82,9 +75,10 @@ export const ForumPost = LazyComponent(
                 () =>
                     ChannelSectionStore.getCurrentSidebarChannelId(channel.parent_id) === channel.id
             );
+
             const { firstMessage } = useFirstMessage(channel);
             const { content, firstMedia } = useForumPostMetadata({ firstMessage });
-            const { messageCountText: messageCount } = useMessageCount(channel);
+            const { messageCountText } = useMessageCount(channel.id);
             const { ref: ringTarget, height } = useFocusRing<HTMLDivElement>();
             const setCardHeight = useForumPostComposerStore(
                 store => store.setCardHeight,
@@ -97,12 +91,10 @@ export const ForumPost = LazyComponent(
                 }
             }, [height, setCardHeight, threadId]);
 
-            const facepileRef = useRef<HTMLDivElement>(null);
-
             const { handleLeftClick, handleRightClick } = useForumPostEvents({
-                facepileRef,
                 goToThread,
                 channel,
+                facepileRef: () => {},
             });
 
             return (
@@ -122,7 +114,7 @@ export const ForumPost = LazyComponent(
                         onContextMenu={handleRightClick}
                         aria-label={getIntlMessage("FORUM_POST_ARIA_LABEL", {
                             title: channel.name,
-                            count: messageCount,
+                            count: messageCountText,
                         })}
                         style={{ display: "none" }}
                     />
@@ -135,11 +127,7 @@ export const ForumPost = LazyComponent(
                         />
                         {firstMedia && <ForumPostMedia {...firstMedia} />}
                     </Flex>
-                    <ForumPostFooter
-                        channel={channel}
-                        firstMessage={firstMessage}
-                        facepileRef={facepileRef}
-                    />
+                    <ForumPostFooter channel={channel} firstMessage={firstMessage} />
                 </Flex>
             );
         }

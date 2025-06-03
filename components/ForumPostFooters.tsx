@@ -11,7 +11,8 @@ import { Channel, Message } from "discord-types/general";
 
 import { cl } from "..";
 import { ThreadMessageStore } from "../stores";
-import { ThreadChannel, useMessageCount, useTypingUsers } from "../utils";
+import { memoizedComponent, ThreadChannel, useMessageCount, useTypingUsers } from "../utils";
+import { AvatarPile } from "./ActiveUsers";
 import { ChatIcon, UsersIcon } from "./icons";
 import { DefaultReaction, Reaction } from "./Reaction";
 
@@ -35,71 +36,22 @@ const TypingText = findComponentByCodeLazy<TypingTextProps>("getTypingUsers", "I
 
 interface ForumPostFooterProps {
     channel: ThreadChannel;
-    facepileRef: React.Ref<HTMLDivElement>;
     firstMessage: Message | null;
 }
 
-export function ForumPostFooter({ channel, facepileRef, firstMessage }: ForumPostFooterProps) {
-    const typingUsers = useTypingUsers(channel.id);
+export function ForumPostFooter({ channel, firstMessage }: ForumPostFooterProps) {
     const hasReactions = firstMessage?.reactions && firstMessage.reactions.length > 0;
-
-    const mostRecentMessage = useStateFromStores(
-        [ThreadMessageStore],
-        () => ThreadMessageStore.getMostRecentMessage(channel.id) ?? firstMessage
-    );
-    const { messageCountText, unreadCount } = useMessageCount(channel);
 
     return (
         <Flex className="vc-better-forums-footer">
-            <ForumPostFooterSection>
-                <UsersIcon />
-                <Text variant="text-sm/semibold" color="currentColor">
-                    7
-                </Text>
-            </ForumPostFooterSection>
-            <ForumPostFooterSection
-                className={cl("vc-better-forums-latest-message", {
-                    "vc-better-forums-unread": unreadCount,
-                })}
-            >
-                <ChatIcon />
-                <Text variant="text-sm/semibold" color="currentColor">
-                    {messageCountText}
-                </Text>
-                <Text
-                    variant="text-sm/semibold"
-                    color="currentColor"
-                    className="vc-better-forum-latest-message-content"
-                >
-                    {mostRecentMessage?.author.username}: {mostRecentMessage?.content}
-                </Text>
-                {unreadCount && (
-                    <Text variant="text-sm/semibold" color="text-brand">
-                        {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
-                            count: unreadCount,
-                        })}
-                    </Text>
-                )}
-            </ForumPostFooterSection>
+            <ForumPostMembersSection channel={channel} />
+            <ForumPostLatestMessageSection channel={channel} />
             {hasReactions || !firstMessage ? null : (
                 <DefaultReaction firstMessage={firstMessage} channel={channel} />
             )}
             {!firstMessage ? null : <Reaction firstMessage={firstMessage} channel={channel} />}
             {/* <MessageComponent channel={channel} iconSize={14} /> */}
             {/* <span className={"bullet"}>•</span> */}
-            {/* {typingUsers.length > 0 && (
-                <div className={"typing"}>
-                    <ActiveUsers
-                        channel={channel}
-                        userIds={typingUsers}
-                        facepileRef={facepileRef}
-                    />
-                    <div className={"dots"}>
-                        <ThreeDots themed dotRadius={2} />
-                    </div>
-                    <TypingText channel={channel} className={"typingUsers"} renderDots={false} />
-                </div>
-            )} */}
         </Flex>
     );
 }
@@ -107,8 +59,92 @@ export function ForumPostFooter({ channel, facepileRef, firstMessage }: ForumPos
 interface ForumPostFooterSectionProps {
     children?: React.ReactNode;
     className?: string;
+    icon?: React.ReactNode;
+    text?: string;
 }
 
-function ForumPostFooterSection({ children, className }: ForumPostFooterSectionProps) {
-    return <div className={cl("vc-better-forums-footer-section", className)}>{children}</div>;
+function ForumPostFooterSection({ children, className, icon, text }: ForumPostFooterSectionProps) {
+    return (
+        <div className={cl("vc-better-forums-footer-section", className)}>
+            {icon}
+            <Text
+                variant="text-sm/semibold"
+                color="currentColor"
+                className="vc-better-forums-footer-section-text"
+            >
+                {text}
+            </Text>
+            {children}
+        </div>
+    );
 }
+
+interface ForumPostMembersSectionProps {
+    channel: ThreadChannel;
+}
+
+const ForumPostMembersSection = memoizedComponent<ForumPostMembersSectionProps>(
+    function ForumPostMembersSection({ channel }) {
+        return (
+            <ForumPostFooterSection icon={<UsersIcon />} text={channel.memberCount.toString()}>
+                <AvatarPile
+                    guildId={channel.getGuildId()}
+                    userIds={channel.memberIdsPreview}
+                    size={16}
+                    renderIcon
+                    renderMoreUsers={(_, a) => <div>{a}</div>}
+                    hideMoreUsers={false}
+                    max={10}
+                />
+            </ForumPostFooterSection>
+        );
+    }
+);
+
+interface ForumPostLatestMessageSectionProps {
+    channel: ThreadChannel;
+}
+
+const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSectionProps>(
+    function ForumPostLatestMessageSection({ channel }) {
+        const mostRecentMessage = useStateFromStores([ThreadMessageStore], () =>
+            ThreadMessageStore.getMostRecentMessage(channel.id)
+        );
+        const { messageCountText, unreadCount, unreadCountText } = useMessageCount(channel.id);
+        const typingUsers = useTypingUsers(channel.id);
+
+        return (
+            <ForumPostFooterSection
+                className={cl("vc-better-forums-latest-message", {
+                    "vc-better-forums-unread": unreadCount,
+                })}
+                icon={<ChatIcon />}
+                text={messageCountText}
+            >
+                <Text
+                    variant="text-sm/semibold"
+                    color="currentColor"
+                    className="vc-better-forum-latest-message-content"
+                >
+                    {mostRecentMessage?.author.username}: {mostRecentMessage?.content}
+                </Text>
+                {unreadCount !== null && (
+                    <Text variant="text-sm/semibold" color="text-brand">
+                        {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
+                            count: unreadCountText,
+                        })}
+                    </Text>
+                )}
+                {typingUsers.length > 0 && (
+                    <div className={"typing"}>
+                        <AvatarPile guildId={channel.getGuildId()} userIds={typingUsers} />
+                        <div className={"dots"}>
+                            <ThreeDots themed dotRadius={2} />
+                        </div>
+                        <TypingText channel={channel} className={"typingUsers"} renderDots={true} />
+                    </div>
+                )}
+            </ForumPostFooterSection>
+        );
+    }
+);

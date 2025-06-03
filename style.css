@@ -30,6 +30,7 @@
 .vc-better-forums-thread-header,
 .vc-better-forums-footer {
     gap: var(--space-6);
+    min-width: 0;
 }
 
 .vc-better-forums-thread-title-container {
@@ -88,6 +89,16 @@
 .vc-better-forums-latest-message,
 .vc-better-forum-latest-message-content {
     flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vc-better-forums-footer-section-text {
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .vc-better-forums-unread {
@@ -95,4 +106,9 @@
     background-color: var(--opacity-blurple-24);
     outline: 1px solid var(--blurple-50);
     outline-offset: -1px;
+}
+
+.vc-better-forums-icon {
+    flex-shrink: 0;
+    object-fit: contain;
 }

@@ -5,7 +5,7 @@
  */
 
 import { findComponentByCodeLazy } from "@webpack";
-import { Channel, Guild, User } from "discord-types/general";
+import { Guild, User } from "discord-types/general";
 
 import { useUsers } from "../utils";
 
@@ -16,7 +16,7 @@ interface FacePileProps {
     count?: number;
     max?: number;
     hideMoreUsers?: boolean;
-    renderMoreUsers?: boolean;
+    renderMoreUsers?: (text: string, extraCount: number) => React.ReactNode;
     showDefaultAvatarsForNullUsers?: boolean;
     size?: 16 | 24 | 32 | 56;
     showUserPopout?: boolean;
@@ -27,26 +27,11 @@ interface FacePileProps {
 
 const FacePile = findComponentByCodeLazy<FacePileProps>("this.props.renderIcon");
 
-interface ActiveUsersProps {
-    channel: Channel;
+interface AvatarPileProps extends Omit<FacePileProps, "users"> {
     userIds: User["id"][];
-    facepileRef: React.Ref<HTMLDivElement>;
 }
 
-export function ActiveUsers({ channel, userIds, facepileRef }: ActiveUsersProps) {
-    const users = useUsers(channel, userIds);
-    return (
-        <div ref={facepileRef}>
-            <FacePile
-                className={"__invalid_facepile"}
-                showDefaultAvatarsForNullUsers={true}
-                guildId={channel.getGuildId()}
-                users={users}
-                max={5}
-                size={16}
-                hideMoreUsers={true}
-                showUserPopout={true}
-            />
-        </div>
-    );
+export function AvatarPile({ guildId, userIds, max, ...props }: AvatarPileProps) {
+    const users = useUsers(guildId, userIds.slice(0, max));
+    return <FacePile guildId={guildId} users={users} max={max} count={userIds.length} {...props} />;
 }

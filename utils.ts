@@ -6,6 +6,7 @@
 
 import { getIntlMessage } from "@utils/discord";
 import { runtimeHashMessageKey } from "@utils/intlHash";
+import { LazyComponent } from "@utils/lazyReact";
 import { findByCodeLazy } from "@webpack";
 import {
     ChannelStore,
@@ -46,8 +47,23 @@ export interface ForumChannel extends Channel {
     availableTags: Tag[] | null;
 }
 
+interface ThreadMetadata {
+    archived: boolean;
+    autoArchiveDuration: number;
+    archiveTimestamp: string;
+    createTimestamp: string;
+    locked: boolean;
+    invitable: boolean;
+}
+
 export interface ThreadChannel extends Channel {
     appliedTags: Tag["id"][] | null;
+    memberIdsPreview: User["id"][];
+    memberCount: number;
+    messageCount: number;
+    totalMessageSent: number;
+    name: string;
+    threadMetadata: ThreadMetadata;
     isArchivedLockedThread(): boolean;
 }
 
@@ -58,48 +74,50 @@ type TimeFormatterOptions = Record<
 const timeFormatter: (timestamp: number | null, options?: () => TimeFormatterOptions) => string =
     findByCodeLazy('"minutes",1');
 
-export function formatMessageCount(count: number) {
+function formatMessageCount(count: number) {
     count = Math.max(0, count);
     return count >= 50 ? "50+" : count >= 1e5 ? "100k+" : `${count}`;
 }
 
-interface MessageCount {
-    messageCount: number;
-    isMaxMessageCount: boolean;
-    messageCountText: string;
-    unreadCount: string | number | null;
+function formatUnreadCount(count: number | undefined | null, totalCount: number): string {
+    if (typeof count !== "number") return "1+";
+
+    count = Math.min(count, totalCount);
+    return count >= 25 ? "25+" : `${count}`;
 }
 
-export function useMessageCount(channel: Channel): MessageCount {
+interface MessageCount {
+    messageCount: number;
+    messageCountText: string;
+    unreadCount: number | null;
+    unreadCountText: string | number | null;
+}
+
+export function useMessageCount(channelId: Channel["id"]): MessageCount {
     const messageCount = useStateFromStores(
         [ThreadMessageStore],
-        () => ThreadMessageStore.getCount(channel.id) ?? 0
+        () => ThreadMessageStore.getCount(channelId) ?? 0
     );
-    const messageCountText = formatMessageCount(messageCount);
-    const unread = useStateFromStores(
+
+    const hasUnreads = useStateFromStores(
         [ReadStateStore],
         () =>
-            ReadStateStore.hasTrackedUnread(channel.id) &&
-            ReadStateStore.hasOpenedThread(channel.id) &&
-            !!ReadStateStore.getTrackedAckMessageId(channel.id)
+            ReadStateStore.hasTrackedUnread(channelId) &&
+            ReadStateStore.hasOpenedThread(channelId) &&
+            !!ReadStateStore.getTrackedAckMessageId(channelId)
     );
 
-    const unreadCount = useStateFromStores([ForumPostUnreadCountStore], () => {
-        if (!unread) return null;
+    const unreadCount = useStateFromStores([ForumPostUnreadCountStore], () =>
+        hasUnreads ? ForumPostUnreadCountStore.getCount(channelId) ?? null : null
+    );
 
-        const count = ForumPostUnreadCountStore.getCount(channel.id);
-        if (!count) return "1+";
+    const messageCountText = useMemo(() => formatMessageCount(messageCount), [messageCount]);
+    const unreadCountText = useMemo(
+        () => (hasUnreads ? formatUnreadCount(unreadCount, messageCount) : null),
+        [hasUnreads, messageCount, unreadCount]
+    );
 
-        const realCount = Math.min(count, messageCount);
-        return realCount >= 25 ? "25+" : realCount;
-    });
-
-    return {
-        messageCount,
-        isMaxMessageCount: !!messageCount && `${messageCount}` !== messageCountText,
-        messageCountText,
-        unreadCount,
-    };
+    return { messageCount, messageCountText, unreadCount, unreadCountText };
 }
 
 interface ForumPostState {
@@ -241,14 +259,12 @@ export function useTypingUsers(
     );
 }
 
-export function useUsers(channel: Channel, userIds: User["id"][]) {
+export function useUsers(guildId: Guild["id"], userIds: User["id"][]) {
     const users = useStateFromStores([UserStore], () =>
         userIds.map(UserStore.getUser).filter(Boolean)
     );
     useEffect(() => {
-        users.forEach(user => {
-            GuildMemberRequesterStore.requestMember(channel.guild_id, user.id);
-        });
+        userIds.forEach(user => GuildMemberRequesterStore.requestMember(guildId, user));
     }, []);
 
     return users;
@@ -452,4 +468,10 @@ export function useForumChannelState(channelId: Channel["id"]): ChannelState {
               tagSetting: TagSetting.MATCH_SOME,
           }
         : ForumChannelStore.getChannelState(channelId)!;
+}
+
+export function memoizedComponent<TProps extends object = {}>(
+    component: React.ComponentType<TProps>
+) {
+    return LazyComponent(() => React.memo(component));
 }

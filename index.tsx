@@ -34,6 +34,13 @@ export default definePlugin({
                 replace: "$&;$self.ForumChannelStore=$2",
             },
         },
+        {
+            find: "findUserIdSortedPosition",
+            replacement: {
+                match: /getSubscribedThreadIds\(\),\i=!1/,
+                replace: "$&;return false;",
+            },
+        },
     ],
     ForumPost,
     set ForumChannelStore(value: () => ForumChannelStore) {

@@ -18,7 +18,7 @@ interface MessageProps {
 }
 
 export function Message({ channel, iconSize, showReadState = false }: MessageProps) {
-    const { messageCountText, unreadCount } = useMessageCount(channel);
+    const { messageCountText, unreadCount, unreadCountText } = useMessageCount(channel.id);
     return (
         <div
             className={cl("messageCountBox", {
@@ -40,7 +40,7 @@ export function Message({ channel, iconSize, showReadState = false }: MessagePro
                 <Text className={"newMessageCount"} variant="text-sm/semibold" color="text-brand">
                     {"(" +
                         getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
-                            count: unreadCount,
+                            count: unreadCountText,
                         }) +
                         ")"}
                 </Text>
