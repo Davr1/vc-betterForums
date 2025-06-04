@@ -79,6 +79,10 @@ function ForumPostFooterSection({ children, className, icon, text }: ForumPostFo
     );
 }
 
+function ForumPostSpacerSection() {
+    return <div className="vc-better-forums-spacer" />;
+}
+
 interface ForumPostMembersSectionProps {
     channel: ThreadChannel;
 }
@@ -107,8 +111,12 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
         const mostRecentMessage = useStateFromStores([ThreadMessageStore], () =>
             ThreadMessageStore.getMostRecentMessage(channel.id)
         );
-        const { messageCountText, unreadCount, unreadCountText } = useMessageCount(channel.id);
+        const { messageCount, messageCountText, unreadCount, unreadCountText } = useMessageCount(
+            channel.id
+        );
         const typingUsers = useTypingUsers(channel.id);
+
+        if (messageCount === 0) return <ForumPostSpacerSection />;
 
         return (
             <ForumPostFooterSection

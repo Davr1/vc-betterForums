@@ -141,3 +141,7 @@
     max-height: var(--forum-post-thumbnail-size);
     max-width: var(--forum-post-thumbnail-size);
 }
+
+.vc-better-forums-spacer {
+    flex-grow: 1;
+}

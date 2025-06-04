@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { memoizedComponent } from "userplugins/betterForums/utils";
-
 import { cl } from "..";
+import { memoizedComponent } from "../utils";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
     size?: number;
