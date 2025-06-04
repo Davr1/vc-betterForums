@@ -127,3 +127,17 @@
     font-weight: 700;
     line-height: 0;
 }
+
+.vc-better-forums-thumbnail-override {
+    object-fit: cover;
+    max-height: var(--forum-post-thumbnail-size);
+    max-width: var(--forum-post-thumbnail-size);
+    border-radius: var(--radius-sm);
+}
+
+.vc-better-forums-thumbnail-container {
+    --forum-post-thumbnail-size: 72px;
+
+    max-height: var(--forum-post-thumbnail-size);
+    max-width: var(--forum-post-thumbnail-size);
+}

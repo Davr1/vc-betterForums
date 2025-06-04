@@ -58,8 +58,8 @@ export function ForumPostMedia({ src, width, height, alt, srcIsAnimated }: Forum
                 alt={alt}
                 animated={isAnimated && isFocused}
                 srcIsAnimated={srcIsAnimated}
-                containerClassName={"thumbnailContainer"}
-                imageClassName={"thumbnailOverride"}
+                containerClassName="vc-better-forums-thumbnail-container"
+                imageClassName="vc-better-forums-thumbnail-override"
             />
         </div>
     );
