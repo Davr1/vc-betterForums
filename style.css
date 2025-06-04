@@ -38,6 +38,7 @@
     flex-grow: 0;
     gap: var(--space-xs);
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .vc-better-forums-tag {

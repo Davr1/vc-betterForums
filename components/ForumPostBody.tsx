@@ -5,7 +5,7 @@
  */
 
 import { findComponentByCodeLazy } from "@webpack";
-import { Flex, Heading, useStateFromStores } from "@webpack/common";
+import { Flex, Heading, Text, useStateFromStores } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
 
 import { RelationshipStore } from "../stores";
@@ -58,10 +58,9 @@ export function ForumPostBody({
                 <Heading
                     variant="heading-lg/semibold"
                     color="header-primary"
-                    lineClamp={2}
                     className="vc-better-forums-thread-title-container"
                 >
-                    {channelName}
+                    <Text lineClamp={2}>{channelName}</Text>
                     <ForumPostTags channel={channel} isNew={isNew} />
                     {/* {isNew && (
                             <span className={"newBadgeWrapper"}>
