@@ -14,7 +14,7 @@ import { ThreadMessageStore } from "../stores";
 import { memoizedComponent, ThreadChannel, useMessageCount, useTypingUsers } from "../utils";
 import { AvatarPile } from "./ActiveUsers";
 import { ChatIcon, UsersIcon } from "./icons";
-import { DefaultReaction, Reaction } from "./Reaction";
+import { DefaultReaction, Reactions } from "./Reaction";
 import { Username } from "./Username";
 
 interface TypingIndicatorProps {
@@ -47,10 +47,12 @@ export function ForumPostFooter({ channel, firstMessage }: ForumPostFooterProps)
         <Flex className="vc-better-forums-footer">
             <ForumPostMembersSection channel={channel} />
             <ForumPostLatestMessageSection channel={channel} />
-            {hasReactions || !firstMessage ? null : (
-                <DefaultReaction firstMessage={firstMessage} channel={channel} />
-            )}
-            {!firstMessage ? null : <Reaction firstMessage={firstMessage} channel={channel} />}
+            {firstMessage &&
+                (hasReactions ? (
+                    <Reactions firstMessage={firstMessage} channel={channel} />
+                ) : (
+                    <DefaultReaction firstMessage={firstMessage} channel={channel} />
+                ))}
             {/* <MessageComponent channel={channel} iconSize={14} /> */}
             {/* <span className={"bullet"}>•</span> */}
         </Flex>

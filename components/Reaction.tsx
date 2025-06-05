@@ -5,7 +5,7 @@
  */
 
 import { findComponentByCodeLazy } from "@webpack";
-import { ChannelStore, useStateFromStores } from "@webpack/common";
+import { ChannelStore, useMemo, useStateFromStores } from "@webpack/common";
 import { Message, MessageReaction } from "discord-types/general";
 
 import { ForumChannel, ThreadChannel, useCheckPermissions, useDefaultEmoji } from "../utils";
@@ -74,11 +74,29 @@ export function DefaultReaction({ firstMessage, channel }: ReactionProps) {
     );
 }
 
-export function Reaction({ firstMessage, channel }: ReactionProps) {
-    const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
-    const reactions = firstMessage.reactions.slice(0, 3) as MessageReactionWithBurst[];
+function useTopReaction(message: Message) {
+    return useMemo(() => {
+        let topCount = 0;
+        let topReaction: MessageReactionWithBurst | null = null;
 
-    return reactions.map(reaction => (
+        for (const reaction of message.reactions as MessageReactionWithBurst[]) {
+            const count = Math.max(reaction.count, reaction.burst_count);
+            if (topReaction && count < topCount) continue;
+
+            topReaction = reaction;
+            topCount = count;
+        }
+
+        return topReaction;
+    }, [message?.reactions]);
+}
+
+export function Reactions({ firstMessage, channel }: ReactionProps) {
+    const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
+    const reaction = useTopReaction(firstMessage);
+    if (!reaction) return null;
+
+    return (
         <ReactionButton
             {...reactionButtonDefaultProps}
             message={firstMessage}
@@ -89,5 +107,5 @@ export function Reaction({ firstMessage, channel }: ReactionProps) {
             key={reaction.emoji.id}
             {...reaction}
         />
-    ));
+    );
 }

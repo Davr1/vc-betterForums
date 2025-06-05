@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { ErrorBoundary } from "@components/index";
 import { getIntlMessage } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
 import { findByCodeLazy } from "@webpack";
@@ -98,37 +99,39 @@ export const ForumPost = LazyComponent(
             });
 
             return (
-                <Flex
-                    ref={ringTarget}
-                    data-item-id={threadId}
-                    onClick={handleLeftClick}
-                    onContextMenu={handleRightClick}
-                    direction={Flex.Direction.VERTICAL}
-                    className={cl("vc-better-forums-thread", {
-                        "vc-better-forums-thread-open": isOpen,
-                    })}
-                >
-                    <ClickableWithRing
+                <ErrorBoundary>
+                    <Flex
+                        ref={ringTarget}
+                        data-item-id={threadId}
                         onClick={handleLeftClick}
-                        focusProps={{ ringTarget }}
                         onContextMenu={handleRightClick}
-                        aria-label={getIntlMessage("FORUM_POST_ARIA_LABEL", {
-                            title: channel.name,
-                            count: messageCountText,
+                        direction={Flex.Direction.VERTICAL}
+                        className={cl("vc-better-forums-thread", {
+                            "vc-better-forums-thread-open": isOpen,
                         })}
-                        style={{ display: "none" }}
-                    />
-                    <Flex className="vc-better-forums-thread-body-container">
-                        <ForumPostBody
-                            channel={channel}
-                            firstMessage={firstMessage}
-                            content={content}
-                            hasMediaAttachment={!!firstMedia}
+                    >
+                        <ClickableWithRing
+                            onClick={handleLeftClick}
+                            focusProps={{ ringTarget }}
+                            onContextMenu={handleRightClick}
+                            aria-label={getIntlMessage("FORUM_POST_ARIA_LABEL", {
+                                title: channel.name,
+                                count: messageCountText,
+                            })}
+                            style={{ display: "none" }}
                         />
-                        {firstMedia && <ForumPostMedia {...firstMedia} />}
+                        <Flex className="vc-better-forums-thread-body-container">
+                            <ForumPostBody
+                                channel={channel}
+                                firstMessage={firstMessage}
+                                content={content}
+                                hasMediaAttachment={!!firstMedia}
+                            />
+                            {firstMedia && <ForumPostMedia {...firstMedia} />}
+                        </Flex>
+                        <ForumPostFooter channel={channel} firstMessage={firstMessage} />
                     </Flex>
-                    <ForumPostFooter channel={channel} firstMessage={firstMessage} />
-                </Flex>
+                </ErrorBoundary>
             );
         }
 );
