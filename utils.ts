@@ -563,14 +563,16 @@ export function useMessageContent({
     isAuthorBlocked,
     isAuthorIgnored,
     className,
-}: MessageFormattingOptions): React.ReactNode | null {
+}: MessageFormattingOptions): { content: React.ReactNode | null; systemMessage: boolean } {
     const isLoading = useStateFromStores([ForumPostMessagesStore], () =>
         ForumPostMessagesStore.isLoading(channel.id)
     );
 
-    if (isAuthorBlocked) return getIntlMessage("FORUM_POST_BLOCKED_FIRST_MESSAGE");
+    if (isAuthorBlocked)
+        return { content: getIntlMessage("FORUM_POST_BLOCKED_FIRST_MESSAGE"), systemMessage: true };
 
-    if (isAuthorIgnored) return getIntlMessage("FORUM_POST_IGNORED_FIRST_MESSAGE");
+    if (isAuthorIgnored)
+        return { content: getIntlMessage("FORUM_POST_IGNORED_FIRST_MESSAGE"), systemMessage: true };
 
     const { contentPlaceholder, renderedContent } = useMemo(() => {
         return !message
@@ -578,11 +580,42 @@ export function useMessageContent({
             : getMessageContent(message, content, isAuthorBlocked, isAuthorIgnored, className, {});
     }, [message, content, isAuthorBlocked, isAuthorIgnored, className]);
 
-    if (renderedContent) return renderedContent;
+    if (renderedContent) return { content: renderedContent, systemMessage: false };
 
-    if (hasMediaAttachment) return null;
+    if (hasMediaAttachment)
+        return { content: getIntlMessage("REPLY_QUOTE_NO_TEXT_CONTENT"), systemMessage: true };
 
-    if (!message) return isLoading ? null : getIntlMessage("REPLY_QUOTE_MESSAGE_DELETED");
+    if (!message)
+        return {
+            content: isLoading ? "..." : getIntlMessage("REPLY_QUOTE_MESSAGE_DELETED"),
+            systemMessage: true,
+        };
 
-    return contentPlaceholder;
+    return { content: contentPlaceholder, systemMessage: false };
 }
+
+export interface Attachment {
+    type: "embed" | "attachment";
+    src: string;
+    width: number;
+    height: number;
+    spoiler?: boolean;
+    contentScanVersion?: number;
+    isVideo?: boolean;
+    isThumbnail?: boolean;
+    attachmentId?: string;
+    mediaIndex?: number;
+    srcIsAnimated?: boolean;
+    alt?: string;
+}
+
+export const useForumPostMetadata: (options: {
+    firstMessage: Message | null;
+    formatInline?: boolean;
+    noStyleAndInteraction?: boolean;
+}) => {
+    hasSpoilerEmbeds: boolean;
+    content: React.ReactNode | null;
+    firstMedia: Attachment | null;
+    firstMediaIsEmbed: boolean;
+} = findByCodeLazy(/noStyleAndInteraction:\i=!0\}/);

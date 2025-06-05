@@ -38,7 +38,6 @@ export function ForumPostBody({ channel, firstMessage }: ForumPostBodyProps) {
             <MessageContent
                 channel={channel}
                 message={firstMessage}
-                variant="text-sm/normal"
                 color="text-secondary"
                 lineClamp={3}
             />

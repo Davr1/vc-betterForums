@@ -7,20 +7,7 @@
 import { findComponentByCodeLazy } from "@webpack";
 import { useMemo, useStateFromStores, WindowStore } from "@webpack/common";
 
-export interface Attachment {
-    type: "embed" | "attachment";
-    src: string;
-    width: number;
-    height: number;
-    spoiler?: boolean;
-    contentScanVersion?: number;
-    isVideo?: boolean;
-    isThumbnail?: boolean;
-    attachmentId?: string;
-    mediaIndex?: number;
-    srcIsAnimated?: boolean;
-    alt?: string;
-}
+import { Attachment } from "../utils";
 
 interface MediaMosaicProps {
     src: string;

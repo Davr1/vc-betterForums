@@ -13,10 +13,10 @@ import { Channel, Message } from "discord-types/general";
 
 import { cl } from "..";
 import { ChannelSectionStore, ForumPostComposerStore } from "../stores";
-import { ThreadChannel, useMessageCount } from "../utils";
+import { ThreadChannel, useForumPostMetadata, useMessageCount } from "../utils";
 import { ForumPostBody } from "./ForumPostBody";
 import { ForumPostFooter } from "./ForumPostFooter";
-import { Attachment, ForumPostMedia } from "./ForumPostMedia";
+import { ForumPostMedia } from "./ForumPostMedia";
 
 const ClickableWithRing: React.FC<
     React.ComponentProps<typeof Clickable> & {
@@ -46,17 +46,6 @@ const useForumPostEvents: (options: {
     handleLeftClick: React.MouseEventHandler<unknown>;
     handleRightClick: React.MouseEventHandler<unknown>;
 } = findByCodeLazy("facepileRef:", "handleLeftClick");
-
-const useForumPostMetadata: (options: {
-    firstMessage: Message | null;
-    formatInline?: boolean;
-    noStyleAndInteraction?: boolean;
-}) => {
-    hasSpoilerEmbeds: boolean;
-    content: React.ReactNode | null;
-    firstMedia: Attachment | null;
-    firstMediaIsEmbed: boolean;
-} = findByCodeLazy(/noStyleAndInteraction:\i=!0\}/);
 
 interface ForumPostProps {
     className?: string;

@@ -120,7 +120,8 @@
     white-space: nowrap;
 
     > * {
-        height: unset;
+        height: unset !important;
+        white-space: nowrap !important;
     }
 }
 

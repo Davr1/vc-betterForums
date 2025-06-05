@@ -4,25 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByCodeLazy } from "@webpack";
 import { Text, useStateFromStores } from "@webpack/common";
 import { TextProps } from "@webpack/types";
 import { Channel, Message } from "discord-types/general";
 
-import { Attachment } from "../components/ForumPostMedia";
 import { RelationshipStore } from "../stores";
-import { memoizedComponent, useMessageContent } from "../utils";
-
-const useForumPostMetadata: (options: {
-    firstMessage: Message | null;
-    formatInline?: boolean;
-    noStyleAndInteraction?: boolean;
-}) => {
-    hasSpoilerEmbeds: boolean;
-    content: React.ReactNode | null;
-    firstMedia: Attachment | null;
-    firstMediaIsEmbed: boolean;
-} = findByCodeLazy(/noStyleAndInteraction:\i=!0\}/);
+import { memoizedComponent, useForumPostMetadata, useMessageContent } from "../utils";
 
 interface MessageContentProps extends Omit<TextProps, "children"> {
     channel: Channel;
@@ -43,11 +30,11 @@ export const MessageContent = memoizedComponent<MessageContentProps>(function Me
         isIgnored: !!message && RelationshipStore.isIgnoredForMessage(message),
     }));
 
-    const messageContent = useMessageContent({
+    const { content: messageContent, systemMessage } = useMessageContent({
         channel,
         message,
         content,
-        hasMediaAttachment: true,
+        hasMediaAttachment: !!firstMedia,
         isAuthorBlocked: isBlocked,
         isAuthorIgnored: isIgnored,
         className: messageClassName,
@@ -55,7 +42,12 @@ export const MessageContent = memoizedComponent<MessageContentProps>(function Me
 
     return (
         <Text
-            style={{ fontStyle: isBlocked || isIgnored ? "italic" : "normal", ...props.style }}
+            style={{
+                fontStyle: systemMessage ? "italic" : "normal",
+                ...props.style,
+            }}
+            color="currentColor"
+            variant="text-sm/normal"
             {...props}
         >
             {messageContent}
