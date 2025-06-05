@@ -119,12 +119,14 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
         );
         const typingUsers = useTypingUsers(channel.id);
 
-        if (!mostRecentMessage && typingUsers.length === 0) return <ForumPostSpacerSection />;
+        if (messageCount === 0 && typingUsers.length === 0) return <ForumPostSpacerSection />;
 
         return (
             <ForumPostFooterSection
                 className={cl("vc-better-forums-latest-message", {
                     "vc-better-forums-unread": unreadCount,
+                    "vc-better-forums-empty-section":
+                        !mostRecentMessage && typingUsers.length === 0,
                 })}
                 icon={<ChatIcon />}
                 text={messageCountText}
@@ -148,26 +150,28 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
                         )}
                     </>
                 ) : (
-                    <div className="vc-better-forums-typing">
-                        <AvatarPile
-                            guildId={channel.getGuildId()}
-                            userIds={typingUsers}
-                            size={16}
-                            max={typingUsers.length}
-                            renderMoreUsers={() => (
-                                <ThreeDots
-                                    themed
-                                    dotRadius={2}
-                                    className="vc-better-forums-typing-indicator"
-                                />
-                            )}
-                        />
-                        <TypingText
-                            channel={channel}
-                            renderDots={false}
-                            className="vc-better-forums-typing-text"
-                        />
-                    </div>
+                    typingUsers.length > 0 && (
+                        <div className="vc-better-forums-typing">
+                            <AvatarPile
+                                guildId={channel.getGuildId()}
+                                userIds={typingUsers}
+                                size={16}
+                                max={typingUsers.length}
+                                renderMoreUsers={() => (
+                                    <ThreeDots
+                                        themed
+                                        dotRadius={2}
+                                        className="vc-better-forums-typing-indicator"
+                                    />
+                                )}
+                            />
+                            <TypingText
+                                channel={channel}
+                                renderDots={false}
+                                className="vc-better-forums-typing-text"
+                            />
+                        </div>
+                    )
                 )}
             </ForumPostFooterSection>
         );

@@ -178,3 +178,8 @@
     inset: 0 !important;
     height: auto;
 }
+
+.vc-better-forums-empty-section {
+    flex-grow: 0;
+    margin-right: auto;
+}
