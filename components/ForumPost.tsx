@@ -13,7 +13,7 @@ import { Channel, Message } from "discord-types/general";
 
 import { cl } from "..";
 import { ChannelSectionStore, ForumPostComposerStore } from "../stores";
-import { CompareFn, deepEqual, ThreadChannel, useMessageCount } from "../utils";
+import { ThreadChannel, useMessageCount } from "../utils";
 import { ForumPostBody } from "./ForumPostBody";
 import { ForumPostFooter } from "./ForumPostFooter";
 import { Attachment, ForumPostMedia } from "./ForumPostMedia";
@@ -35,7 +35,7 @@ const useFocusRing: <T extends HTMLElement = HTMLElement>() => {
 
 const useForumPostComposerStore: <T>(
     selector: (store: ForumPostComposerStore) => T,
-    compareFn: CompareFn
+    compareFn?: (a: unknown, b: unknown) => boolean
 ) => T = findByCodeLazy("[useForumPostComposerStore]", ")}");
 
 const useForumPostEvents: (options: {
@@ -81,15 +81,10 @@ export const ForumPost = LazyComponent(
             const { content, firstMedia } = useForumPostMetadata({ firstMessage });
             const { messageCountText } = useMessageCount(channel.id);
             const { ref: ringTarget, height } = useFocusRing<HTMLDivElement>();
-            const setCardHeight = useForumPostComposerStore(
-                store => store.setCardHeight,
-                deepEqual
-            );
+            const setCardHeight = useForumPostComposerStore(store => store.setCardHeight);
 
             useEffect(() => {
-                if (typeof height === "number") {
-                    setCardHeight(threadId, height);
-                }
+                if (typeof height === "number") setCardHeight(threadId, height);
             }, [height, setCardHeight, threadId]);
 
             const { handleLeftClick, handleRightClick } = useForumPostEvents({

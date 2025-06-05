@@ -188,58 +188,6 @@ export function useFormatTimestamp(
     return useMemo(() => timeFormatter(targetTimestamp, format), [targetTimestamp, format]);
 }
 
-const isIterable = (obj: object): obj is Iterable<unknown> =>
-    typeof obj?.[Symbol.iterator] === "function";
-const hasEntries = (obj: object): obj is ComparableObject =>
-    ("entries" in obj && typeof obj?.entries === "function") || obj instanceof Map;
-type ComparableObject = { entries(): Iterable<[PropertyKey, unknown]> } | Map<unknown, unknown>;
-
-const compareObjects = (a: ComparableObject, b: ComparableObject): boolean => {
-    const aEntries = a instanceof Map ? a : new Map(a.entries());
-    const bEntries = b instanceof Map ? b : new Map(b.entries());
-
-    if (aEntries.size !== bEntries.size) return false;
-
-    for (const [key, value] of aEntries) {
-        if (!Object.is(value, bEntries.get(key))) return false;
-    }
-
-    return true;
-};
-
-const compareIterables = (a: Iterable<unknown>, b: Iterable<unknown>): boolean => {
-    const aIterator = a[Symbol.iterator]();
-    const bIterator = b[Symbol.iterator]();
-
-    let aNext = aIterator.next();
-    let bNext = bIterator.next();
-
-    while (!aNext.done && !bNext.done) {
-        if (!Object.is(aNext.value, bNext.value)) return false;
-
-        aNext = aIterator.next();
-        bNext = bIterator.next();
-    }
-
-    return !!aNext.done && !!bNext.done;
-};
-
-export type CompareFn = (a: unknown, b: unknown) => boolean;
-
-export const deepEqual: CompareFn = (a, b) => {
-    if (Object.is(a, b)) return true;
-
-    if (typeof a !== "object" || a === null || typeof b !== "object" || b === null) return false;
-
-    if (isIterable(a) && isIterable(b))
-        return hasEntries(a) && hasEntries(b) ? compareObjects(a, b) : compareIterables(a, b);
-
-    return compareObjects(
-        { entries: () => Object.entries(a) },
-        { entries: () => Object.entries(b) }
-    );
-};
-
 export function useTypingUsers(
     channelId: Channel["id"],
     limit: number = Number.MAX_SAFE_INTEGER
