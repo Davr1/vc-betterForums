@@ -41,25 +41,68 @@
     flex-wrap: wrap;
 }
 
-.vc-better-forums-tag {
+.vc-better-forums-tag,
+.vc-better-forums-tag-custom {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: var(--space-xxs);
     padding: 2px 6px;
     border-radius: var(--radius-md);
-    border: 1px solid var(--border-subtle);
-    background: var(--button-secondary-background);
-    color: var(--text-secondary);
     text-transform: uppercase;
     height: var(--size-md);
     letter-spacing: 0.02rem;
+}
+
+.vc-better-forums-tag-custom {
+    --color: var(--blue-new-60);
+    --bg: var(--blue-new-15);
+
+    color: var(--color);
+    background-color: var(--bg);
+
+    &[data-color="green"] {
+        --color: var(--green-new-60);
+        --bg: var(--green-new-15);
+    }
+
+    &[data-color="yellow"] {
+        --color: var(--yellow-new-60);
+        --bg: var(--yellow-new-15);
+    }
+
+    &[data-color="orange"] {
+        --color: var(--orange-new-60);
+        --bg: var(--orange-new-15);
+    }
+
+    &[data-color="red"] {
+        --color: var(--red-new-60);
+        --bg: var(--red-new-15);
+    }
+
+    &[data-color="teal"] {
+        --color: var(--teal-new-60);
+        --bg: var(--teal-new-15);
+    }
+}
+
+.vc-better-forums-tag {
+    border: 1px solid var(--border-subtle);
+    background: var(--button-secondary-background);
+    color: var(--text-secondary);
 }
 
 .vc-better-forums-tag-emoji {
     width: var(--size-sm);
     height: var(--size-sm);
     object-fit: contain;
+}
+
+.vc-better-forums-tag-filtered {
+    background-color: var(--message-reacted-background);
+    color: var(--message-reacted-text);
+    border-color: var(--brand-500);
 }
 
 .vc-better-forums-message-block-content {
@@ -141,6 +184,7 @@
 
     max-height: var(--forum-post-thumbnail-size);
     max-width: var(--forum-post-thumbnail-size);
+    overflow: hidden;
 }
 
 .vc-better-forums-spacer {
@@ -182,4 +226,8 @@
 .vc-better-forums-empty-section {
     flex-grow: 0;
     margin-right: auto;
+}
+
+.vc-better-forums-timestamp {
+    display: contents;
 }

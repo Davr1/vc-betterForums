@@ -19,14 +19,16 @@ export function ForumPostTimestamp({ channel }: ForumPostTimestampProps) {
     const createTimestamp = channel.threadMetadata?.createTimestamp ?? "";
 
     return (
-        <Tooltip text={<Timestamp timestamp={new Date(createTimestamp)} />}>
+        <Tooltip
+            text={
+                <Timestamp
+                    timestamp={new Date(createTimestamp)}
+                    className="vc-better-forums-timestamp"
+                />
+            }
+        >
             {props => (
-                <Text
-                    className={"__invalid_activityText"}
-                    variant="text-sm/normal"
-                    color="header-secondary"
-                    {...props}
-                >
+                <Text variant="text-sm/normal" color="header-secondary" {...props}>
                     {children}
                 </Text>
             )}

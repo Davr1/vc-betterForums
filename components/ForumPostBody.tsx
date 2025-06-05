@@ -49,13 +49,6 @@ export function ForumPostBody({
                 >
                     <Text lineClamp={2}>{channelName}</Text>
                     <ForumPostTags channel={channel} isNew={isNew} />
-                    {/* {isNew && (
-                            <span className={"newBadgeWrapper"}>
-                                <span className={"newBadge"}>
-                                    {getIntlMessageFromHash("y2b7CA")}
-                                </span>
-                            </span>
-                        )} */}
                 </Heading>
             </div>
             <ForumPostContent

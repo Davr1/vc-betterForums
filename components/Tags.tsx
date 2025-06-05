@@ -57,10 +57,30 @@ export function MoreTags({ tags, count }: MoreTagsProps) {
             ))}
         >
             {props => (
-                <div {...props}>
-                    <Text variant="text-xs/semibold">+{count}</Text>
+                <div className="vc-better-forums-tag" {...props}>
+                    <Text variant="text-xs/semibold" color="currentColor">
+                        +{count}
+                    </Text>
                 </div>
             )}
         </Tooltip>
+    );
+}
+
+interface CustomTagProps {
+    name: string;
+    color?: "blue" | "green" | "red" | "teal" | "yellow" | "orange";
+    icon?: React.ReactNode;
+    className?: string;
+}
+
+export function CustomTag({ name, color = "blue", icon, className }: CustomTagProps) {
+    return (
+        <div className={cl(className, "vc-better-forums-tag-custom")} data-color={color}>
+            {icon}
+            <Text variant="text-xs/bold" lineClamp={1} color="currentColor">
+                {name}
+            </Text>
+        </div>
     );
 }
