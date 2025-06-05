@@ -20,7 +20,7 @@ import {
     UserStore,
     useStateFromStores,
 } from "@webpack/common";
-import { Channel, Guild, ReactionEmoji, User } from "discord-types/general";
+import { Channel, Guild, GuildMember, ReactionEmoji, User } from "discord-types/general";
 
 import {
     ChannelState,
@@ -474,4 +474,71 @@ export function memoizedComponent<TProps extends object = {}>(
     component: React.ComponentType<TProps>
 ) {
     return LazyComponent(() => React.memo(component));
+}
+
+interface FullGuildMember extends GuildMember {
+    global_name?: string;
+    globalName?: string;
+    avatarDecoration?: { asset: string; skuId: string };
+    colorStrings?: Record<
+        "primaryColor" | "secondaryColor" | "tertiaryColor",
+        GuildMember["colorString"]
+    >;
+    colorRoleId?: string;
+}
+
+interface FullUser extends User {
+    global_name?: string;
+    globalName?: string;
+    primaryGuild?: Partial<{
+        badge: string;
+        identityEnabled: boolean;
+        identityGuildId: string;
+        tag: string;
+    }>;
+}
+
+export function useMember(user: FullUser | null, channel: Channel) {
+    const userId = user?.id;
+    const guildId = channel?.guild_id;
+    const member = useStateFromStores([GuildMemberStore], () =>
+        !guildId || !userId
+            ? null
+            : (GuildMemberStore.getMember(guildId, userId) as FullGuildMember)
+    );
+
+    const { guild, guildRoles } = useStateFromStores(
+        [GuildStore],
+        () => {
+            const guild = GuildStore.getGuild(guildId);
+            const guildRoles = guild ? GuildStore.getRoles(guild.id) : undefined;
+            return { guild, guildRoles };
+        },
+        [guildId]
+    );
+
+    const friendNickname = useStateFromStores([RelationshipStore], () =>
+        userId && channel?.isPrivate() ? RelationshipStore.getNickname(userId) : null
+    );
+
+    const userName = user?.global_name || user?.globalName || user?.username || "???";
+
+    if (!user?.id || !channel || !member) return { nick: userName };
+
+    if (!guild?.id) return { nick: friendNickname ?? userName };
+
+    const { nick, colorRoleId, iconRoleId, colorString, colorStrings } = member;
+
+    return {
+        nick: nick ?? userName,
+        colorString,
+        colorStrings,
+        colorRoleName: colorRoleId && guild ? guildRoles?.[colorRoleId]?.name : undefined,
+        colorRoleId,
+        iconRoleId,
+        guildMemberAvatar: member.avatar,
+        guildMemberAvatarDecoration: member.avatarDecoration,
+        primaryGuild: user?.primaryGuild,
+        guildId: guild.id,
+    };
 }

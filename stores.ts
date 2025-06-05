@@ -15,6 +15,8 @@ interface ChannelSectionStore extends FluxStore {
 
 interface ForumPostMessagesStore extends FluxStore {
     isLoading(channelId: Channel["id"]): boolean;
+
+    getMessage(channelId: Channel["id"]): { firstMessage: Message | null };
 }
 
 interface ThreadMessageStore extends FluxStore {
@@ -148,5 +150,4 @@ export const LurkingStore: LurkingStore = findStoreLazy("LurkingStore");
 export const RelationshipStore: RelationshipStore = findStoreLazy("RelationshipStore");
 export const GuildMemberStore: GuildMemberStore = findStoreLazy("GuildMemberStore");
 export const PermissionStore: PermissionStore = findStoreLazy("PermissionStore");
-export const ChannelMemberCountStore = findStoreLazy("ChannelMemberCountStore");
 export const ThreadMemberListStore: ThreadMemberListStore = findStoreLazy("ThreadMemberListStore");

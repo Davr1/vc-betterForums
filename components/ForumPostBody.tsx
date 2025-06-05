@@ -4,23 +4,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findComponentByCodeLazy } from "@webpack";
 import { Flex, Heading, Text, useStateFromStores } from "@webpack/common";
-import { Channel, Message } from "discord-types/general";
+import { Message } from "discord-types/general";
 
 import { RelationshipStore } from "../stores";
 import { ThreadChannel, useChannelName, useForumPostState } from "../utils";
 import { ForumPostContent } from "./ForumPostContent";
 import { ForumPostTags } from "./ForumPostTags";
 import { ForumPostTimestamp } from "./ForumPostTimestamp";
-
-interface UsernameProps {
-    message: Message | null;
-    channel: Channel;
-    renderColon?: boolean;
-    hasUnreads?: boolean;
-}
-const Username = findComponentByCodeLazy<UsernameProps>("#{intl::FORUM_POST_AUTHOR_A11Y_LABEL}");
+import { Username } from "./Username";
 
 interface ForumPostBodyProps {
     channel: ThreadChannel;
@@ -46,15 +38,10 @@ export function ForumPostBody({
     return (
         <Flex className="vc-better-forums-thread-body" direction={Flex.Direction.VERTICAL}>
             <Flex className="vc-better-forums-thread-header" align={Flex.Align.CENTER} grow={0}>
-                <Username
-                    channel={channel}
-                    message={firstMessage}
-                    renderColon={false}
-                    hasUnreads={hasUnreads}
-                />
+                <Username channel={channel} message={firstMessage} renderColon={false} />
                 <ForumPostTimestamp channel={channel} />
             </Flex>
-            <div className={"headerText"}>
+            <div>
                 <Heading
                     variant="heading-lg/semibold"
                     color="header-primary"

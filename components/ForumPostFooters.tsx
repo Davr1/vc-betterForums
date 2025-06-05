@@ -15,6 +15,7 @@ import { memoizedComponent, ThreadChannel, useMessageCount, useTypingUsers } fro
 import { AvatarPile } from "./ActiveUsers";
 import { ChatIcon, UsersIcon } from "./icons";
 import { DefaultReaction, Reaction } from "./Reaction";
+import { Username } from "./Username";
 
 interface TypingIndicatorProps {
     dotRadius?: number;
@@ -116,7 +117,7 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
         );
         const typingUsers = useTypingUsers(channel.id);
 
-        if (messageCount === 0) return <ForumPostSpacerSection />;
+        if (messageCount === 0 || !mostRecentMessage) return <ForumPostSpacerSection />;
 
         return (
             <ForumPostFooterSection
@@ -131,7 +132,8 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
                     color="currentColor"
                     className="vc-better-forum-latest-message-content"
                 >
-                    {mostRecentMessage?.author.username}: {mostRecentMessage?.content}
+                    <Username channel={channel} message={mostRecentMessage} renderColon />{" "}
+                    {mostRecentMessage.content}
                 </Text>
                 {unreadCount !== null && (
                     <Text variant="text-sm/semibold" color="text-brand">
