@@ -105,10 +105,23 @@
     border-color: var(--brand-500);
 }
 
-.vc-better-forums-message-block-content {
+.vc-better-forums-message-content {
+    line-height: 1.5;
+}
+
+.vc-better-forums-message-content,
+.vc-better-forums-message-content-inline {
     color: inherit;
     font: inherit;
-    line-height: 1.5;
+}
+
+.vc-better-forums-message-content-inline {
+    display: inline;
+    white-space: nowrap;
+
+    > * {
+        height: unset;
+    }
 }
 
 .vc-better-forums-reaction-button {

@@ -78,7 +78,7 @@ export const ForumPost = LazyComponent(
             );
 
             const { firstMessage } = useFirstMessage(channel);
-            const { content, firstMedia } = useForumPostMetadata({ firstMessage });
+            const { firstMedia } = useForumPostMetadata({ firstMessage });
             const { messageCountText } = useMessageCount(channel.id);
             const { ref: ringTarget, height } = useFocusRing<HTMLDivElement>();
             const setCardHeight = useForumPostComposerStore(store => store.setCardHeight);
@@ -116,12 +116,7 @@ export const ForumPost = LazyComponent(
                             style={{ display: "none" }}
                         />
                         <Flex className="vc-better-forums-thread-body-container">
-                            <ForumPostBody
-                                channel={channel}
-                                firstMessage={firstMessage}
-                                content={content}
-                                hasMediaAttachment={!!firstMedia}
-                            />
+                            <ForumPostBody channel={channel} firstMessage={firstMessage} />
                             {firstMedia && <ForumPostMedia {...firstMedia} />}
                         </Flex>
                         <ForumPostFooter channel={channel} firstMessage={firstMessage} />

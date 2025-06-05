@@ -4,21 +4,22 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getIntlMessage, getIntlMessageFromHash } from "@utils/discord";
-import { PinIcon } from "userplugins/betterForums/components/icons";
+import { getIntlMessage } from "@utils/discord";
 
 import { cl } from "..";
-import { ThreadChannel, useForumChannelState, useForumPostInfo } from "../utils";
+import { ThreadChannel, useForumChannelState, useForumPostInfo, useForumPostState } from "../utils";
+import { PinIcon } from "./icons";
 import { CustomTag, MoreTags, Tag } from "./Tags";
 
 interface ForumPostTagsProps {
     channel: ThreadChannel;
-    isNew?: boolean;
     tagsClassName?: string;
     className?: string;
 }
 
-export function ForumPostTags({ channel, isNew, tagsClassName }: ForumPostTagsProps) {
+export function ForumPostTags({ channel, tagsClassName }: ForumPostTagsProps) {
+    const { isNew } = useForumPostState(channel);
+
     const { shownTags, remainingTags, moreTagsCount, isPinned, shouldRenderTagsRow } =
         useForumPostInfo({ channel, isNew });
 
@@ -28,7 +29,7 @@ export function ForumPostTags({ channel, isNew, tagsClassName }: ForumPostTagsPr
     return (
         <>
             {isNew && <CustomTag name={getIntlMessage("NEW")} />}
-            {isPinned && <CustomTag name={getIntlMessageFromHash("1QLRYW")} icon={<PinIcon />} />}
+            {isPinned && <CustomTag name={getIntlMessage("PINNED_POST")} icon={<PinIcon />} />}
             {shownTags.map(tag => (
                 <Tag
                     tag={tag}

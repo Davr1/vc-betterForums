@@ -13,8 +13,9 @@ import { PropsWithChildren } from "react";
 import { cl } from "..";
 import { ThreadMessageStore } from "../stores";
 import { memoizedComponent, ThreadChannel, useMessageCount, useTypingUsers } from "../utils";
-import { AvatarPile } from "./ActiveUsers";
+import { AvatarPile } from "./AvatarPile";
 import { ChatIcon, UsersIcon } from "./icons";
+import { MessageContent } from "./MessageContent";
 import { DefaultReaction, Reactions } from "./Reaction";
 import { Username } from "./Username";
 
@@ -105,6 +106,10 @@ const ForumPostMembersSection = memoizedComponent<ForumPostMembersSectionProps>(
     }
 );
 
+const renderTypingIndicator = () => (
+    <ThreeDots themed dotRadius={2} className="vc-better-forums-typing-indicator" />
+);
+
 interface ForumPostLatestMessageSectionProps {
     channel: ThreadChannel;
 }
@@ -139,7 +144,14 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
                             className="vc-better-forum-latest-message-content"
                         >
                             <Username channel={channel} message={mostRecentMessage} renderColon />{" "}
-                            {mostRecentMessage.content}
+                            <MessageContent
+                                channel={channel}
+                                message={mostRecentMessage}
+                                messageClassName="vc-better-forums-message-content-inline"
+                                color="currentColor"
+                                tag="span"
+                                lineClamp={1}
+                            />
                         </Text>
                         {unreadCount !== null && (
                             <Text variant="text-sm/semibold" color="text-brand">
@@ -157,13 +169,7 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
                                 userIds={typingUsers}
                                 size={16}
                                 max={typingUsers.length}
-                                renderMoreUsers={() => (
-                                    <ThreeDots
-                                        themed
-                                        dotRadius={2}
-                                        className="vc-better-forums-typing-indicator"
-                                    />
-                                )}
+                                renderMoreUsers={renderTypingIndicator}
                             />
                             <TypingText
                                 channel={channel}

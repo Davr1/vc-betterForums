@@ -4,61 +4,43 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex, Heading, Text, useStateFromStores } from "@webpack/common";
+import { Flex, Heading, Text } from "@webpack/common";
 import { Message } from "discord-types/general";
 
-import { RelationshipStore } from "../stores";
-import { ThreadChannel, useChannelName, useForumPostState } from "../utils";
-import { ForumPostContent } from "./ForumPostContent";
+import { ThreadChannel, useChannelName } from "../utils";
 import { ForumPostTags } from "./ForumPostTags";
-import { ForumPostTimestamp } from "./ForumPostTimestamp";
+import { MessageContent } from "./MessageContent";
+import { Timestamp } from "./Timestamp";
 import { Username } from "./Username";
 
 interface ForumPostBodyProps {
     channel: ThreadChannel;
     firstMessage: Message | null;
-    content: React.ReactNode;
-    hasMediaAttachment: boolean;
 }
 
-export function ForumPostBody({
-    channel,
-    firstMessage,
-    content,
-    hasMediaAttachment,
-}: ForumPostBodyProps) {
-    const { isNew, hasUnreads } = useForumPostState(channel);
+export function ForumPostBody({ channel, firstMessage }: ForumPostBodyProps) {
     const channelName = useChannelName(channel);
-
-    const { isBlocked, isIgnored } = useStateFromStores([RelationshipStore], () => ({
-        isBlocked: !!firstMessage && RelationshipStore.isBlockedForMessage(firstMessage),
-        isIgnored: !!firstMessage && RelationshipStore.isIgnoredForMessage(firstMessage),
-    }));
 
     return (
         <Flex className="vc-better-forums-thread-body" direction={Flex.Direction.VERTICAL}>
             <Flex className="vc-better-forums-thread-header" align={Flex.Align.CENTER} grow={0}>
                 <Username channel={channel} message={firstMessage} renderColon={false} />
-                <ForumPostTimestamp channel={channel} />
+                <Timestamp channel={channel} />
             </Flex>
-            <div>
-                <Heading
-                    variant="heading-lg/semibold"
-                    color="header-primary"
-                    className="vc-better-forums-thread-title-container"
-                >
-                    <Text lineClamp={2}>{channelName}</Text>
-                    <ForumPostTags channel={channel} isNew={isNew} />
-                </Heading>
-            </div>
-            <ForumPostContent
+            <Heading
+                variant="heading-lg/semibold"
+                color="header-primary"
+                className="vc-better-forums-thread-title-container"
+            >
+                <Text lineClamp={2}>{channelName}</Text>
+                <ForumPostTags channel={channel} />
+            </Heading>
+            <MessageContent
                 channel={channel}
                 message={firstMessage}
-                content={content}
-                hasMediaAttachment={hasMediaAttachment}
-                hasUnreads={hasUnreads}
-                isAuthorBlocked={isBlocked}
-                isAuthorIgnored={isIgnored}
+                variant="text-sm/normal"
+                color="text-secondary"
+                lineClamp={3}
             />
         </Flex>
     );

@@ -34,6 +34,7 @@ import {
     ChannelState,
     Duration,
     ForumChannelStore,
+    ForumPostMessagesStore,
     ForumPostUnreadCountStore,
     ForumSearchStore,
     GuildMemberRequesterStore,
@@ -131,20 +132,19 @@ export function useMessageCount(channelId: Channel["id"]): MessageCount {
 interface ForumPostState {
     isNew: boolean;
     hasUnreads: boolean;
+    isActive: boolean;
 }
 
 export function useForumPostState(channel: Channel): ForumPostState {
     return useStateFromStores([GuildStore, ReadStateStore], () => {
         const guild: Guild | null = GuildStore.getGuild(channel.getGuildId());
+        const isActive = !!guild && !channel.isArchivedThread();
+
         return {
+            isActive,
             isNew:
-                !!guild &&
-                !channel.isArchivedThread() &&
-                ReadStateStore.isNewForumThread(channel.id, channel.parent_id, guild),
-            hasUnreads:
-                !!guild &&
-                !channel.isArchivedThread() &&
-                ReadStateStore.isForumPostUnread(channel.id),
+                isActive && ReadStateStore.isNewForumThread(channel.id, channel.parent_id, guild),
+            hasUnreads: isActive && ReadStateStore.isForumPostUnread(channel.id),
         };
     });
 }
@@ -531,4 +531,58 @@ export function useAuthor(channel: ThreadChannel, message?: Message | null) {
     }, [channel.guild_id, message?.author?.id]);
 
     return author;
+}
+
+const getMessageContent: (
+    message: Message,
+    content: React.ReactNode,
+    isBlocked: boolean | undefined,
+    isIgnored: boolean | undefined,
+    className?: string,
+    props?: { trailingIconClass?: string; leadingIconClass?: string; iconSize?: number }
+) => Record<
+    "contentPlaceholder" | "renderedContent" | "trailingIcon" | "leadingIcon",
+    React.ReactNode | null
+> = findByCodeLazy("#{intl::MESSAGE_PINNED}");
+
+interface MessageFormattingOptions {
+    message: Message | null;
+    channel: Channel;
+    content: React.ReactNode;
+    hasMediaAttachment: boolean;
+    isAuthorBlocked?: boolean;
+    isAuthorIgnored?: boolean;
+    className?: string;
+}
+
+export function useMessageContent({
+    message,
+    channel,
+    content,
+    hasMediaAttachment,
+    isAuthorBlocked,
+    isAuthorIgnored,
+    className,
+}: MessageFormattingOptions): React.ReactNode | null {
+    const isLoading = useStateFromStores([ForumPostMessagesStore], () =>
+        ForumPostMessagesStore.isLoading(channel.id)
+    );
+
+    if (isAuthorBlocked) return getIntlMessage("FORUM_POST_BLOCKED_FIRST_MESSAGE");
+
+    if (isAuthorIgnored) return getIntlMessage("FORUM_POST_IGNORED_FIRST_MESSAGE");
+
+    const { contentPlaceholder, renderedContent } = useMemo(() => {
+        return !message
+            ? { contentPlaceholder: null, renderedContent: null }
+            : getMessageContent(message, content, isAuthorBlocked, isAuthorIgnored, className, {});
+    }, [message, content, isAuthorBlocked, isAuthorIgnored, className]);
+
+    if (renderedContent) return renderedContent;
+
+    if (hasMediaAttachment) return null;
+
+    if (!message) return isLoading ? null : getIntlMessage("REPLY_QUOTE_MESSAGE_DELETED");
+
+    return contentPlaceholder;
 }

@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Text, Timestamp, Tooltip } from "@webpack/common";
+import { Text, Timestamp as TimestampComponent, Tooltip } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
 import { useFormatTimestamp, useForumChannelState } from "../utils";
 
-interface ForumPostTimestampProps {
+interface TimestampProps {
     channel: Channel;
 }
 
-export function ForumPostTimestamp({ channel }: ForumPostTimestampProps) {
+export function Timestamp({ channel }: TimestampProps) {
     const { sortOrder } = useForumChannelState(channel.parent_id);
     const children = useFormatTimestamp(channel, sortOrder);
     const createTimestamp = channel.threadMetadata?.createTimestamp ?? "";
@@ -21,7 +21,7 @@ export function ForumPostTimestamp({ channel }: ForumPostTimestampProps) {
     return (
         <Tooltip
             text={
-                <Timestamp
+                <TimestampComponent
                     timestamp={new Date(createTimestamp)}
                     className="vc-better-forums-timestamp"
                 />
