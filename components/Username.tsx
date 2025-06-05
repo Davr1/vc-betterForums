@@ -5,26 +5,10 @@
  */
 
 import { findByCodeLazy } from "@webpack";
-import { Text, useEffect, UserStore, useStateFromStores } from "@webpack/common";
+import { Text } from "@webpack/common";
 import { Channel, Guild, Message, User } from "discord-types/general";
 
-import { GuildMemberRequesterStore } from "../stores";
-import { memoizedComponent, ThreadChannel, useMember } from "../utils";
-
-function useAuthor(channel: ThreadChannel, message?: Message | null) {
-    const owner = useStateFromStores([UserStore], () =>
-        message ? null : UserStore.getUser(channel.ownerId)
-    );
-
-    const author = useMember(message?.author ?? owner, channel);
-
-    useEffect(() => {
-        message?.author?.id &&
-            GuildMemberRequesterStore.requestMember(channel.guild_id, message.author?.id);
-    }, [channel.guild_id, message?.author?.id]);
-
-    return author;
-}
+import { memoizedComponent, ThreadChannel, useAuthor } from "../utils";
 
 const useUsernameHook: (
     options: Partial<{

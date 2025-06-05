@@ -150,3 +150,31 @@
 .vc-better-forums-username a {
     color: var(--text-muted);
 }
+
+.vc-better-forums-typing,
+.vc-better-forums-typing-text {
+    flex-grow: 1;
+}
+
+.vc-better-forums-typing,
+.vc-better-forums-typing-indicator {
+    display: flex;
+    align-items: center;
+}
+
+.vc-better-forums-typing {
+    gap: var(--space-xxs);
+}
+
+.vc-better-forums-typing-indicator {
+    background-color: var(--background-tertiary);
+    border-radius: var(--radius-md);
+    justify-content: center;
+    padding: 6px 5px;
+}
+
+.vc-better-forums-typing-text {
+    position: relative;
+    inset: 0 !important;
+    height: auto;
+}

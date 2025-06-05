@@ -5,12 +5,17 @@
  */
 
 import { findComponentByCodeLazy } from "@webpack";
-import { ChannelStore, useMemo, useStateFromStores } from "@webpack/common";
-import { Message, MessageReaction } from "discord-types/general";
+import { ChannelStore, useStateFromStores } from "@webpack/common";
+import { Message } from "discord-types/general";
 
-import { ForumChannel, ThreadChannel, useCheckPermissions, useDefaultEmoji } from "../utils";
-
-type MessageReactionWithBurst = MessageReaction & { burst_count: number; me_burst: boolean };
+import {
+    ForumChannel,
+    MessageReactionWithBurst,
+    ThreadChannel,
+    useCheckPermissions,
+    useDefaultEmoji,
+    useTopReaction,
+} from "../utils";
 
 enum ReactionType {
     NORMAL = 0,
@@ -72,23 +77,6 @@ export function DefaultReaction({ firstMessage, channel }: ReactionProps) {
             type={ReactionType.NORMAL}
         />
     );
-}
-
-function useTopReaction(message: Message) {
-    return useMemo(() => {
-        let topCount = 0;
-        let topReaction: MessageReactionWithBurst | null = null;
-
-        for (const reaction of message.reactions as MessageReactionWithBurst[]) {
-            const count = Math.max(reaction.count, reaction.burst_count);
-            if (topReaction && count < topCount) continue;
-
-            topReaction = reaction;
-            topCount = count;
-        }
-
-        return topReaction;
-    }, [message?.reactions]);
 }
 
 export function Reactions({ firstMessage, channel }: ReactionProps) {

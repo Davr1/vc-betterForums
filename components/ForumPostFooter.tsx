@@ -8,6 +8,7 @@ import { getIntlMessage } from "@utils/discord";
 import { findComponentByCodeLazy } from "@webpack";
 import { Flex, Text, useStateFromStores } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
+import { PropsWithChildren } from "react";
 
 import { cl } from "..";
 import { ThreadMessageStore } from "../stores";
@@ -53,14 +54,11 @@ export function ForumPostFooter({ channel, firstMessage }: ForumPostFooterProps)
                 ) : (
                     <DefaultReaction firstMessage={firstMessage} channel={channel} />
                 ))}
-            {/* <MessageComponent channel={channel} iconSize={14} /> */}
-            {/* <span className={"bullet"}>•</span> */}
         </Flex>
     );
 }
 
-interface ForumPostFooterSectionProps {
-    children?: React.ReactNode;
+interface ForumPostFooterSectionProps extends PropsWithChildren {
     className?: string;
     icon?: React.ReactNode;
     text?: string;
@@ -94,12 +92,14 @@ const ForumPostMembersSection = memoizedComponent<ForumPostMembersSectionProps>(
     function ForumPostMembersSection({ channel }) {
         return (
             <ForumPostFooterSection icon={<UsersIcon />} text={channel.memberCount.toString()}>
-                <AvatarPile
-                    guildId={channel.getGuildId()}
-                    userIds={channel.memberIdsPreview}
-                    size={16}
-                    count={channel.memberCount}
-                />
+                {channel.memberIdsPreview.length > 0 && (
+                    <AvatarPile
+                        guildId={channel.getGuildId()}
+                        userIds={channel.memberIdsPreview}
+                        size={16}
+                        count={channel.memberCount}
+                    />
+                )}
             </ForumPostFooterSection>
         );
     }
@@ -119,7 +119,7 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
         );
         const typingUsers = useTypingUsers(channel.id);
 
-        if (messageCount === 0 || !mostRecentMessage) return <ForumPostSpacerSection />;
+        if (!mostRecentMessage && typingUsers.length === 0) return <ForumPostSpacerSection />;
 
         return (
             <ForumPostFooterSection
@@ -129,28 +129,44 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
                 icon={<ChatIcon />}
                 text={messageCountText}
             >
-                <Text
-                    variant="text-sm/semibold"
-                    color="currentColor"
-                    className="vc-better-forum-latest-message-content"
-                >
-                    <Username channel={channel} message={mostRecentMessage} renderColon />{" "}
-                    {mostRecentMessage.content}
-                </Text>
-                {unreadCount !== null && (
-                    <Text variant="text-sm/semibold" color="text-brand">
-                        {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
-                            count: unreadCountText,
-                        })}
-                    </Text>
-                )}
-                {typingUsers.length > 0 && (
-                    <div className={"typing"}>
-                        <AvatarPile guildId={channel.getGuildId()} userIds={typingUsers} />
-                        <div className={"dots"}>
-                            <ThreeDots themed dotRadius={2} />
-                        </div>
-                        <TypingText channel={channel} className={"typingUsers"} renderDots={true} />
+                {typingUsers.length === 0 && mostRecentMessage ? (
+                    <>
+                        <Text
+                            variant="text-sm/semibold"
+                            color="currentColor"
+                            className="vc-better-forum-latest-message-content"
+                        >
+                            <Username channel={channel} message={mostRecentMessage} renderColon />{" "}
+                            {mostRecentMessage.content}
+                        </Text>
+                        {unreadCount !== null && (
+                            <Text variant="text-sm/semibold" color="text-brand">
+                                {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
+                                    count: unreadCountText,
+                                })}
+                            </Text>
+                        )}
+                    </>
+                ) : (
+                    <div className="vc-better-forums-typing">
+                        <AvatarPile
+                            guildId={channel.getGuildId()}
+                            userIds={typingUsers}
+                            size={16}
+                            max={typingUsers.length}
+                            renderMoreUsers={() => (
+                                <ThreeDots
+                                    themed
+                                    dotRadius={2}
+                                    className="vc-better-forums-typing-indicator"
+                                />
+                            )}
+                        />
+                        <TypingText
+                            channel={channel}
+                            renderDots={false}
+                            className="vc-better-forums-typing-text"
+                        />
                     </div>
                 )}
             </ForumPostFooterSection>

@@ -20,7 +20,15 @@ import {
     UserStore,
     useStateFromStores,
 } from "@webpack/common";
-import { Channel, Guild, GuildMember, ReactionEmoji, User } from "discord-types/general";
+import {
+    Channel,
+    Guild,
+    GuildMember,
+    Message,
+    MessageReaction,
+    ReactionEmoji,
+    User,
+} from "discord-types/general";
 
 import {
     ChannelState,
@@ -541,4 +549,38 @@ export function useMember(user: FullUser | null, channel: Channel) {
         primaryGuild: user?.primaryGuild,
         guildId: guild.id,
     };
+}
+
+export type MessageReactionWithBurst = MessageReaction & { burst_count: number; me_burst: boolean };
+
+export function useTopReaction(message: Message) {
+    return useMemo(() => {
+        let topCount = 0;
+        let topReaction: MessageReactionWithBurst | null = null;
+
+        for (const reaction of message.reactions as MessageReactionWithBurst[]) {
+            const count = Math.max(reaction.count, reaction.burst_count);
+            if (topReaction && count < topCount) continue;
+
+            topReaction = reaction;
+            topCount = count;
+        }
+
+        return topReaction;
+    }, [message?.reactions]);
+}
+
+export function useAuthor(channel: ThreadChannel, message?: Message | null) {
+    const owner = useStateFromStores([UserStore], () =>
+        message ? null : UserStore.getUser(channel.ownerId)
+    );
+
+    const author = useMember(message?.author ?? owner, channel);
+
+    useEffect(() => {
+        message?.author?.id &&
+            GuildMemberRequesterStore.requestMember(channel.guild_id, message.author?.id);
+    }, [channel.guild_id, message?.author?.id]);
+
+    return author;
 }

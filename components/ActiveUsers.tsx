@@ -27,7 +27,7 @@ interface FacePileProps {
 
 const FacePile = findComponentByCodeLazy<FacePileProps>("this.props.renderIcon");
 
-interface AvatarPileProps extends Omit<FacePileProps, "users" | "renderMoreUsers"> {
+interface AvatarPileProps extends Omit<FacePileProps, "users"> {
     userIds: User["id"][];
 }
 

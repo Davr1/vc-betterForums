@@ -15,7 +15,7 @@ import { cl } from "..";
 import { ChannelSectionStore, ForumPostComposerStore } from "../stores";
 import { CompareFn, deepEqual, ThreadChannel, useMessageCount } from "../utils";
 import { ForumPostBody } from "./ForumPostBody";
-import { ForumPostFooter } from "./ForumPostFooters";
+import { ForumPostFooter } from "./ForumPostFooter";
 import { Attachment, ForumPostMedia } from "./ForumPostMedia";
 
 const ClickableWithRing: React.FC<
