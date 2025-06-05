@@ -146,3 +146,7 @@
 .vc-better-forums-spacer {
     flex-grow: 1;
 }
+
+.vc-better-forums-username a {
+    color: var(--text-muted);
+}

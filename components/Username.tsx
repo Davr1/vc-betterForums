@@ -64,7 +64,7 @@ export const Username = memoizedComponent<UsernameProps>(function Username({
     const usernameElement = useUsername(author)(username, channel.id);
 
     return (
-        <Text tag="span" className="author" variant="text-sm/semibold">
+        <Text tag="span" className="vc-better-forums-username" variant="text-sm/semibold">
             {usernameElement}
             {renderColon ? ": " : null}
         </Text>
