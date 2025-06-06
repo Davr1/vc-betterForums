@@ -138,20 +138,16 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
             >
                 {typingUsers.length === 0 && mostRecentMessage ? (
                     <>
-                        <Text
-                            className="vc-better-forum-latest-message-content"
-                            color="currentColor"
-                        >
+                        <div className="vc-better-forum-latest-message-content">
                             <Username channel={channel} message={mostRecentMessage} renderColon />
                             <MessageContent
                                 channel={channel}
                                 message={mostRecentMessage}
                                 messageClassName="vc-better-forums-message-content-inline"
-                                tag="span"
                                 variant={unreadCount ? "text-sm/semibold" : "text-sm/normal"}
                                 lineClamp={1}
                             />
-                        </Text>
+                        </div>
                         {unreadCount !== null && (
                             <Text variant="text-sm/semibold" color="text-brand">
                                 {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {

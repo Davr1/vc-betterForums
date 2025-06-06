@@ -116,13 +116,11 @@
 }
 
 .vc-better-forums-message-content-inline {
-    display: inline;
+    height: 1lh;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
-
-    > * {
-        height: unset !important;
-        white-space: nowrap !important;
-    }
+    margin-left: 4px;
 }
 
 .vc-better-forums-reaction-button {
@@ -150,6 +148,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.vc-better-forum-latest-message-content {
+    display: flex;
 }
 
 .vc-better-forums-footer-section-text {
