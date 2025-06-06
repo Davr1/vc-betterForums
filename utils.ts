@@ -315,7 +315,7 @@ export function useCheckPermissions(
             isGuest ||
             !idk ||
             !(
-                (canAddNewReactions === true || isPrivate) &&
+                (canAddNewReactions || isPrivate) &&
                 !isSystemDM &&
                 isActiveChannelOrUnarchivableThread
             ),
@@ -577,17 +577,17 @@ export function useMessageContent({
         ForumPostMessagesStore.isLoading(channel.id)
     );
 
-    if (isAuthorBlocked)
-        return { content: getIntlMessage("FORUM_POST_BLOCKED_FIRST_MESSAGE"), systemMessage: true };
-
-    if (isAuthorIgnored)
-        return { content: getIntlMessage("FORUM_POST_IGNORED_FIRST_MESSAGE"), systemMessage: true };
-
     const { contentPlaceholder, renderedContent } = useMemo(() => {
         return !message
             ? { contentPlaceholder: null, renderedContent: null }
             : getMessageContent(message, content, isAuthorBlocked, isAuthorIgnored, className, {});
     }, [message, content, isAuthorBlocked, isAuthorIgnored, className]);
+
+    if (isAuthorBlocked)
+        return { content: getIntlMessage("FORUM_POST_BLOCKED_FIRST_MESSAGE"), systemMessage: true };
+
+    if (isAuthorIgnored)
+        return { content: getIntlMessage("FORUM_POST_IGNORED_FIRST_MESSAGE"), systemMessage: true };
 
     if (renderedContent) return { content: renderedContent, systemMessage: false };
 
