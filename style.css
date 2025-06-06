@@ -120,7 +120,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin-left: 4px;
 }
 
 .vc-better-forums-reaction-button {
@@ -148,6 +147,7 @@
 
 .vc-better-forum-latest-message-content {
     display: flex;
+    gap: 4px;
 }
 
 .vc-better-forums-footer-section-text {

@@ -600,7 +600,7 @@ export function useMessageContent({
             systemMessage: true,
         };
 
-    return { content: contentPlaceholder, systemMessage: false };
+    return { content: contentPlaceholder, systemMessage: true };
 }
 
 export interface Attachment {
