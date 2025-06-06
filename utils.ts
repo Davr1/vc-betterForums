@@ -501,21 +501,30 @@ export function useMember(user: FullUser | null, channel: Channel) {
 
 export type MessageReactionWithBurst = MessageReaction & { burst_count: number; me_burst: boolean };
 
-export function useTopReaction(message: Message) {
+export enum ReactionType {
+    NORMAL = 0,
+    BURST = 1,
+    VOTE = 2,
+}
+
+export function useTopReactions(
+    message: Message,
+    n?: number
+): { id: string; type: ReactionType; count: number; reaction: MessageReactionWithBurst }[] {
+    const reactions = message.reactions as MessageReactionWithBurst[];
+
     return useMemo(() => {
-        let topCount = 0;
-        let topReaction: MessageReactionWithBurst | null = null;
-
-        for (const reaction of message.reactions as MessageReactionWithBurst[]) {
-            const count = Math.max(reaction.count, reaction.burst_count);
-            if (topReaction && count < topCount) continue;
-
-            topReaction = reaction;
-            topCount = count;
-        }
-
-        return topReaction;
-    }, [message?.reactions]);
+        return reactions
+            .map(reaction => ({
+                id: `${reaction.emoji.id ?? 0}:${reaction.emoji.name}`,
+                reaction,
+                ...(reaction.burst_count > reaction.count
+                    ? { type: ReactionType.BURST, count: reaction.burst_count }
+                    : { type: ReactionType.NORMAL, count: reaction.count }),
+            }))
+            .sort((r1, r2) => r2.count - r1.count)
+            .slice(0, n);
+    }, [reactions, n]);
 }
 
 export function useAuthor(channel: ThreadChannel, message?: Message | null) {

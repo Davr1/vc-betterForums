@@ -48,14 +48,13 @@ const useForumPostEvents: (options: {
 } = findByCodeLazy("facepileRef:", "handleLeftClick");
 
 interface ForumPostProps {
-    className?: string;
     goToThread: (channel: Channel, _: boolean) => void;
     threadId: string;
 }
 
 export const ForumPost = LazyComponent(
     () =>
-        function ForumPost({ className, goToThread, threadId }: ForumPostProps) {
+        function ForumPost({ goToThread, threadId }: ForumPostProps) {
             const channel = useStateFromStores(
                 [ChannelStore],
                 () => ChannelStore.getChannel(threadId) as ThreadChannel
@@ -69,7 +68,7 @@ export const ForumPost = LazyComponent(
             const { firstMessage } = useFirstMessage(channel);
             const { firstMedia } = useForumPostMetadata({ firstMessage });
             const { messageCountText } = useMessageCount(channel.id);
-            const { ref: ringTarget, height } = useFocusRing<HTMLDivElement>();
+            const { ref: ringTarget, width, height } = useFocusRing<HTMLDivElement>();
             const setCardHeight = useForumPostComposerStore(store => store.setCardHeight);
 
             useEffect(() => {
@@ -108,7 +107,11 @@ export const ForumPost = LazyComponent(
                             <ForumPostBody channel={channel} firstMessage={firstMessage} />
                             {firstMedia && <ForumPostMedia {...firstMedia} />}
                         </Flex>
-                        <ForumPostFooter channel={channel} firstMessage={firstMessage} />
+                        <ForumPostFooter
+                            channel={channel}
+                            firstMessage={firstMessage}
+                            containerWidth={width}
+                        />
                     </Flex>
                 </ErrorBoundary>
             );

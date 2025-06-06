@@ -126,10 +126,6 @@
 .vc-better-forums-reaction-button {
     margin: 0;
     display: flex;
-
-    :has(> &) {
-        display: flex;
-    }
 }
 
 .vc-better-forums-footer-section {
@@ -246,4 +242,23 @@
 
 .vc-better-forums-timestamp {
     display: contents;
+}
+
+.vc-better-forums-reactions {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: var(--space-6);
+}
+
+.vc-better-forums-reaction {
+    &,
+    & > div {
+        display: flex;
+    }
+}
+
+.vc-better-forums-reaction-hidden {
+    visibility: hidden;
+    position: absolute;
+    pointer-events: none;
 }

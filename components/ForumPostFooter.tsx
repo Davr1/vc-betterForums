@@ -40,9 +40,10 @@ const TypingText = findComponentByCodeLazy<TypingTextProps>("getTypingUsers", "I
 interface ForumPostFooterProps {
     channel: ThreadChannel;
     firstMessage: Message | null;
+    containerWidth?: number;
 }
 
-export function ForumPostFooter({ channel, firstMessage }: ForumPostFooterProps) {
+export function ForumPostFooter({ channel, firstMessage, containerWidth }: ForumPostFooterProps) {
     const hasReactions = firstMessage?.reactions && firstMessage.reactions.length > 0;
 
     return (
@@ -51,7 +52,11 @@ export function ForumPostFooter({ channel, firstMessage }: ForumPostFooterProps)
             <ForumPostLatestMessageSection channel={channel} />
             {firstMessage &&
                 (hasReactions ? (
-                    <Reactions firstMessage={firstMessage} channel={channel} />
+                    <Reactions
+                        firstMessage={firstMessage}
+                        channel={channel}
+                        maxWidth={containerWidth ? containerWidth / 3 : undefined}
+                    />
                 ) : (
                     <DefaultReaction firstMessage={firstMessage} channel={channel} />
                 ))}

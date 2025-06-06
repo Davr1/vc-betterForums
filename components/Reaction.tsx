@@ -4,24 +4,29 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { LazyComponent } from "@utils/lazyReact";
 import { findComponentByCodeLazy } from "@webpack";
-import { ChannelStore, useStateFromStores } from "@webpack/common";
+import {
+    ChannelStore,
+    React,
+    useLayoutEffect,
+    useRef,
+    useState,
+    useStateFromStores,
+} from "@webpack/common";
 import { Message } from "discord-types/general";
 
+import { cl } from "..";
 import {
     ForumChannel,
+    memoizedComponent,
     MessageReactionWithBurst,
+    ReactionType,
     ThreadChannel,
     useCheckPermissions,
     useDefaultEmoji,
-    useTopReaction,
+    useTopReactions,
 } from "../utils";
-
-enum ReactionType {
-    NORMAL = 0,
-    BURST = 1,
-    VOTE = 2,
-}
 
 export type EmojiSize = "reaction" | "jumbo";
 
@@ -39,6 +44,28 @@ interface ReactionButtonProps extends MessageReactionWithBurst {
 }
 const ReactionButton = findComponentByCodeLazy<ReactionButtonProps>("getReactionPickerAnimation");
 
+interface ReactionContainerProps extends ReactionButtonProps {
+    visible?: boolean;
+}
+
+const ReactionContainer = LazyComponent(() =>
+    React.forwardRef(function ReactionContainer(
+        { visible = true, ...props }: ReactionContainerProps,
+        ref: React.Ref<HTMLDivElement>
+    ) {
+        return (
+            <div
+                ref={ref}
+                className={cl("vc-better-forums-reaction", {
+                    "vc-better-forums-reaction-hidden": !visible,
+                })}
+            >
+                <ReactionButton {...props} />
+            </div>
+        );
+    })
+);
+
 const reactionButtonDefaultProps = {
     count: 0,
     burst_count: 0,
@@ -53,6 +80,7 @@ const reactionButtonDefaultProps = {
 interface ReactionProps {
     firstMessage: Message;
     channel: ThreadChannel;
+    maxWidth?: number;
 }
 
 export function DefaultReaction({ firstMessage, channel }: ReactionProps) {
@@ -66,7 +94,7 @@ export function DefaultReaction({ firstMessage, channel }: ReactionProps) {
     if (!defaultEmoji || disableReactionCreates) return null;
 
     return (
-        <ReactionButton
+        <ReactionContainer
             {...reactionButtonDefaultProps}
             message={firstMessage}
             readOnly={channel.isArchivedLockedThread()}
@@ -79,21 +107,57 @@ export function DefaultReaction({ firstMessage, channel }: ReactionProps) {
     );
 }
 
-export function Reactions({ firstMessage, channel }: ReactionProps) {
+export const Reactions = memoizedComponent<ReactionProps>(function Reactions({
+    firstMessage,
+    channel,
+    maxWidth,
+}) {
     const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
-    const reaction = useTopReaction(firstMessage);
-    if (!reaction) return null;
+    const reactions = useTopReactions(firstMessage, 5);
+
+    const [visibleReactions, setVisibleReactions] = useState(reactions.length);
+    const refs = useRef<Array<HTMLDivElement | null>>([]);
+
+    if (reactions.length !== refs.current.length) {
+        refs.current = Array.from({ length: reactions.length }, (_, i) => refs.current[i] ?? null);
+    }
+
+    useLayoutEffect(() => {
+        if (!maxWidth || reactions.length === 0) return;
+
+        let count = 0;
+        let width = 0;
+
+        for (const ref of refs.current) {
+            if (!ref) break;
+            width += ref.offsetWidth + 6 /* (gap) */;
+            if (width >= maxWidth) break;
+            count++;
+        }
+
+        setVisibleReactions(count);
+    }, [maxWidth, reactions]);
+
+    if (reactions.length === 0) return null;
 
     return (
-        <ReactionButton
-            {...reactionButtonDefaultProps}
-            message={firstMessage}
-            readOnly={disableReactionCreates || channel.isArchivedLockedThread()}
-            isLurking={isLurking}
-            isPendingMember={isPendingMember}
-            type={reaction.burst_count >= reaction.count ? ReactionType.BURST : ReactionType.NORMAL}
-            key={reaction.emoji.id}
-            {...reaction}
-        />
+        <div className="vc-better-forums-reactions">
+            {reactions.map((reaction, i) => (
+                <ReactionContainer
+                    {...reactionButtonDefaultProps}
+                    message={firstMessage}
+                    readOnly={disableReactionCreates || channel.isArchivedLockedThread()}
+                    isLurking={isLurking}
+                    isPendingMember={isPendingMember}
+                    type={reaction.type}
+                    key={reaction.id}
+                    visible={i < visibleReactions || i === 0}
+                    ref={ref => {
+                        refs.current[i] = ref;
+                    }}
+                    {...reaction.reaction}
+                />
+            ))}
+        </div>
     );
-}
+});
