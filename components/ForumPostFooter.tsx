@@ -36,7 +36,7 @@ interface TypingTextProps {
 }
 
 const ThreeDots = findComponentByCodeLazy<TypingIndicatorProps>(".dots,", "dotRadius:");
-const TypingText = findComponentByCodeLazy<TypingTextProps>("getTypingUsers", "INTERACTIVE_NORMAL");
+const TypingText = findComponentByCodeLazy<TypingTextProps>("getUserCombo", "isThreadCreation");
 
 interface ForumPostFooterProps {
     channel: ThreadChannel;
