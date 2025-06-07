@@ -123,8 +123,12 @@ export interface ChannelState {
     tagSetting: TagSetting;
 }
 
-export interface ForumChannelStore {
+export interface ForumChannelStore extends ForumChannelStoreState {
     getChannelState(channelId: Channel["id"]): ChannelState | undefined;
+}
+
+export interface ForumChannelStoreState {
+    channelStates: Record<Channel["id"], ChannelState>;
 }
 
 export interface ForumPostComposerStore {

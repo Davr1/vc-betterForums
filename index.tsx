@@ -7,14 +7,18 @@
 import "./style.css";
 
 import { classNameFactory } from "@api/Styles";
+import { proxyLazy } from "@utils/lazy";
 import definePlugin from "@utils/types";
+import { zustandCreate, zustandPersist } from "@webpack/common";
 
 import { ForumPost } from "./components/ForumPost";
 import { settings } from "./settings";
-import { ForumChannelStore } from "./stores";
-import { setForumChannelStore } from "./utils";
+import { ForumChannelStore, ForumChannelStoreState } from "./stores";
+import { indexedDBStorageFactory, setForumChannelStore } from "./utils";
 
 export const cl = classNameFactory();
+
+const STORAGE_KEY = "BetterForums";
 
 export default definePlugin({
     name: "BetterForums",
@@ -32,13 +36,26 @@ export default definePlugin({
         {
             find: "this.toggleTagFilter",
             replacement: {
-                match: /(\i)=(\i)\(\)/,
-                replace: "$&;$self.ForumChannelStore=$2",
+                match: /let (\i)=\(0,\i\.\i\)/,
+                replace: "let $1=$self.createStore",
             },
+            predicate: () => settings.store.keepState,
         },
     ],
     ForumPost,
-    set ForumChannelStore(value: () => ForumChannelStore) {
-        setForumChannelStore(value());
+    createStore(storeCreator: (_set: unknown, _get: unknown) => ForumChannelStore) {
+        const useStore = proxyLazy<() => ForumChannelStore>(() =>
+            zustandCreate(
+                zustandPersist(storeCreator, {
+                    name: `${STORAGE_KEY}-state`,
+                    storage: indexedDBStorageFactory<ForumChannelStoreState>(),
+                    partialize: ({ channelStates }: ForumChannelStore) => ({ channelStates }),
+                })
+            )
+        );
+
+        setForumChannelStore(useStore);
+
+        return useStore;
     },
 });

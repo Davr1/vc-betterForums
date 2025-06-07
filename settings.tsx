@@ -19,6 +19,12 @@ export enum MessagePreviewLineCount {
 }
 
 export const settings = definePluginSettings({
+    keepState: {
+        type: OptionType.BOOLEAN,
+        description: "Keep forum state after reload",
+        default: true,
+        restartNeeded: true,
+    },
     maxReactionCount: {
         type: OptionType.SLIDER,
         description: "Maximum number of reactions to show in the thread footer",

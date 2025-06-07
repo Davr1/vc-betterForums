@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { DataStore } from "@api/index";
 import { getIntlMessage } from "@utils/discord";
 import { runtimeHashMessageKey } from "@utils/intlHash";
 import { LazyComponent } from "@utils/lazyReact";
@@ -50,6 +51,26 @@ import {
     ThreadMessageStore,
     TypingStore,
 } from "./stores";
+
+export function indexedDBStorageFactory<T>() {
+    return {
+        async getItem(name: string): Promise<T | null> {
+            return (await DataStore.get(name)) ?? null;
+        },
+        async setItem(name: string, value: T): Promise<void> {
+            await DataStore.set(name, value);
+        },
+        async removeItem(name: string): Promise<void> {
+            await DataStore.del(name);
+        },
+    };
+}
+
+export interface ZustandStore<StoreType> {
+    (): StoreType;
+    getState: () => StoreType;
+    subscribe: (cb: (value: StoreType) => void) => void;
+}
 
 export interface ForumChannel extends Channel {
     defaultReactionEmoji: Record<"emojiId" | "emojiName", string | null> | null;
@@ -407,23 +428,26 @@ export function useForumPostInfo({ channel, isNew }: ForumPostInfoOptions) {
     };
 }
 
-let ForumChannelStore: ForumChannelStore | null = null;
-export function setForumChannelStore(store: ForumChannelStore) {
-    ForumChannelStore = store;
+let useForumChannelStore: () => ForumChannelStore | null = () => null;
+export function setForumChannelStore(storeGetter: () => ForumChannelStore) {
+    useForumChannelStore = storeGetter;
+}
+
+export function getDefaultChannelState(): ChannelState {
+    return {
+        layoutType: LayoutType.LIST,
+        sortOrder: SortOrder.CREATION_DATE,
+        tagFilter: new Set(),
+        scrollPosition: 0,
+        tagSetting: TagSetting.MATCH_SOME,
+    };
 }
 
 export function useForumChannelState(channelId: Channel["id"]): ChannelState {
     const channel = useStateFromStores([ChannelStore], () => ChannelStore.getChannel(channelId));
+    const channelState = useForumChannelStore()?.getChannelState(channelId);
 
-    return !channel || !ForumChannelStore
-        ? {
-              layoutType: LayoutType.LIST,
-              sortOrder: SortOrder.CREATION_DATE,
-              tagFilter: new Set(),
-              scrollPosition: 0,
-              tagSetting: TagSetting.MATCH_SOME,
-          }
-        : ForumChannelStore.getChannelState(channelId)!;
+    return !channel || !channelState ? getDefaultChannelState() : channelState;
 }
 
 export function memoizedComponent<TProps extends object = {}>(
@@ -433,8 +457,6 @@ export function memoizedComponent<TProps extends object = {}>(
 }
 
 interface FullGuildMember extends GuildMember {
-    global_name?: string;
-    globalName?: string;
     avatarDecoration?: { asset: string; skuId: string };
     colorStrings?: Record<
         "primaryColor" | "secondaryColor" | "tertiaryColor",
