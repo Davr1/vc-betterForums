@@ -5,10 +5,10 @@
  */
 
 import { getIntlMessage } from "@utils/discord";
-import { findComponentByCodeLazy } from "@webpack";
-import { Flex, Text, useStateFromStores } from "@webpack/common";
+import { findByPropsLazy, findComponentByCodeLazy } from "@webpack";
+import { Flex, Text, useCallback, useStateFromStores } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
-import { PropsWithChildren } from "react";
+import { JSX, PropsWithChildren } from "react";
 
 import { cl } from "..";
 import { MaxReactionCount, settings } from "../settings";
@@ -73,15 +73,21 @@ export function ForumPostFooter({ channel, firstMessage, containerWidth }: Forum
     );
 }
 
-interface ForumPostFooterSectionProps extends PropsWithChildren {
+interface ForumPostFooterSectionProps extends PropsWithChildren<JSX.IntrinsicElements["div"]> {
     className?: string;
     icon?: React.ReactNode;
     text?: string;
 }
 
-function ForumPostFooterSection({ children, className, icon, text }: ForumPostFooterSectionProps) {
+function ForumPostFooterSection({
+    children,
+    className,
+    icon,
+    text,
+    ...props
+}: ForumPostFooterSectionProps) {
     return (
-        <div className={cl("vc-better-forums-footer-section", className)}>
+        <div className={cl("vc-better-forums-footer-section", className)} {...props}>
             {icon}
             <Text
                 variant="text-sm/semibold"
@@ -124,6 +130,18 @@ const renderTypingIndicator = () => (
     <ThreeDots themed dotRadius={2} className="vc-better-forums-typing-indicator" />
 );
 
+const Kangaroo: {
+    jumpToMessage: (options: {
+        channelId: Channel["id"];
+        messageId: Message["id"];
+        flash?: boolean;
+        jumpType?: "ANIMATED" | "INSTANT";
+        skipLocalFetch?: boolean;
+        isPreload?: boolean;
+        avoidInitialScroll?: boolean;
+    }) => void;
+} = findByPropsLazy("jumpToMessage");
+
 interface ForumPostLatestMessageSectionProps {
     channel: ThreadChannel;
 }
@@ -137,6 +155,12 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
             channel.id
         );
         const typingUsers = useTypingUsers(channel.id);
+        const clickHandler = useCallback(
+            () =>
+                mostRecentMessage?.id &&
+                Kangaroo.jumpToMessage({ channelId: channel.id, messageId: mostRecentMessage.id }),
+            [channel.id, mostRecentMessage?.id]
+        );
 
         if (messageCount === 0 && typingUsers.length === 0) return <ForumPostSpacerSection />;
 
@@ -149,6 +173,7 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
                 })}
                 icon={<ChatIcon />}
                 text={messageCountText}
+                onClick={clickHandler}
             >
                 {typingUsers.length === 0 && mostRecentMessage ? (
                     <>
