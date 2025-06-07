@@ -55,7 +55,7 @@ export function ForumPostFooter({ channel, firstMessage, containerWidth }: Forum
                     <Reactions
                         firstMessage={firstMessage}
                         channel={channel}
-                        maxWidth={containerWidth ? containerWidth / 3 : undefined}
+                        maxWidth={containerWidth ? containerWidth - 500 : undefined}
                     />
                 ) : (
                     <DefaultReaction firstMessage={firstMessage} channel={channel} />
@@ -143,7 +143,7 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
             >
                 {typingUsers.length === 0 && mostRecentMessage ? (
                     <>
-                        <div className="vc-better-forum-latest-message-content">
+                        <div className="vc-better-forums-latest-message-content">
                             <Username channel={channel} message={mostRecentMessage} renderColon />
                             <MessageContent
                                 channel={channel}
@@ -151,6 +151,7 @@ const ForumPostLatestMessageSection = memoizedComponent<ForumPostLatestMessageSe
                                 messageClassName="vc-better-forums-message-content-inline"
                                 variant={unreadCount ? "text-sm/semibold" : "text-sm/normal"}
                                 lineClamp={1}
+                                visibleIcons
                             />
                         </div>
                         {unreadCount !== null && (

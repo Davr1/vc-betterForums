@@ -138,16 +138,17 @@
 }
 
 .vc-better-forums-latest-message,
-.vc-better-forum-latest-message-content {
+.vc-better-forums-latest-message-content {
     flex-grow: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.vc-better-forum-latest-message-content {
+.vc-better-forums-latest-message-content {
     display: flex;
     gap: 4px;
+    align-items: center;
 }
 
 .vc-better-forums-footer-section-text {
@@ -261,4 +262,8 @@
     visibility: hidden;
     position: absolute;
     pointer-events: none;
+}
+
+.vc-better-forums-message-icon {
+    flex-shrink: 0;
 }

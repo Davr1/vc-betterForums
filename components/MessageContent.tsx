@@ -15,12 +15,14 @@ interface MessageContentProps extends Omit<TextProps, "children"> {
     channel: Channel;
     message: Message | null;
     messageClassName?: string;
+    visibleIcons?: boolean;
 }
 
 export const MessageContent = memoizedComponent<MessageContentProps>(function MessageContent({
     channel,
     message,
     messageClassName = "vc-better-forums-message-content",
+    visibleIcons,
     ...props
 }) {
     const { content, firstMedia } = useForumPostMetadata({ firstMessage: message });
@@ -30,7 +32,12 @@ export const MessageContent = memoizedComponent<MessageContentProps>(function Me
         isIgnored: !!message && RelationshipStore.isIgnoredForMessage(message),
     }));
 
-    const { content: messageContent, systemMessage } = useMessageContent({
+    const {
+        content: messageContent,
+        systemMessage,
+        leadingIcon,
+        trailingIcon,
+    } = useMessageContent({
         channel,
         message,
         content,
@@ -38,9 +45,11 @@ export const MessageContent = memoizedComponent<MessageContentProps>(function Me
         isAuthorBlocked: isBlocked,
         isAuthorIgnored: isIgnored,
         className: messageClassName,
+        iconSize: 16,
+        iconClassName: "vc-better-forums-message-icon",
     });
 
-    return (
+    const text = (
         <Text
             style={{
                 fontStyle: systemMessage ? "italic" : "normal",
@@ -53,4 +62,6 @@ export const MessageContent = memoizedComponent<MessageContentProps>(function Me
             {messageContent}
         </Text>
     );
+
+    return visibleIcons ? [leadingIcon, text, trailingIcon] : text;
 });
