@@ -14,6 +14,7 @@ import {
     EmojiStore,
     GuildStore,
     i18n,
+    PermissionsBits,
     React,
     SnowflakeUtils,
     useEffect,
@@ -30,6 +31,7 @@ import {
     ReactionEmoji,
     User,
 } from "discord-types/general";
+import { ComponentType, ReactNode } from "react";
 
 import {
     ChannelState,
@@ -66,15 +68,9 @@ export function indexedDBStorageFactory<T>() {
     };
 }
 
-export interface ZustandStore<StoreType> {
-    (): StoreType;
-    getState: () => StoreType;
-    subscribe: (cb: (value: StoreType) => void) => void;
-}
-
 export interface ForumChannel extends Channel {
     defaultReactionEmoji: Record<"emojiId" | "emojiName", string | null> | null;
-    availableTags: Tag[] | null;
+    availableTags: DiscordTag[] | null;
 }
 
 interface ThreadMetadata {
@@ -87,7 +83,7 @@ interface ThreadMetadata {
 }
 
 export interface ThreadChannel extends Channel {
-    appliedTags: Tag["id"][] | null;
+    appliedTags: DiscordTag["id"][] | null;
     memberIdsPreview: User["id"][];
     memberCount: number;
     messageCount: number;
@@ -157,17 +153,19 @@ interface ForumPostState {
 }
 
 export function useForumPostState(channel: Channel): ForumPostState {
-    return useStateFromStores([GuildStore, ReadStateStore], () => {
-        const guild: Guild | null = GuildStore.getGuild(channel.getGuildId());
-        const isActive = !!guild && !channel.isArchivedThread();
+    return useStateFromStores(
+        [GuildStore, ReadStateStore],
+        () => {
+            const guild: Guild | null = GuildStore.getGuild(channel.getGuildId());
+            const isActive = !!guild && !channel.isArchivedThread();
+            const isNew =
+                isActive && ReadStateStore.isNewForumThread(channel.id, channel.parent_id, guild);
+            const hasUnreads = isActive && ReadStateStore.isForumPostUnread(channel.id);
 
-        return {
-            isActive,
-            isNew:
-                isActive && ReadStateStore.isNewForumThread(channel.id, channel.parent_id, guild),
-            hasUnreads: isActive && ReadStateStore.isForumPostUnread(channel.id),
-        };
-    });
+            return { isActive, isNew, hasUnreads };
+        },
+        [channel]
+    );
 }
 
 const timeFormat = () =>
@@ -176,7 +174,7 @@ const timeFormat = () =>
         hours: i18n.t[runtimeHashMessageKey("FORM_POST_CREATED_AGO_TIMESTAMP_HOURS")],
         days: i18n.t[runtimeHashMessageKey("FORM_POST_CREATED_AGO_TIMESTAMP_DAYS")],
         month: getIntlMessage("FORM_POST_CREATED_AGO_TIMESTAMP_MORE_THAN_MONTH"),
-    } as TimeFormatterOptions);
+    } as const satisfies TimeFormatterOptions);
 
 export function useFormatTimestamp(
     channel: Channel,
@@ -185,8 +183,10 @@ export function useFormatTimestamp(
 ): string {
     const timestamp = useMemo(() => SnowflakeUtils.extractTimestamp(channel.id), [channel.id]);
 
-    const lastMessage = useStateFromStores([ReadStateStore], () =>
-        ReadStateStore.lastMessageId(channel.id)
+    const lastMessage = useStateFromStores(
+        [ReadStateStore],
+        () => ReadStateStore.lastMessageId(channel.id),
+        [channel.id]
     );
 
     const lastMessageTimestamp = useMemo(
@@ -198,6 +198,7 @@ export function useFormatTimestamp(
         () => (sortOrder === SortOrder.CREATION_DATE ? timestamp : lastMessageTimestamp),
         [lastMessageTimestamp, sortOrder, timestamp]
     );
+
     const format = useMemo(
         () =>
             sortOrder === SortOrder.CREATION_DATE && duration === Duration.POSTED_DURATION_AGO
@@ -236,13 +237,16 @@ export function useTypingUsers(
     );
 }
 
-export function useUsers(guildId: Guild["id"], userIds: User["id"][]) {
-    const users = useStateFromStores([UserStore], () =>
-        userIds.map(UserStore.getUser).filter(Boolean)
+export function useUsers(guildId: Guild["id"], userIds: User["id"][], limit?: number) {
+    const users = useStateFromStores(
+        [UserStore],
+        () => userIds.map(UserStore.getUser).filter(Boolean).slice(0, limit),
+        [userIds, limit]
     );
+
     useEffect(() => {
         userIds.forEach(user => GuildMemberRequesterStore.requestMember(guildId, user));
-    }, []);
+    }, [userIds, guildId]);
 
     return users;
 }
@@ -251,16 +255,14 @@ export function useDefaultEmoji(channel: ForumChannel): ReactionEmoji | null {
     const emoji = channel.defaultReactionEmoji;
     if (!emoji) return null;
 
-    const customEmoji = useStateFromStores([EmojiStore], () =>
-        EmojiStore.getUsableCustomEmojiById(emoji.emojiId)
+    const customEmoji = useStateFromStores(
+        [EmojiStore],
+        () => EmojiStore.getUsableCustomEmojiById(emoji.emojiId),
+        [emoji.emojiId]
     );
 
-    if (emoji.emojiId && customEmoji)
-        return {
-            id: emoji.emojiId,
-            name: customEmoji.name,
-            animated: customEmoji.animated,
-        };
+    if (emoji.emojiId && customEmoji) return customEmoji;
+
     if (emoji.emojiName)
         return {
             id: emoji.emojiId ?? undefined,
@@ -274,15 +276,18 @@ export function useDefaultEmoji(channel: ForumChannel): ReactionEmoji | null {
 function useIsActiveChannelOrUnarchivableThread(channel: Channel | null): boolean {
     const canSendMessagesInThreads = useStateFromStores(
         [PermissionStore],
-        () => !!channel && PermissionStore.can(1n << 38n, channel)
+        () => !!channel && PermissionStore.can(PermissionsBits.SEND_MESSAGES_IN_THREADS, channel),
+        [channel]
     );
+
+    if (!channel) return false;
+
+    if (!channel.isThread() || channel.isActiveThread()) return true;
+
     return (
-        !!channel &&
-        (!channel.isThread() ||
-            channel.isActiveThread() ||
-            (channel.isArchivedThread() &&
-                channel.threadMetadata?.locked !== true &&
-                canSendMessagesInThreads))
+        channel.isArchivedThread() &&
+        channel.threadMetadata?.locked !== true &&
+        canSendMessagesInThreads
     );
 }
 
@@ -311,7 +316,7 @@ export function useCheckPermissions(
     );
     const canAddNewReactions = useStateFromStores(
         [PermissionStore],
-        () => canChat && PermissionStore.can(1n << 6n, channel),
+        () => canChat && PermissionStore.can(PermissionsBits.ADD_REACTIONS, channel),
         [canChat, channel]
     );
     const isActiveChannelOrUnarchivableThread = useIsActiveChannelOrUnarchivableThread(channel);
@@ -325,22 +330,22 @@ export function useCheckPermissions(
             isPendingMember: false,
         };
 
-    const isPrivate = channel.isPrivate(),
-        isSystemDM = channel.isSystemDM(),
-        idk = (canChat || isPrivate) && isActiveChannelOrUnarchivableThread;
+    const isPrivate = channel.isPrivate();
+    const isSystemDM = channel.isSystemDM();
+    const active = (canChat || isPrivate) && isActiveChannelOrUnarchivableThread;
 
     return {
         disableReactionReads: false,
         disableReactionCreates:
             isLurking ||
             isGuest ||
-            !idk ||
+            !active ||
             !(
                 (canAddNewReactions || isPrivate) &&
                 !isSystemDM &&
                 isActiveChannelOrUnarchivableThread
             ),
-        disableReactionUpdates: isLurking || isGuest || !idk,
+        disableReactionUpdates: isLurking || isGuest || !active,
         isLurking,
         isGuest,
         isPendingMember: false,
@@ -363,12 +368,16 @@ const textHightlightParser: (
 } = findByCodeLazy("hideSimpleEmbedContent:", "1!==");
 
 export function useChannelName(channel: Channel): React.ReactNode {
-    const hasSearchResults = useStateFromStores([ForumSearchStore], () =>
-        ForumSearchStore.getHasSearchResults(channel.parent_id)
+    const hasSearchResults = useStateFromStores(
+        [ForumSearchStore],
+        () => ForumSearchStore.getHasSearchResults(channel.parent_id),
+        [channel.parent_id]
     );
 
-    const searchQuery = useStateFromStores([ForumSearchStore], () =>
-        ForumSearchStore.getSearchQuery(channel.parent_id)
+    const searchQuery = useStateFromStores(
+        [ForumSearchStore],
+        () => ForumSearchStore.getSearchQuery(channel.parent_id),
+        [channel.parent_id]
     );
 
     const postProcessor = useMemo(
@@ -376,57 +385,34 @@ export function useChannelName(channel: Channel): React.ReactNode {
         [hasSearchResults, searchQuery]
     );
 
-    return React.useMemo(
+    return useMemo(
         () =>
             textHightlightParser({ content: channel.name, embeds: [] }, { postProcessor }).content,
         [channel.name, postProcessor]
     );
 }
 
-export interface Tag {
+export interface DiscordTag {
     id: string;
+    custom?: false;
     name: string;
     emojiId: null | string;
     emojiName: null | string;
     moderated: boolean;
 }
 
-function useTags(channel: ThreadChannel): Tag[] {
-    return useStateFromStores([ChannelStore], () => {
-        const forumChannel = ChannelStore.getChannel(channel.parent_id) as ForumChannel | null;
+export type CustomTagType = "new" | "pinned" | "archived" | "locked";
+export type CustomTagColor = "blue" | "green" | "red" | "teal" | "yellow" | "orange";
 
-        const availableTags = (forumChannel?.availableTags ?? []).reduce((acc, tag) => {
-            acc[tag.id] = tag;
-            return acc;
-        }, {} as Record<Tag["id"], Tag>);
-
-        return (channel.appliedTags ?? []).map(tag => availableTags[tag]);
-    });
+export interface CustomTag {
+    id: CustomTagType;
+    name: string;
+    custom: true;
+    color?: CustomTagColor;
+    icon?: ReactNode;
 }
 
-interface ForumPostInfoOptions {
-    channel: ThreadChannel;
-    isNew?: boolean;
-}
-
-export function useForumPostInfo({ channel, isNew }: ForumPostInfoOptions) {
-    const appliedTags = useTags(channel);
-
-    const shownTags = appliedTags.slice(0, 3);
-    const remainingTags = appliedTags.slice(3);
-    const moreTagsCount = appliedTags.length > 3 ? appliedTags.length - 3 : 0;
-    const isPinned = channel.hasFlag(2);
-    const shouldRenderTagsRow = shownTags.length > 0 || isPinned || !!isNew;
-
-    return {
-        shownTags,
-        remainingTags,
-        moreTagsCount,
-        isPinned,
-        shouldRenderTagsRow,
-        forumPostContainsTags: appliedTags.length > 0,
-    };
-}
+export type Tag = DiscordTag | CustomTag;
 
 let useForumChannelStore: () => ForumChannelStore | null = () => null;
 export function setForumChannelStore(storeGetter: () => ForumChannelStore) {
@@ -444,15 +430,15 @@ export function getDefaultChannelState(): ChannelState {
 }
 
 export function useForumChannelState(channelId: Channel["id"]): ChannelState {
-    const channel = useStateFromStores([ChannelStore], () => ChannelStore.getChannel(channelId));
+    const channel = useStateFromStores([ChannelStore], () => ChannelStore.getChannel(channelId), [
+        channelId,
+    ]);
     const channelState = useForumChannelStore()?.getChannelState(channelId);
 
     return !channel || !channelState ? getDefaultChannelState() : channelState;
 }
 
-export function memoizedComponent<TProps extends object = {}>(
-    component: React.ComponentType<TProps>
-) {
+export function memoizedComponent<TProps extends object = {}>(component: ComponentType<TProps>) {
     return LazyComponent(() => React.memo(component));
 }
 
@@ -479,10 +465,13 @@ interface FullUser extends User {
 export function useMember(user: FullUser | null, channel: Channel) {
     const userId = user?.id;
     const guildId = channel?.guild_id;
-    const member = useStateFromStores([GuildMemberStore], () =>
-        !guildId || !userId
-            ? null
-            : (GuildMemberStore.getMember(guildId, userId) as FullGuildMember)
+    const member = useStateFromStores(
+        [GuildMemberStore],
+        () =>
+            !guildId || !userId
+                ? null
+                : (GuildMemberStore.getMember(guildId, userId) as FullGuildMember),
+        [guildId, userId]
     );
 
     const { guild, guildRoles } = useStateFromStores(
@@ -495,8 +484,10 @@ export function useMember(user: FullUser | null, channel: Channel) {
         [guildId]
     );
 
-    const friendNickname = useStateFromStores([RelationshipStore], () =>
-        userId && channel?.isPrivate() ? RelationshipStore.getNickname(userId) : null
+    const friendNickname = useStateFromStores(
+        [RelationshipStore],
+        () => (userId && channel?.isPrivate() ? RelationshipStore.getNickname(userId) : null),
+        [userId, channel]
     );
 
     const userName = user?.global_name || user?.globalName || user?.username || "???";
@@ -531,7 +522,7 @@ export enum ReactionType {
 
 export function useTopReactions(
     message: Message,
-    n?: number
+    limit?: number
 ): { id: string; type: ReactionType; count: number; reaction: MessageReactionWithBurst }[] {
     const reactions = message.reactions as MessageReactionWithBurst[];
 
@@ -545,16 +536,16 @@ export function useTopReactions(
                     : { type: ReactionType.NORMAL, count: reaction.count }),
             }))
             .sort((r1, r2) => r2.count - r1.count)
-            .slice(0, n);
-    }, [reactions, n]);
+            .slice(0, limit);
+    }, [reactions, limit]);
 }
 
 export function useAuthor(channel: ThreadChannel, message?: Message | null) {
-    const owner = useStateFromStores([UserStore], () =>
-        message ? null : UserStore.getUser(channel.ownerId)
-    );
+    const owner = useStateFromStores([UserStore], () => UserStore.getUser(channel.ownerId), [
+        channel.ownerId,
+    ]);
 
-    const author = useMember(message?.author ?? owner, channel);
+    const author = useMember(message?.author ?? (message ? null : owner), channel);
 
     useEffect(() => {
         message?.author?.id &&
@@ -566,20 +557,18 @@ export function useAuthor(channel: ThreadChannel, message?: Message | null) {
 
 const getReplyPreview: (
     message: Message,
-    content: React.ReactNode,
+    content: ReactNode,
     isBlocked: boolean | undefined,
     isIgnored: boolean | undefined,
     className?: string,
     props?: { trailingIconClass?: string; leadingIconClass?: string; iconSize?: number }
-) => Record<
-    "contentPlaceholder" | "renderedContent" | "trailingIcon" | "leadingIcon",
-    React.ReactNode | null
-> = findByCodeLazy("#{intl::MESSAGE_PINNED}");
+) => Record<"contentPlaceholder" | "renderedContent" | "trailingIcon" | "leadingIcon", ReactNode> =
+    findByCodeLazy("#{intl::MESSAGE_PINNED}");
 
 interface MessageFormattingOptions {
     message: Message | null;
     channel: Channel;
-    content: React.ReactNode;
+    content: ReactNode;
     hasMediaAttachment: boolean;
     isAuthorBlocked?: boolean;
     isAuthorIgnored?: boolean;
@@ -598,12 +587,13 @@ export function useMessageContent({
     className,
     iconSize,
     iconClassName,
-}: MessageFormattingOptions): Record<
-    "content" | "leadingIcon" | "trailingIcon",
-    React.ReactNode | null
-> & { systemMessage: boolean } {
-    const isLoading = useStateFromStores([ForumPostMessagesStore], () =>
-        ForumPostMessagesStore.isLoading(channel.id)
+}: MessageFormattingOptions): Record<"content" | "leadingIcon" | "trailingIcon", ReactNode> & {
+    systemMessage: boolean;
+} {
+    const isLoading = useStateFromStores(
+        [ForumPostMessagesStore],
+        () => ForumPostMessagesStore.isLoading(channel.id),
+        [channel.id]
     );
 
     const { contentPlaceholder, renderedContent, leadingIcon, trailingIcon } = useMemo(() => {
@@ -660,7 +650,7 @@ export const useForumPostMetadata: (options: {
     noStyleAndInteraction?: boolean;
 }) => {
     hasSpoilerEmbeds: boolean;
-    content: React.ReactNode | null;
+    content: ReactNode;
     firstMedia: Attachment | null;
     firstMediaIsEmbed: boolean;
 } = findByCodeLazy(/noStyleAndInteraction:\i=!0\}/);

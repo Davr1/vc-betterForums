@@ -7,6 +7,7 @@
 import { findByCodeLazy } from "@webpack";
 import { Text } from "@webpack/common";
 import { Channel, Guild, Message, User } from "discord-types/general";
+import { ReactNode } from "react";
 
 import { memoizedComponent, ThreadChannel, useAuthor } from "../utils";
 
@@ -20,8 +21,7 @@ const useUsernameHook: (
     }>
 ) => (
     author: ReturnType<typeof useAuthor>
-) => (username: string, channelId: Channel["id"]) => React.ReactNode =
-    findByCodeLazy("useUsernameHook");
+) => (username: string, channelId: Channel["id"]) => ReactNode = findByCodeLazy("useUsernameHook");
 
 interface UsernameProps {
     message?: Message | null;

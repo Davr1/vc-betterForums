@@ -6,6 +6,7 @@
 
 import { findComponentByCodeLazy } from "@webpack";
 import { Guild, User } from "discord-types/general";
+import { ComponentType, ReactNode } from "react";
 
 import { useUsers } from "../utils";
 
@@ -16,13 +17,13 @@ interface FacePileProps {
     count?: number;
     max?: number;
     hideMoreUsers?: boolean;
-    renderMoreUsers?: (text: string, extraCount: number) => React.ReactNode;
+    renderMoreUsers?: (text: string, extraCount: number) => ReactNode;
     showDefaultAvatarsForNullUsers?: boolean;
     size?: 16 | 24 | 32 | 56;
     showUserPopout?: boolean;
     useFallbackUserForPopout?: boolean;
     renderIcon?: boolean;
-    renderUser?: React.FC<Omit<FacePileProps, "renderUser">>;
+    renderUser?: ComponentType<Omit<FacePileProps, "renderUser">>;
 }
 
 const FacePile = findComponentByCodeLazy<FacePileProps>("this.props.renderIcon");
@@ -36,7 +37,7 @@ function renderMoreUsers(text: string) {
 }
 
 export function AvatarPile({ guildId, userIds, max = 99, ...props }: AvatarPileProps) {
-    const users = useUsers(guildId, userIds.slice(0, 5));
+    const users = useUsers(guildId, userIds, 5);
     return (
         <FacePile
             guildId={guildId}

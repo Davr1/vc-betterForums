@@ -8,7 +8,7 @@ import { getIntlMessage } from "@utils/discord";
 import { findByPropsLazy, findComponentByCodeLazy } from "@webpack";
 import { Flex, Text, useCallback, useStateFromStores } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
-import { JSX, PropsWithChildren } from "react";
+import { HTMLAttributes, ReactNode } from "react";
 
 import { cl } from "..";
 import { MaxReactionCount, settings } from "../settings";
@@ -73,9 +73,9 @@ export function ForumPostFooter({ channel, firstMessage, containerWidth }: Forum
     );
 }
 
-interface ForumPostFooterSectionProps extends PropsWithChildren<JSX.IntrinsicElements["div"]> {
+interface ForumPostFooterSectionProps extends HTMLAttributes<HTMLDivElement> {
     className?: string;
-    icon?: React.ReactNode;
+    icon?: ReactNode;
     text?: string;
 }
 

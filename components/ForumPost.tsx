@@ -10,6 +10,7 @@ import { LazyComponent } from "@utils/lazyReact";
 import { findByCodeLazy } from "@webpack";
 import { ChannelStore, Clickable, Flex, useEffect, useStateFromStores } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
+import { ComponentProps, ComponentType, MouseEventHandler, Ref } from "react";
 
 import { cl } from "..";
 import { ChannelSectionStore, ForumPostComposerStore } from "../stores";
@@ -18,9 +19,9 @@ import { ForumPostBody } from "./ForumPostBody";
 import { ForumPostFooter } from "./ForumPostFooter";
 import { ForumPostMedia } from "./ForumPostMedia";
 
-const ClickableWithRing: React.FC<
-    React.ComponentProps<typeof Clickable> & {
-        focusProps: { ringTarget: React.Ref<HTMLElement> };
+const ClickableWithRing: ComponentType<
+    ComponentProps<typeof Clickable> & {
+        focusProps: { ringTarget: Ref<HTMLElement> };
     }
 > = Clickable;
 
@@ -28,7 +29,7 @@ const useFirstMessage: (channel: Channel) => { loaded: boolean; firstMessage: Me
     findByCodeLazy("loaded:", "firstMessage:", "getChannel", "getMessage");
 
 const useFocusRing: <T extends HTMLElement = HTMLElement>() => {
-    ref: React.Ref<T>;
+    ref: Ref<T>;
     width: number;
     height: number | null;
 } = findByCodeLazy(/,\{ref:\i,width:\i,height:\i\}\}/);
@@ -39,12 +40,12 @@ const useForumPostComposerStore: <T>(
 ) => T = findByCodeLazy("[useForumPostComposerStore]", ")}");
 
 const useForumPostEvents: (options: {
-    facepileRef?: React.Ref<HTMLElement>;
+    facepileRef?: Ref<HTMLElement>;
     goToThread: ForumPostProps["goToThread"];
     channel: Channel;
 }) => {
-    handleLeftClick: React.MouseEventHandler<unknown>;
-    handleRightClick: React.MouseEventHandler<unknown>;
+    handleLeftClick: MouseEventHandler<unknown>;
+    handleRightClick: MouseEventHandler<unknown>;
 } = findByCodeLazy("facepileRef:", "handleLeftClick");
 
 interface ForumPostProps {

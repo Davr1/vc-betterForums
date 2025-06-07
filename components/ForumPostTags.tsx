@@ -5,11 +5,64 @@
  */
 
 import { getIntlMessage } from "@utils/discord";
+import { ChannelStore, useCallback, useStateFromStores } from "@webpack/common";
 
 import { cl } from "..";
-import { ThreadChannel, useForumChannelState, useForumPostInfo, useForumPostState } from "../utils";
+import {
+    CustomTag,
+    CustomTagType,
+    DiscordTag,
+    ForumChannel,
+    Tag as TagType,
+    ThreadChannel,
+    useForumChannelState,
+    useForumPostState,
+} from "../utils";
 import { PinIcon } from "./icons";
-import { CustomTag, MoreTags, Tag } from "./Tags";
+import { MoreTags, Tag } from "./Tags";
+
+export function useTags(channel: ThreadChannel): TagType[] {
+    const { isNew } = useForumPostState(channel);
+
+    return useStateFromStores(
+        [ChannelStore],
+        () => {
+            const isPinned = channel.hasFlag(2);
+            const isArchived = channel.isArchivedThread();
+            const isLocked = channel.threadMetadata?.locked === true;
+
+            const customTags: CustomTag[] = (
+                [
+                    isNew && { id: "new", name: getIntlMessage("NEW") },
+                    isPinned && {
+                        id: "pinned",
+                        name: getIntlMessage("PINNED_POST"),
+                        icon: <PinIcon />,
+                    },
+                    isArchived && {
+                        id: "archived",
+                        name: getIntlMessage("THREAD_BROWSER_ARCHIVED"),
+                    },
+                    isLocked && { id: "locked", name: "Locked" },
+                ] as Array<CustomTag | false>
+            )
+                .filter(tag => !!tag)
+                .map(tag => ({ ...tag, id: tag.id as CustomTagType, custom: true }));
+
+            const forumChannel = ChannelStore.getChannel(channel.parent_id) as ForumChannel | null;
+
+            const availableTags = (forumChannel?.availableTags ?? []).reduce((acc, tag) => {
+                acc[tag.id] = tag;
+                return acc;
+            }, {} as Record<DiscordTag["id"], TagType>);
+
+            const appliedTags = (channel.appliedTags ?? []).map(tag => availableTags[tag]);
+
+            return [...customTags, ...appliedTags];
+        },
+        [channel, isNew]
+    );
+}
 
 interface ForumPostTagsProps {
     channel: ThreadChannel;
@@ -17,29 +70,31 @@ interface ForumPostTagsProps {
     className?: string;
 }
 
+const visibleTagsLimit = 3;
+
 export function ForumPostTags({ channel, tagsClassName }: ForumPostTagsProps) {
-    const { isNew } = useForumPostState(channel);
-
-    const { shownTags, remainingTags, moreTagsCount, isPinned, shouldRenderTagsRow } =
-        useForumPostInfo({ channel, isNew });
-
+    const tags = useTags(channel);
     const { tagFilter } = useForumChannelState(channel.parent_id);
-    if (!shouldRenderTagsRow) return null;
 
-    return (
-        <>
-            {isNew && <CustomTag name={getIntlMessage("NEW")} />}
-            {isPinned && <CustomTag name={getIntlMessage("PINNED_POST")} icon={<PinIcon />} />}
-            {shownTags.map(tag => (
-                <Tag
-                    tag={tag}
-                    className={cl(tagsClassName, {
-                        "vc-better-forums-tag-filtered": tagFilter.has(tag.id),
-                    })}
-                    key={tag.id}
-                />
-            ))}
-            {moreTagsCount > 0 && <MoreTags tags={remainingTags} count={moreTagsCount} />}
-        </>
+    const renderTag = useCallback(
+        (tag: TagType) => (
+            <Tag
+                tag={tag}
+                className={cl(tagsClassName, {
+                    "vc-better-forums-tag-filtered": tagFilter.has(tag.id),
+                })}
+                key={tag.id}
+            />
+        ),
+        [tagFilter]
     );
+
+    if (tags.length === 0) return null;
+
+    return [
+        tags.slice(0, visibleTagsLimit).map(renderTag),
+        tags.length > visibleTagsLimit && (
+            <MoreTags tags={tags.slice(visibleTagsLimit)} renderTag={renderTag} />
+        ),
+    ];
 }

@@ -7,9 +7,10 @@
 import { findComponentByCodeLazy } from "@webpack";
 import { Text, Tooltip } from "@webpack/common";
 import { ReactionEmoji } from "discord-types/general";
+import { ReactNode } from "react";
 
 import { cl } from "..";
-import { Tag as TagType } from "../utils";
+import { CustomTag, Tag as TagType } from "../utils";
 import { EmojiSize } from "./Reaction";
 
 interface EmojiProps {
@@ -27,7 +28,11 @@ interface TagProps {
     className?: string;
 }
 
-export function Tag({ tag: { name, emojiId, emojiName }, className }: TagProps) {
+export function Tag({ tag, className }: TagProps) {
+    if (tag.custom) return <CustomTag {...tag} />;
+
+    const { emojiId, emojiName, name } = tag;
+
     return (
         <div className={cl(className, "vc-better-forums-tag")}>
             <Emoji
@@ -46,20 +51,16 @@ export function Tag({ tag: { name, emojiId, emojiName }, className }: TagProps) 
 
 interface MoreTagsProps {
     tags: TagType[];
-    count: number;
+    renderTag: (tag: TagType) => ReactNode;
 }
 
-export function MoreTags({ tags, count }: MoreTagsProps) {
+export function MoreTags({ tags, renderTag }: MoreTagsProps) {
     return (
-        <Tooltip
-            text={tags.map(tag => (
-                <Tag tag={tag} key={tag.id} />
-            ))}
-        >
+        <Tooltip text={tags.map(renderTag)}>
             {props => (
                 <div className="vc-better-forums-tag" {...props}>
                     <Text variant="text-xs/semibold" color="currentColor">
-                        +{count}
+                        +{tags.length}
                     </Text>
                 </div>
             )}
@@ -67,10 +68,7 @@ export function MoreTags({ tags, count }: MoreTagsProps) {
     );
 }
 
-interface CustomTagProps {
-    name: string;
-    color?: "blue" | "green" | "red" | "teal" | "yellow" | "orange";
-    icon?: React.ReactNode;
+interface CustomTagProps extends CustomTag {
     className?: string;
 }
 

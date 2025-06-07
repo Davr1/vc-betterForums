@@ -15,6 +15,7 @@ import {
     useStateFromStores,
 } from "@webpack/common";
 import { Message } from "discord-types/general";
+import { Ref } from "react";
 
 import { cl } from "..";
 import {
@@ -51,7 +52,7 @@ interface ReactionContainerProps extends ReactionButtonProps {
 const ReactionContainer = LazyComponent(() =>
     React.forwardRef(function ReactionContainer(
         { visible = true, ...props }: ReactionContainerProps,
-        ref: React.Ref<HTMLDivElement>
+        ref: Ref<HTMLDivElement>
     ) {
         return (
             <div

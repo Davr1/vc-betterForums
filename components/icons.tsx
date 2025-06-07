@@ -4,10 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { SVGProps } from "react";
+
 import { cl } from "..";
 import { memoizedComponent } from "../utils";
 
-interface IconProps extends React.SVGProps<SVGSVGElement> {
+interface IconProps extends SVGProps<SVGSVGElement> {
     size?: number;
     className?: string;
     fill?: string;
@@ -18,7 +20,7 @@ const IconWrapper = memoizedComponent(function IconWrapper({
     className,
     fill = "currentColor",
     ...props
-}: React.PropsWithChildren<IconProps>) {
+}: IconProps) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
