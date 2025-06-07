@@ -10,6 +10,7 @@ import { classNameFactory } from "@api/Styles";
 import definePlugin from "@utils/types";
 
 import { ForumPost } from "./components/ForumPost";
+import { settings } from "./settings";
 import { ForumChannelStore } from "./stores";
 import { setForumChannelStore } from "./utils";
 
@@ -19,6 +20,7 @@ export default definePlugin({
     name: "BetterForums",
     description: "",
     authors: [],
+    settings,
     patches: [
         {
             find: ".getHasSearchResults",

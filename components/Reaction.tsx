@@ -81,6 +81,7 @@ interface ReactionProps {
     firstMessage: Message;
     channel: ThreadChannel;
     maxWidth?: number;
+    maxCount?: number;
 }
 
 export function DefaultReaction({ firstMessage, channel }: ReactionProps) {
@@ -111,9 +112,10 @@ export const Reactions = memoizedComponent<ReactionProps>(function Reactions({
     firstMessage,
     channel,
     maxWidth,
+    maxCount,
 }) {
     const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
-    const reactions = useTopReactions(firstMessage, 5);
+    const reactions = useTopReactions(firstMessage, maxCount);
 
     const [visibleReactions, setVisibleReactions] = useState(reactions.length);
     const refs = useRef<Array<HTMLDivElement | null>>([]);

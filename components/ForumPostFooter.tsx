@@ -11,6 +11,7 @@ import { Channel, Message } from "discord-types/general";
 import { PropsWithChildren } from "react";
 
 import { cl } from "..";
+import { MaxReactionCount, settings } from "../settings";
 import { ThreadMessageStore } from "../stores";
 import { memoizedComponent, ThreadChannel, useMessageCount, useTypingUsers } from "../utils";
 import { AvatarPile } from "./AvatarPile";
@@ -44,18 +45,26 @@ interface ForumPostFooterProps {
 }
 
 export function ForumPostFooter({ channel, firstMessage, containerWidth }: ForumPostFooterProps) {
+    const { maxReactionCount, showThreadMembers } = settings.use([
+        "maxReactionCount",
+        "showThreadMembers",
+    ]);
     const hasReactions = firstMessage?.reactions && firstMessage.reactions.length > 0;
 
     return (
         <Flex className="vc-better-forums-footer">
-            <ForumPostMembersSection channel={channel} />
+            {showThreadMembers && <ForumPostMembersSection channel={channel} />}
             <ForumPostLatestMessageSection channel={channel} />
             {firstMessage &&
+                maxReactionCount !== MaxReactionCount.OFF &&
                 (hasReactions ? (
                     <Reactions
                         firstMessage={firstMessage}
                         channel={channel}
                         maxWidth={containerWidth ? containerWidth - 500 : undefined}
+                        maxCount={
+                            maxReactionCount !== MaxReactionCount.ALL ? maxReactionCount : undefined
+                        }
                     />
                 ) : (
                     <DefaultReaction firstMessage={firstMessage} channel={channel} />

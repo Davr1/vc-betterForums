@@ -7,6 +7,7 @@
 import { Flex, Heading, Text } from "@webpack/common";
 import { Message } from "discord-types/general";
 
+import { settings } from "../settings";
 import { ThreadChannel, useChannelName } from "../utils";
 import { ForumPostTags } from "./ForumPostTags";
 import { MessageContent } from "./MessageContent";
@@ -19,6 +20,7 @@ interface ForumPostBodyProps {
 }
 
 export function ForumPostBody({ channel, firstMessage }: ForumPostBodyProps) {
+    const { messagePreviewLineCount } = settings.use(["messagePreviewLineCount"]);
     const channelName = useChannelName(channel);
 
     return (
@@ -39,7 +41,12 @@ export function ForumPostBody({ channel, firstMessage }: ForumPostBodyProps) {
                 channel={channel}
                 message={firstMessage}
                 color="text-secondary"
-                lineClamp={3}
+                lineClamp={messagePreviewLineCount}
+                messageClassName={
+                    messagePreviewLineCount === 1
+                        ? "vc-better-forums-message-content-inline"
+                        : "vc-better-forums-message-content"
+                }
             />
         </Flex>
     );
