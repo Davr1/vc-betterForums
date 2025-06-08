@@ -93,6 +93,12 @@
     color: var(--text-secondary);
 }
 
+.theme-light .vc-better-forums-tag {
+    border: none;
+    outline: 1px solid var(--border-subtle);
+    outline-offset: -1px;
+}
+
 .vc-better-forums-tag-emoji {
     width: var(--size-sm);
     height: var(--size-sm);

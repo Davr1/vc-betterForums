@@ -18,12 +18,29 @@ export enum MessagePreviewLineCount {
     ALL = 6,
 }
 
+export enum MaxTagCount {
+    ALL = 6,
+}
+
 export const settings = definePluginSettings({
     keepState: {
         type: OptionType.BOOLEAN,
         description: "Keep forum state after reload",
         default: true,
         restartNeeded: true,
+    },
+    maxTagCount: {
+        type: OptionType.SLIDER,
+        description: "Maximum number of tags to show in the thread header",
+        default: 3,
+        min: 1,
+        max: 6,
+        markers: [...makeRange(1, 5), MaxTagCount.ALL],
+        stickToMarkers: true,
+        componentProps: {
+            onMarkerRender: (value: number) =>
+                value === MaxTagCount.ALL ? getIntlMessage("FORM_LABEL_ALL") : value,
+        },
     },
     maxReactionCount: {
         type: OptionType.SLIDER,

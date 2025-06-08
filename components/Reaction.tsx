@@ -88,7 +88,8 @@ interface ReactionProps {
 export function DefaultReaction({ firstMessage, channel }: ReactionProps) {
     const forumChannel = useStateFromStores(
         [ChannelStore],
-        () => ChannelStore.getChannel(channel.parent_id) as ForumChannel
+        () => ChannelStore.getChannel(channel.parent_id) as ForumChannel,
+        [channel.parent_id]
     );
     const defaultEmoji = useDefaultEmoji(forumChannel);
     const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);

@@ -146,7 +146,7 @@ export function useMessageCount(channelId: Channel["id"]): MessageCount {
     return { messageCount, messageCountText, unreadCount, unreadCountText };
 }
 
-interface ForumPostState {
+export interface ForumPostState {
     isNew: boolean;
     hasUnreads: boolean;
     isActive: boolean;
@@ -401,11 +401,10 @@ export interface DiscordTag {
     moderated: boolean;
 }
 
-export type CustomTagType = "new" | "pinned" | "archived" | "locked";
 export type CustomTagColor = "blue" | "green" | "red" | "teal" | "yellow" | "orange";
 
 export interface CustomTag {
-    id: CustomTagType;
+    id: string;
     name: string;
     custom: true;
     color?: CustomTagColor;

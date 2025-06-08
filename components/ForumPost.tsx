@@ -58,12 +58,15 @@ export const ForumPost = LazyComponent(
         function ForumPost({ goToThread, threadId }: ForumPostProps) {
             const channel = useStateFromStores(
                 [ChannelStore],
-                () => ChannelStore.getChannel(threadId) as ThreadChannel
+                () => ChannelStore.getChannel(threadId) as ThreadChannel,
+                [threadId]
             );
             const isOpen = useStateFromStores(
                 [ChannelSectionStore],
                 () =>
-                    ChannelSectionStore.getCurrentSidebarChannelId(channel.parent_id) === channel.id
+                    ChannelSectionStore.getCurrentSidebarChannelId(channel.parent_id) ===
+                    channel.id,
+                [channel.parent_id, channel.id]
             );
 
             const { firstMessage } = useFirstMessage(channel);

@@ -5,63 +5,98 @@
  */
 
 import { getIntlMessage } from "@utils/discord";
-import { ChannelStore, useCallback, useStateFromStores } from "@webpack/common";
+import { ChannelStore, useCallback, useMemo, useStateFromStores } from "@webpack/common";
+import { ReactNode } from "react";
 
 import { cl } from "..";
+import { settings } from "../settings";
 import {
     CustomTag,
-    CustomTagType,
     DiscordTag,
     ForumChannel,
+    ForumPostState,
+    memoizedComponent,
     Tag as TagType,
     ThreadChannel,
     useForumChannelState,
     useForumPostState,
 } from "../utils";
-import { PinIcon } from "./icons";
+import { ArchiveIcon, LockIcon, PinIcon } from "./icons";
 import { MoreTags, Tag } from "./Tags";
 
-export function useTags(channel: ThreadChannel): TagType[] {
-    const { isNew } = useForumPostState(channel);
+interface TagDefinition {
+    id: CustomTag["id"];
+    name: string | (() => string);
+    icon?: () => ReactNode;
+    condition: (channel: ThreadChannel, context: ForumPostState) => boolean;
+    color?: CustomTag["color"];
+}
 
-    return useStateFromStores(
+const tagDefinitions: TagDefinition[] = [
+    {
+        id: "new",
+        name: () => getIntlMessage("NEW"),
+        condition: (_, { isNew }) => isNew,
+    },
+    {
+        id: "pinned",
+        name: () => getIntlMessage("PINNED_POST"),
+        icon: () => <PinIcon />,
+        condition: channel => channel.hasFlag(2),
+    },
+    {
+        id: "archived",
+        name: () => getIntlMessage("THREAD_BROWSER_ARCHIVED"),
+        icon: () => <ArchiveIcon />,
+        condition: channel => channel.isArchivedThread(),
+        color: "orange",
+    },
+    {
+        id: "locked",
+        name: "Locked",
+        icon: () => <LockIcon />,
+        condition: channel => channel.threadMetadata?.locked === true,
+        color: "orange",
+    },
+];
+
+export function useTags(channel: ThreadChannel): TagType[] {
+    const context = useForumPostState(channel);
+
+    const availableTags = useStateFromStores(
         [ChannelStore],
         () => {
-            const isPinned = channel.hasFlag(2);
-            const isArchived = channel.isArchivedThread();
-            const isLocked = channel.threadMetadata?.locked === true;
-
-            const customTags: CustomTag[] = (
-                [
-                    isNew && { id: "new", name: getIntlMessage("NEW") },
-                    isPinned && {
-                        id: "pinned",
-                        name: getIntlMessage("PINNED_POST"),
-                        icon: <PinIcon />,
-                    },
-                    isArchived && {
-                        id: "archived",
-                        name: getIntlMessage("THREAD_BROWSER_ARCHIVED"),
-                    },
-                    isLocked && { id: "locked", name: "Locked" },
-                ] as Array<CustomTag | false>
-            )
-                .filter(tag => !!tag)
-                .map(tag => ({ ...tag, id: tag.id as CustomTagType, custom: true }));
-
             const forumChannel = ChannelStore.getChannel(channel.parent_id) as ForumChannel | null;
 
-            const availableTags = (forumChannel?.availableTags ?? []).reduce((acc, tag) => {
+            return (forumChannel?.availableTags ?? []).reduce((acc, tag) => {
                 acc[tag.id] = tag;
                 return acc;
             }, {} as Record<DiscordTag["id"], TagType>);
-
-            const appliedTags = (channel.appliedTags ?? []).map(tag => availableTags[tag]);
-
-            return [...customTags, ...appliedTags];
         },
-        [channel, isNew]
+        [channel.parent_id]
     );
+
+    const appliedTags = useStateFromStores(
+        [ChannelStore],
+        () => (channel.appliedTags ?? []).map(tagId => availableTags[tagId]),
+        [channel.appliedTags]
+    );
+
+    const customTags: CustomTag[] = useMemo(
+        () =>
+            tagDefinitions
+                .filter(def => def.condition(channel, context))
+                .map(({ id, name, icon, color }) => ({
+                    id,
+                    name: typeof name === "function" ? name() : name,
+                    icon: icon?.(),
+                    custom: true,
+                    color,
+                })),
+        [channel, context]
+    );
+
+    return useMemo(() => [...customTags, ...appliedTags], [appliedTags, customTags]);
 }
 
 interface ForumPostTagsProps {
@@ -70,11 +105,13 @@ interface ForumPostTagsProps {
     className?: string;
 }
 
-const visibleTagsLimit = 3;
-
-export function ForumPostTags({ channel, tagsClassName }: ForumPostTagsProps) {
+export const ForumPostTags = memoizedComponent<ForumPostTagsProps>(function ForumPostTags({
+    channel,
+    tagsClassName,
+}) {
     const tags = useTags(channel);
     const { tagFilter } = useForumChannelState(channel.parent_id);
+    const { maxTagCount } = settings.use(["maxTagCount"]);
 
     const renderTag = useCallback(
         (tag: TagType) => (
@@ -92,9 +129,9 @@ export function ForumPostTags({ channel, tagsClassName }: ForumPostTagsProps) {
     if (tags.length === 0) return null;
 
     return [
-        tags.slice(0, visibleTagsLimit).map(renderTag),
-        tags.length > visibleTagsLimit && (
-            <MoreTags tags={tags.slice(visibleTagsLimit)} renderTag={renderTag} />
+        tags.slice(0, maxTagCount).map(renderTag),
+        tags.length > maxTagCount && (
+            <MoreTags tags={tags.slice(maxTagCount)} renderTag={renderTag} />
         ),
     ];
-}
+});
