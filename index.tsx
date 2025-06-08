@@ -12,9 +12,10 @@ import definePlugin from "@utils/types";
 import { zustandCreate, zustandPersist } from "@webpack/common";
 
 import { ForumPost } from "./components/ForumPost";
+import { setForumChannelStore } from "./hooks/useForumChannelState";
 import { settings } from "./settings";
 import { ForumChannelStore, ForumChannelStoreState } from "./stores";
-import { indexedDBStorageFactory, setForumChannelStore } from "./utils";
+import { indexedDBStorageFactory } from "./utils";
 
 export const cl = classNameFactory();
 

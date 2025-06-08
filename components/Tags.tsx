@@ -4,24 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findComponentByCodeLazy } from "@webpack";
 import { Text, Tooltip } from "@webpack/common";
-import { ReactionEmoji } from "discord-types/general";
 import { ReactNode } from "react";
 
 import { cl } from "..";
-import { CustomTag, Tag as TagType } from "../utils";
-import { EmojiSize } from "./Reaction";
-
-interface EmojiProps {
-    animated?: boolean;
-    className?: string;
-    emojiId: ReactionEmoji["id"] | null;
-    emojiName: ReactionEmoji["name"] | null;
-    size?: EmojiSize;
-}
-
-const Emoji = findComponentByCodeLazy<EmojiProps>(/void 0===\i\.shouldAnimate/);
+import { CustomTag, Tag as TagType } from "../types";
+import { Emoji } from "./Emoji";
 
 interface TagProps {
     tag: TagType;

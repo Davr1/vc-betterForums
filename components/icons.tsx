@@ -7,7 +7,7 @@
 import { ComponentType, SVGProps } from "react";
 
 import { cl } from "..";
-import { memoizedComponent } from "../utils";
+import { _memo } from "../utils";
 
 interface IconProps extends SVGProps<SVGSVGElement> {
     size?: number;
@@ -36,7 +36,7 @@ function icon<T extends {} = {}>(Icon: ComponentType<T>) {
 
     WrappedIcon.displayName = Icon.displayName || Icon.name || "Icon";
 
-    return memoizedComponent(WrappedIcon);
+    return _memo(WrappedIcon);
 }
 
 export const UsersIcon = icon(function UsersIcon() {

@@ -7,19 +7,20 @@
 import { Flex, Heading, Text } from "@webpack/common";
 import { Message } from "discord-types/general";
 
-import { settings } from "../settings";
-import { ThreadChannel, useChannelName } from "../utils";
-import { ForumPostTags } from "./ForumPostTags";
-import { MessageContent } from "./MessageContent";
-import { Timestamp } from "./Timestamp";
-import { Username } from "./Username";
+import { useChannelName } from "../../hooks";
+import { settings } from "../../settings";
+import { ThreadChannel } from "../../types";
+import { MessageContent } from "../MessageContent";
+import { Timestamp } from "../Timestamp";
+import { Username } from "../Username";
+import { ForumPost } from "./";
 
-interface ForumPostBodyProps {
+interface BodyProps {
     channel: ThreadChannel;
     firstMessage: Message | null;
 }
 
-export function ForumPostBody({ channel, firstMessage }: ForumPostBodyProps) {
+export function Body({ channel, firstMessage }: BodyProps) {
     const { messagePreviewLineCount } = settings.use(["messagePreviewLineCount"]);
     const channelName = useChannelName(channel);
 
@@ -35,7 +36,7 @@ export function ForumPostBody({ channel, firstMessage }: ForumPostBodyProps) {
                 className="vc-better-forums-thread-title-container"
             >
                 <Text lineClamp={2}>{channelName}</Text>
-                <ForumPostTags channel={channel} />
+                <ForumPost.Tags channel={channel} />
             </Heading>
             <MessageContent
                 channel={channel}

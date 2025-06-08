@@ -8,8 +8,9 @@ import { Text, useStateFromStores } from "@webpack/common";
 import { TextProps } from "@webpack/types";
 import { Channel, Message } from "discord-types/general";
 
+import { useForumPostMetadata, useMessageContent } from "../hooks";
 import { RelationshipStore } from "../stores";
-import { memoizedComponent, useForumPostMetadata, useMessageContent } from "../utils";
+import { _memo } from "../utils";
 
 interface MessageContentProps extends Omit<TextProps, "children"> {
     channel: Channel;
@@ -18,7 +19,7 @@ interface MessageContentProps extends Omit<TextProps, "children"> {
     visibleIcons?: boolean;
 }
 
-export const MessageContent = memoizedComponent<MessageContentProps>(function MessageContent({
+export const MessageContent = _memo<MessageContentProps>(function MessageContent({
     channel,
     message,
     messageClassName = "vc-better-forums-message-content",

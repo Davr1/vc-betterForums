@@ -4,24 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByCodeLazy } from "@webpack";
 import { Text } from "@webpack/common";
-import { Channel, Guild, Message, User } from "discord-types/general";
-import { ReactNode } from "react";
+import { Message } from "discord-types/general";
 
-import { memoizedComponent, ThreadChannel, useAuthor } from "../utils";
-
-const useUsernameHook: (
-    options: Partial<{
-        user: User;
-        channelId: Channel["id"];
-        guildId: Guild["id"];
-        messageId: Message["id"];
-        stopPropagation: boolean;
-    }>
-) => (
-    author: ReturnType<typeof useAuthor>
-) => (username: string, channelId: Channel["id"]) => ReactNode = findByCodeLazy("useUsernameHook");
+import { useAuthor, useUsernameHook } from "../hooks";
+import { ThreadChannel } from "../types";
+import { _memo } from "../utils";
 
 interface UsernameProps {
     message?: Message | null;
@@ -29,11 +17,7 @@ interface UsernameProps {
     renderColon?: boolean;
 }
 
-export const Username = memoizedComponent<UsernameProps>(function Username({
-    message,
-    channel,
-    renderColon,
-}) {
+export const Username = _memo<UsernameProps>(function Username({ message, channel, renderColon }) {
     const author = useAuthor(channel, message);
     const username = author?.nick ?? "";
 

@@ -4,33 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findComponentByCodeLazy } from "@webpack";
 import { useMemo, useStateFromStores, WindowStore } from "@webpack/common";
 
-import { Attachment } from "../utils";
+import { Attachment } from "../../types";
+import { MediaMosaic } from "../MediaMosaic";
 
-interface MediaMosaicProps {
-    src: string;
-    width?: number;
-    height?: number;
-    minWidth?: number;
-    minHeight?: number;
-    alt?: string;
-    animated?: boolean;
-    srcIsAnimated?: boolean;
-    containerClassName?: string;
-    imageClassName?: string;
-}
-
-const MediaMosaic = findComponentByCodeLazy<MediaMosaicProps>(
-    "mediaMosaicAltTextPopoutDescription"
-);
-
-interface ForumPostMediaProps extends Attachment {}
+interface MediaProps extends Attachment {}
 
 const animatedMediaRegex = /\.(webp|gif|avif)$/i;
 
-export function ForumPostMedia({ src, width, height, alt, srcIsAnimated }: ForumPostMediaProps) {
+export function Media({ src, width, height, alt, srcIsAnimated }: MediaProps) {
     const isFocused = useStateFromStores([WindowStore], () => WindowStore.isFocused());
     const isAnimated = useMemo(() => !src || animatedMediaRegex.test(src.split(/\?/, 1)[0]), [src]);
 

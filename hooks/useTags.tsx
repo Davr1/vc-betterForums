@@ -5,34 +5,20 @@
  */
 
 import { getIntlMessage } from "@utils/discord";
-import { ChannelStore, useCallback, useMemo, useStateFromStores } from "@webpack/common";
-import { ReactNode } from "react";
+import { ChannelStore, useMemo, useStateFromStores } from "@webpack/common";
 
-import { cl } from "..";
-import { settings } from "../settings";
+import { ArchiveIcon, LockIcon, PinIcon } from "../components/icons";
+import { useForumPostState } from "../hooks";
 import {
     CustomTag,
+    CustomTagDefinition,
     DiscordTag,
     ForumChannel,
-    ForumPostState,
-    memoizedComponent,
     Tag as TagType,
     ThreadChannel,
-    useForumChannelState,
-    useForumPostState,
-} from "../utils";
-import { ArchiveIcon, LockIcon, PinIcon } from "./icons";
-import { MoreTags, Tag } from "./Tags";
+} from "../types";
 
-interface TagDefinition {
-    id: CustomTag["id"];
-    name: string | (() => string);
-    icon?: () => ReactNode;
-    condition: (channel: ThreadChannel, context: ForumPostState) => boolean;
-    color?: CustomTag["color"];
-}
-
-const tagDefinitions: TagDefinition[] = [
+const tagDefinitions: CustomTagDefinition[] = [
     {
         id: "new",
         name: () => getIntlMessage("NEW"),
@@ -98,40 +84,3 @@ export function useTags(channel: ThreadChannel): TagType[] {
 
     return useMemo(() => [...customTags, ...appliedTags], [appliedTags, customTags]);
 }
-
-interface ForumPostTagsProps {
-    channel: ThreadChannel;
-    tagsClassName?: string;
-    className?: string;
-}
-
-export const ForumPostTags = memoizedComponent<ForumPostTagsProps>(function ForumPostTags({
-    channel,
-    tagsClassName,
-}) {
-    const tags = useTags(channel);
-    const { tagFilter } = useForumChannelState(channel.parent_id);
-    const { maxTagCount } = settings.use(["maxTagCount"]);
-
-    const renderTag = useCallback(
-        (tag: TagType) => (
-            <Tag
-                tag={tag}
-                className={cl(tagsClassName, {
-                    "vc-better-forums-tag-filtered": tagFilter.has(tag.id),
-                })}
-                key={tag.id}
-            />
-        ),
-        [tagFilter]
-    );
-
-    if (tags.length === 0) return null;
-
-    return [
-        tags.slice(0, maxTagCount).map(renderTag),
-        tags.length > maxTagCount && (
-            <MoreTags tags={tags.slice(maxTagCount)} renderTag={renderTag} />
-        ),
-    ];
-});

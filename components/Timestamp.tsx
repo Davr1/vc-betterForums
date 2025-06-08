@@ -7,7 +7,7 @@
 import { Text, Timestamp as TimestampComponent, Tooltip } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
-import { useFormatTimestamp, useForumChannelState } from "../utils";
+import { useFormatTimestamp, useForumChannelState } from "../hooks";
 
 interface TimestampProps {
     channel: Channel;
