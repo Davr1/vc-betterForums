@@ -94,6 +94,11 @@ interface ThreadMemberListStore extends FluxStore {
     ): Record<Section["sectionId"], Section> | undefined;
 }
 
+interface JoinedThreadsStore extends FluxStore {
+    hasJoined(threadId: Channel["id"]): boolean;
+    isMuted(threadId: Channel["id"]): boolean;
+}
+
 export enum LayoutType {
     DEFAULT = 0,
     LIST = 1,
@@ -155,3 +160,4 @@ export const RelationshipStore: RelationshipStore = findStoreLazy("RelationshipS
 export const GuildMemberStore: GuildMemberStore = findStoreLazy("GuildMemberStore");
 export const PermissionStore: PermissionStore = findStoreLazy("PermissionStore");
 export const ThreadMemberListStore: ThreadMemberListStore = findStoreLazy("ThreadMemberListStore");
+export const JoinedThreadsStore: JoinedThreadsStore = findStoreLazy("JoinedThreadsStore");

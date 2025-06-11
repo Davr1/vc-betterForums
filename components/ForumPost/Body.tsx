@@ -4,16 +4,18 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex, Heading, Text } from "@webpack/common";
+import { Flex, Heading, Text, useCallback } from "@webpack/common";
 import { Message } from "discord-types/general";
 
-import { useChannelName } from "../../hooks";
+import { useChannelName, useForumPostState } from "../../hooks";
 import { settings } from "../../settings";
 import { ThreadChannel } from "../../types";
+import { threadUtils } from "../../utils";
 import { MessageContent } from "../MessageContent";
 import { Timestamp } from "../Timestamp";
 import { Username } from "../Username";
 import { ForumPost } from "./";
+import { FollowButton } from "./FollowButton";
 
 interface BodyProps {
     channel: ThreadChannel;
@@ -21,21 +23,39 @@ interface BodyProps {
 }
 
 export function Body({ channel, firstMessage }: BodyProps) {
+    const { hasUnreads, isMuted, hasJoined } = useForumPostState(channel);
     const { messagePreviewLineCount } = settings.use(["messagePreviewLineCount"]);
     const channelName = useChannelName(channel);
+
+    const followAction = useCallback(
+        () => (hasJoined ? threadUtils.leaveThread(channel) : threadUtils.joinThread(channel)),
+        [hasJoined, channel]
+    );
 
     return (
         <Flex className="vc-better-forums-thread-body" direction={Flex.Direction.VERTICAL}>
             <Flex className="vc-better-forums-thread-header" align={Flex.Align.CENTER} grow={0}>
                 <Username channel={channel} message={firstMessage} renderColon={false} />
                 <Timestamp channel={channel} />
+                <FollowButton hasJoined={hasJoined} onClick={followAction} />
             </Flex>
             <Heading
                 variant="heading-lg/semibold"
-                color="header-primary"
                 className="vc-better-forums-thread-title-container"
             >
-                <Text lineClamp={2}>{channelName}</Text>
+                <Text
+                    lineClamp={2}
+                    color={
+                        isMuted
+                            ? "interactive-muted"
+                            : hasUnreads
+                            ? "header-primary"
+                            : "text-secondary"
+                    }
+                    className="vc-better-forums-thread-title"
+                >
+                    {channelName}
+                </Text>
                 <ForumPost.Tags channel={channel} />
             </Heading>
             <MessageContent

@@ -10,7 +10,7 @@ import { MouseEventHandler, Ref } from "react";
 
 export const useForumPostEvents: (options: {
     facepileRef?: Ref<HTMLElement>;
-    goToThread: (channel: Channel, flag: boolean) => void;
+    goToThread: (channel: Channel, shiftKey: boolean) => void;
     channel: Channel;
 }) => {
     handleLeftClick: MouseEventHandler<unknown>;

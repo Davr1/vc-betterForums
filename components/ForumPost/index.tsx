@@ -33,8 +33,8 @@ const ClickableWithRing: ComponentType<
 > = Clickable;
 
 interface ForumPostProps {
-    goToThread: (channel: Channel, _: boolean) => void;
-    threadId: string;
+    goToThread: (channel: Channel, shiftKey: boolean) => void;
+    threadId: Channel["id"];
 }
 
 export function ForumPost({ goToThread, threadId }: ForumPostProps) {
@@ -77,6 +77,7 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
                 className={cl("vc-better-forums-thread", {
                     "vc-better-forums-thread-open": isOpen,
                 })}
+                onScroll={console.log}
             >
                 <ClickableWithRing
                     onClick={handleLeftClick}
@@ -90,7 +91,7 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
                 />
                 <Flex className="vc-better-forums-thread-body-container">
                     <ForumPost.Body channel={channel} firstMessage={firstMessage} />
-                    {firstMedia && <ForumPost.Media {...firstMedia} />}
+                    {firstMedia && width >= 500 && <ForumPost.Media {...firstMedia} />}
                 </Flex>
                 <ForumPost.Footer
                     channel={channel}

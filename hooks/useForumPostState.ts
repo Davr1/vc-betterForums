@@ -7,20 +7,22 @@
 import { GuildStore, useStateFromStores } from "@webpack/common";
 import { Channel, Guild } from "discord-types/general";
 
-import { ReadStateStore } from "../stores";
+import { JoinedThreadsStore, ReadStateStore } from "../stores";
 import { ForumPostState } from "../types";
 
 export function useForumPostState(channel: Channel): ForumPostState {
     return useStateFromStores(
-        [GuildStore, ReadStateStore],
+        [GuildStore, ReadStateStore, JoinedThreadsStore],
         () => {
             const guild: Guild | null = GuildStore.getGuild(channel.getGuildId());
             const isActive = !!guild && !channel.isArchivedThread();
             const isNew =
                 isActive && ReadStateStore.isNewForumThread(channel.id, channel.parent_id, guild);
             const hasUnreads = isActive && ReadStateStore.isForumPostUnread(channel.id);
+            const isMuted = JoinedThreadsStore.isMuted(channel.id);
+            const hasJoined = JoinedThreadsStore.hasJoined(channel.id);
 
-            return { isActive, isNew, hasUnreads };
+            return { isActive, isNew, hasUnreads, isMuted, hasJoined };
         },
         [channel]
     );

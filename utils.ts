@@ -11,6 +11,8 @@ import { React } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
 import { ComponentType } from "react";
 
+import { ThreadChannel } from "./types";
+
 export function indexedDBStorageFactory<T>() {
     return {
         async getItem(name: string): Promise<T | null> {
@@ -40,3 +42,8 @@ export const Kangaroo: {
         avoidInitialScroll?: boolean;
     }) => void;
 } = findByPropsLazy("jumpToMessage");
+
+export const threadUtils: {
+    joinThread(thread: ThreadChannel): void;
+    leaveThread(thread: ThreadChannel): void;
+} = findByPropsLazy("joinThread", "leaveThread");

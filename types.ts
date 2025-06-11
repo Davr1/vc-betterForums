@@ -43,6 +43,8 @@ export interface ForumPostState {
     isNew: boolean;
     hasUnreads: boolean;
     isActive: boolean;
+    isMuted: boolean;
+    hasJoined: boolean;
 }
 
 export interface DiscordTag {

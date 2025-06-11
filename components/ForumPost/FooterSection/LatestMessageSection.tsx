@@ -7,16 +7,16 @@
 import { getIntlMessage } from "@utils/discord";
 import { Text, useCallback, useStateFromStores } from "@webpack/common";
 
-import { FooterSection } from ".";
 import { cl } from "../../..";
-import { useMessageCount, useTypingUsers } from "../../../hooks";
+import { useForumPostState, useMessageCount, useTypingUsers } from "../../../hooks";
 import { ThreadMessageStore } from "../../../stores";
 import { ThreadChannel } from "../../../types";
 import { _memo, Kangaroo } from "../../../utils";
-import { ChatIcon } from "../../icons";
+import { Icons } from "../../icons";
 import { MessageContent } from "../../MessageContent";
 import { Typing } from "../../Typing";
 import { Username } from "../../Username";
+import { FooterSection } from "./";
 
 interface LatestMessageSectionProps {
     channel: ThreadChannel;
@@ -25,6 +25,7 @@ interface LatestMessageSectionProps {
 export const LatestMessageSection = _memo<LatestMessageSectionProps>(function LatestMessageSection({
     channel,
 }) {
+    const { isMuted } = useForumPostState(channel);
     const mostRecentMessage = useStateFromStores([ThreadMessageStore], () =>
         ThreadMessageStore.getMostRecentMessage(channel.id)
     );
@@ -35,26 +36,32 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
 
     const typingUsers = useTypingUsers(channel.id);
 
-    const clickHandler = useCallback(
-        () =>
-            mostRecentMessage?.id &&
-            Kangaroo.jumpToMessage({ channelId: channel.id, messageId: mostRecentMessage.id }),
-        [channel.id, mostRecentMessage?.id]
-    );
+    const clickHandler = useCallback(() => {
+        if (!mostRecentMessage?.id) return;
+
+        setImmediate(() =>
+            Kangaroo.jumpToMessage({
+                channelId: channel.id,
+                messageId: mostRecentMessage.id,
+                flash: true,
+            })
+        );
+    }, [channel.id, mostRecentMessage?.id]);
 
     if (messageCount === 0 && typingUsers.length === 0) return <FooterSection.Spacer />;
 
     return (
         <FooterSection
             className={cl("vc-better-forums-latest-message", {
-                "vc-better-forums-unread": unreadCount,
-                "vc-better-forums-empty-section": !mostRecentMessage && typingUsers.length === 0,
+                "vc-better-forums-unread": !!unreadCount && !isMuted,
+                "vc-better-forums-empty-section":
+                    (!mostRecentMessage && typingUsers.length === 0) || isMuted,
             })}
-            icon={<ChatIcon />}
+            icon={<Icons.ChatIcon />}
             text={messageCountText}
             onClick={clickHandler}
         >
-            {typingUsers.length === 0 && mostRecentMessage ? (
+            {isMuted ? null : typingUsers.length === 0 && mostRecentMessage ? (
                 <>
                     <div className="vc-better-forums-latest-message-content">
                         <Username channel={channel} message={mostRecentMessage} renderColon />

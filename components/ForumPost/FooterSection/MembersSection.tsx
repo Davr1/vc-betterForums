@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { FooterSection } from ".";
 import { ThreadChannel } from "../../../types";
 import { _memo } from "../../../utils";
 import { AvatarPile } from "../../AvatarPile";
-import { UsersIcon } from "../../icons";
+import { Icons } from "../../icons";
+import { FooterSection } from "./";
 
 interface MembersSectionProps {
     channel: ThreadChannel;
@@ -16,7 +16,7 @@ interface MembersSectionProps {
 
 export const MembersSection = _memo<MembersSectionProps>(function MembersSection({ channel }) {
     return (
-        <FooterSection icon={<UsersIcon />} text={channel.memberCount.toString()}>
+        <FooterSection icon={<Icons.UsersIcon />} text={channel.memberCount.toString()}>
             {channel.memberIdsPreview.length > 0 && (
                 <AvatarPile
                     guildId={channel.getGuildId()}

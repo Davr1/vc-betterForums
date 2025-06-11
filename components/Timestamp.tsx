@@ -28,7 +28,12 @@ export function Timestamp({ channel }: TimestampProps) {
             }
         >
             {props => (
-                <Text variant="text-sm/normal" color="header-secondary" {...props}>
+                <Text
+                    variant="text-sm/normal"
+                    color="text-secondary"
+                    className="vc-better-forums-timestamp-text"
+                    {...props}
+                >
                     {children}
                 </Text>
             )}

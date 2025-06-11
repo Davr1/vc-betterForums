@@ -41,6 +41,10 @@
     flex-wrap: wrap;
 }
 
+.vc-better-forums-thread-title {
+    transition: color 150ms ease;
+}
+
 .vc-better-forums-tag,
 .vc-better-forums-tag-custom {
     display: flex;
@@ -143,6 +147,10 @@
     background-color: var(--background-mod-subtle);
     color: var(--text-secondary);
     user-select: none;
+    outline: 1px solid transparent;
+    outline-offset: -1px;
+    transition: 150ms ease;
+    transition-property: background-color, outline-color, color;
 }
 
 .vc-better-forums-latest-message,
@@ -170,8 +178,7 @@
 .vc-better-forums-unread {
     color: var(--text-brand);
     background-color: var(--opacity-blurple-24);
-    outline: 1px solid var(--blurple-50);
-    outline-offset: -1px;
+    outline-color: var(--blurple-50);
 }
 
 .vc-better-forums-icon {
@@ -210,6 +217,11 @@
 
 .vc-better-forums-spacer {
     flex-grow: 1;
+}
+
+.vc-better-forums-username {
+    max-width: 100%;
+    flex-shrink: 0;
 }
 
 .vc-better-forums-username a {
@@ -274,4 +286,37 @@
 
 .vc-better-forums-message-icon {
     flex-shrink: 0;
+}
+
+.vc-better-forums-username,
+.vc-better-forums-timestamp-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-better-forums-timestamp-text {
+    flex-shrink: 0;
+}
+
+.vc-better-forums-follow-button {
+    appearance: none;
+    background: unset;
+    font: inherit;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xxs);
+    color: var(--interactive-normal);
+    padding: 0.3rem 0.2rem;
+    margin: -0.3rem -0.2rem;
+    transition: color 150ms ease, opacity 150ms ease;
+
+    &.vc-better-forums-follow-button-active {
+        color: var(--text-brand);
+    }
+
+    .vc-better-forums-thread:not(.vc-better-forums-thread-open, :hover)
+        &:not(.vc-better-forums-follow-button-active) {
+        opacity: 0;
+    }
 }

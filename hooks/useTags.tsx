@@ -7,7 +7,7 @@
 import { getIntlMessage } from "@utils/discord";
 import { ChannelStore, useMemo, useStateFromStores } from "@webpack/common";
 
-import { ArchiveIcon, LockIcon, PinIcon } from "../components/icons";
+import { Icons } from "../components/icons";
 import { useForumPostState } from "../hooks";
 import {
     CustomTag,
@@ -27,20 +27,20 @@ const tagDefinitions: CustomTagDefinition[] = [
     {
         id: "pinned",
         name: () => getIntlMessage("PINNED_POST"),
-        icon: () => <PinIcon />,
+        icon: () => <Icons.PinIcon />,
         condition: channel => channel.hasFlag(2),
     },
     {
         id: "archived",
         name: () => getIntlMessage("THREAD_BROWSER_ARCHIVED"),
-        icon: () => <ArchiveIcon />,
+        icon: () => <Icons.ArchiveIcon />,
         condition: channel => channel.isArchivedThread(),
         color: "orange",
     },
     {
         id: "locked",
         name: "Locked",
-        icon: () => <LockIcon />,
+        icon: () => <Icons.LockIcon />,
         condition: channel => channel.threadMetadata?.locked === true,
         color: "orange",
     },
