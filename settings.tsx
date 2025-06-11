@@ -19,6 +19,7 @@ export enum MessagePreviewLineCount {
 }
 
 export enum MaxTagCount {
+    OFF = 0,
     ALL = 6,
 }
 
@@ -29,40 +30,27 @@ export const settings = definePluginSettings({
         default: true,
         restartNeeded: true,
     },
+    showFollowButton: {
+        type: OptionType.BOOLEAN,
+        description: "Show follow/unfollow button in the thread header",
+        default: true,
+    },
     maxTagCount: {
         type: OptionType.SLIDER,
         description: "Maximum number of tags to show in the thread header",
         default: 3,
         min: 1,
         max: 6,
-        markers: [...makeRange(1, 5), MaxTagCount.ALL],
+        markers: [MaxTagCount.OFF, ...makeRange(1, 5), MaxTagCount.ALL],
         stickToMarkers: true,
         componentProps: {
             onMarkerRender: (value: number) =>
-                value === MaxTagCount.ALL ? getIntlMessage("FORM_LABEL_ALL") : value,
-        },
-    },
-    maxReactionCount: {
-        type: OptionType.SLIDER,
-        description: "Maximum number of reactions to show in the thread footer",
-        default: 5,
-        min: MaxReactionCount.OFF,
-        max: MaxReactionCount.ALL,
-        markers: [MaxReactionCount.OFF, ...makeRange(1, 9), MaxReactionCount.ALL],
-        stickToMarkers: true,
-        componentProps: {
-            onMarkerRender: (value: number) =>
-                value === MaxReactionCount.OFF
+                value === MaxTagCount.OFF
                     ? getIntlMessage("FORM_LABEL_OFF")
-                    : value === MaxReactionCount.ALL
+                    : value === MaxTagCount.ALL
                     ? getIntlMessage("FORM_LABEL_ALL")
                     : value,
         },
-    },
-    showThreadMembers: {
-        type: OptionType.BOOLEAN,
-        description: "Show members in the thread footer",
-        default: true,
     },
     messagePreviewLineCount: {
         type: OptionType.SLIDER,
@@ -75,6 +63,33 @@ export const settings = definePluginSettings({
         componentProps: {
             onMarkerRender: (value: number) =>
                 value === MessagePreviewLineCount.ALL ? getIntlMessage("FORM_LABEL_ALL") : value,
+        },
+    },
+    showThreadMembers: {
+        type: OptionType.BOOLEAN,
+        description: "Show members in the thread footer",
+        default: true,
+    },
+    showReplyPreview: {
+        type: OptionType.BOOLEAN,
+        description: "Show a preview of the latest thread reply in active threads",
+        default: true,
+    },
+    maxReactionCount: {
+        type: OptionType.SLIDER,
+        description: "Maximum number of reactions to show in the thread footer",
+        default: 3,
+        min: MaxReactionCount.OFF,
+        max: MaxReactionCount.ALL,
+        markers: [MaxReactionCount.OFF, ...makeRange(1, 9), MaxReactionCount.ALL],
+        stickToMarkers: true,
+        componentProps: {
+            onMarkerRender: (value: number) =>
+                value === MaxReactionCount.OFF
+                    ? getIntlMessage("FORM_LABEL_OFF")
+                    : value === MaxReactionCount.ALL
+                    ? getIntlMessage("FORM_LABEL_ALL")
+                    : value,
         },
     },
 });

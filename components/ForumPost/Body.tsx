@@ -24,7 +24,10 @@ interface BodyProps {
 
 export function Body({ channel, firstMessage }: BodyProps) {
     const { hasUnreads, isMuted, hasJoined } = useForumPostState(channel);
-    const { messagePreviewLineCount } = settings.use(["messagePreviewLineCount"]);
+    const { messagePreviewLineCount, showFollowButton } = settings.use([
+        "messagePreviewLineCount",
+        "showFollowButton",
+    ]);
     const channelName = useChannelName(channel);
 
     const owner = useStateFromStores(
@@ -43,7 +46,7 @@ export function Body({ channel, firstMessage }: BodyProps) {
             <Flex className="vc-better-forums-thread-header" align={Flex.Align.CENTER} grow={0}>
                 <Username channel={channel} user={owner ?? firstMessage?.author ?? null} />
                 <Timestamp channel={channel} />
-                <FollowButton hasJoined={hasJoined} onClick={followAction} />
+                {showFollowButton && <FollowButton hasJoined={hasJoined} onClick={followAction} />}
             </Flex>
             <Heading
                 variant="heading-lg/semibold"

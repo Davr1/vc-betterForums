@@ -91,6 +91,15 @@
     }
 }
 
+.vc-better-forums-extra-tags-tooltip {
+    min-width: max-content;
+}
+
+.vc-better-forums-extra-tags {
+    display: flex;
+    gap: var(--space-xs);
+}
+
 .vc-better-forums-tag {
     border: 1px solid var(--border-subtle);
     background: var(--button-secondary-background);
@@ -316,5 +325,13 @@
     .vc-better-forums-thread:not(.vc-better-forums-thread-open, :hover)
         &:not(.vc-better-forums-follow-button-active) {
         opacity: 0;
+    }
+}
+
+.vc-better-forums-badge-container {
+    display: contents;
+
+    > * {
+        margin: 0 0 0 0.25rem !important;
     }
 }

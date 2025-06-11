@@ -11,12 +11,14 @@ import { Channel, Message, User } from "discord-types/general";
 import { cl } from "..";
 import { useMember, useUsernameHook } from "../hooks";
 import { _memo } from "../utils";
+import { Badge } from "./Badge";
 
 interface UsernameProps extends TextProps {
     user: User | null;
     message?: Message | null;
     channel: Channel;
     renderColon?: boolean;
+    renderBadge?: boolean;
 }
 
 export const Username = _memo<UsernameProps>(function Username({
@@ -24,6 +26,7 @@ export const Username = _memo<UsernameProps>(function Username({
     message,
     channel,
     renderColon,
+    renderBadge,
     className,
     ...props
 }) {
@@ -49,6 +52,11 @@ export const Username = _memo<UsernameProps>(function Username({
             {...props}
         >
             {usernameElement}
+            {user && renderBadge ? (
+                <div className="vc-better-forums-badge-container">
+                    <Badge message={message} channel={channel} user={user} compact />
+                </div>
+            ) : null}
             {renderColon ? ": " : null}
         </Text>
     );

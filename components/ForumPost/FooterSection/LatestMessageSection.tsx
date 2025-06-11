@@ -9,6 +9,7 @@ import { Text, useCallback, useStateFromStores } from "@webpack/common";
 
 import { cl } from "../../..";
 import { useForumPostState, useMessageCount, useTypingUsers } from "../../../hooks";
+import { settings } from "../../../settings";
 import { ThreadMessageStore } from "../../../stores";
 import { ThreadChannel } from "../../../types";
 import { _memo, Kangaroo } from "../../../utils";
@@ -25,6 +26,7 @@ interface LatestMessageSectionProps {
 export const LatestMessageSection = _memo<LatestMessageSectionProps>(function LatestMessageSection({
     channel,
 }) {
+    const { showReplyPreview } = settings.use(["showReplyPreview"]);
     const { isMuted } = useForumPostState(channel);
     const mostRecentMessage = useStateFromStores([ThreadMessageStore], () =>
         ThreadMessageStore.getMostRecentMessage(channel.id)
@@ -55,35 +57,44 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
             className={cl("vc-better-forums-latest-message", {
                 "vc-better-forums-unread": !!unreadCount && !isMuted,
                 "vc-better-forums-empty-section":
-                    (!mostRecentMessage && typingUsers.length === 0) || isMuted,
+                    (!mostRecentMessage && typingUsers.length === 0) ||
+                    isMuted ||
+                    !showReplyPreview,
             })}
             icon={<Icons.ChatIcon />}
             text={messageCountText}
             onClick={clickHandler}
         >
-            {isMuted ? null : typingUsers.length === 0 && mostRecentMessage ? (
-                <>
-                    <div className="vc-better-forums-latest-message-content">
-                        <Username channel={channel} user={mostRecentMessage.author} renderColon />
-                        <MessageContent
-                            channel={channel}
-                            message={mostRecentMessage}
-                            messageClassName="vc-better-forums-message-content-inline"
-                            variant={unreadCount ? "text-sm/semibold" : "text-sm/normal"}
-                            lineClamp={1}
-                            visibleIcons
-                        />
-                    </div>
-                    {unreadCount !== null && (
-                        <Text variant="text-sm/semibold" color="text-brand">
-                            {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
-                                count: unreadCountText,
-                            })}
-                        </Text>
-                    )}
-                </>
+            {isMuted || !showReplyPreview ? null : typingUsers.length > 0 ? (
+                <Typing channel={channel} users={typingUsers} />
             ) : (
-                typingUsers.length > 0 && <Typing channel={channel} users={typingUsers} />
+                mostRecentMessage && (
+                    <>
+                        <div className="vc-better-forums-latest-message-content">
+                            <Username
+                                channel={channel}
+                                user={mostRecentMessage.author}
+                                renderColon
+                                renderBadge
+                            />
+                            <MessageContent
+                                channel={channel}
+                                message={mostRecentMessage}
+                                messageClassName="vc-better-forums-message-content-inline"
+                                variant={unreadCount ? "text-sm/semibold" : "text-sm/normal"}
+                                lineClamp={1}
+                                visibleIcons
+                            />
+                        </div>
+                        {unreadCount !== null && (
+                            <Text variant="text-sm/semibold" color="text-brand">
+                                {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
+                                    count: unreadCountText,
+                                })}
+                            </Text>
+                        )}
+                    </>
+                )
             )}
         </FooterSection>
     );

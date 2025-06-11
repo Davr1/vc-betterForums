@@ -44,7 +44,11 @@ interface MoreTagsProps {
 
 export function MoreTags({ tags, renderTag }: MoreTagsProps) {
     return (
-        <Tooltip text={tags.map(renderTag)}>
+        <Tooltip
+            text={tags.map(renderTag)}
+            tooltipClassName="vc-better-forums-extra-tags-tooltip"
+            tooltipContentClassName="vc-better-forums-extra-tags"
+        >
             {props => (
                 <div className="vc-better-forums-tag" {...props}>
                     <Text variant="text-xs/semibold" color="currentColor">
