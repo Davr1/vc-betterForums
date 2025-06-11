@@ -250,12 +250,6 @@
     padding: 6px 5px;
 }
 
-.vc-better-forums-typing-text {
-    position: relative;
-    inset: 0 !important;
-    height: auto;
-}
-
 .vc-better-forums-empty-section {
     flex-grow: 0;
     margin-right: auto;
@@ -310,6 +304,10 @@
     padding: 0.3rem 0.2rem;
     margin: -0.3rem -0.2rem;
     transition: color 150ms ease, opacity 150ms ease;
+
+    &:hover {
+        color: var(--interactive-active);
+    }
 
     &.vc-better-forums-follow-button-active {
         color: var(--text-brand);

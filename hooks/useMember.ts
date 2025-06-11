@@ -4,15 +4,20 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { GuildStore, useStateFromStores } from "@webpack/common";
+import { GuildStore, useEffect, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
-import { GuildMemberStore, RelationshipStore } from "../stores";
-import { FullGuildMember, FullUser } from "../types";
+import { GuildMemberRequesterStore, GuildMemberStore, RelationshipStore } from "../stores";
+import { FullGuildMember, FullUser, Member } from "../types";
 
-export function useMember(user: FullUser | null, channel: Channel) {
+export function useMember(user: FullUser | null, channel: Channel): Member {
     const userId = user?.id;
     const guildId = channel?.guild_id;
+
+    useEffect(() => {
+        userId && GuildMemberRequesterStore.requestMember(guildId, userId);
+    }, [guildId, userId]);
+
     const member = useStateFromStores(
         [GuildMemberStore],
         () =>
@@ -44,15 +49,11 @@ export function useMember(user: FullUser | null, channel: Channel) {
 
     if (!guild?.id) return { nick: friendNickname ?? userName };
 
-    const { nick, colorRoleId, iconRoleId, colorString, colorStrings } = member;
-
     return {
-        nick: nick ?? userName,
-        colorString,
-        colorStrings,
-        colorRoleName: colorRoleId && guild ? guildRoles?.[colorRoleId]?.name : undefined,
-        colorRoleId,
-        iconRoleId,
+        ...member,
+        nick: member?.nick ?? userName,
+        colorRoleName:
+            member?.colorRoleId && guild ? guildRoles?.[member.colorRoleId]?.name : undefined,
         guildMemberAvatar: member.avatar,
         guildMemberAvatarDecoration: member.avatarDecoration,
         primaryGuild: user?.primaryGuild,

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex, Heading, Text, useCallback } from "@webpack/common";
+import { Flex, Heading, Text, useCallback, UserStore, useStateFromStores } from "@webpack/common";
 import { Message } from "discord-types/general";
 
 import { useChannelName, useForumPostState } from "../../hooks";
@@ -27,6 +27,12 @@ export function Body({ channel, firstMessage }: BodyProps) {
     const { messagePreviewLineCount } = settings.use(["messagePreviewLineCount"]);
     const channelName = useChannelName(channel);
 
+    const owner = useStateFromStores(
+        [UserStore],
+        () => (channel?.ownerId ? UserStore.getUser(channel.ownerId) : null),
+        [channel?.ownerId]
+    );
+
     const followAction = useCallback(
         () => (hasJoined ? threadUtils.leaveThread(channel) : threadUtils.joinThread(channel)),
         [hasJoined, channel]
@@ -35,7 +41,7 @@ export function Body({ channel, firstMessage }: BodyProps) {
     return (
         <Flex className="vc-better-forums-thread-body" direction={Flex.Direction.VERTICAL}>
             <Flex className="vc-better-forums-thread-header" align={Flex.Align.CENTER} grow={0}>
-                <Username channel={channel} message={firstMessage} renderColon={false} />
+                <Username channel={channel} user={owner ?? firstMessage?.author ?? null} />
                 <Timestamp channel={channel} />
                 <FollowButton hasJoined={hasJoined} onClick={followAction} />
             </Flex>

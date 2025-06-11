@@ -5,38 +5,48 @@
  */
 
 import { Text } from "@webpack/common";
-import { Message } from "discord-types/general";
+import { TextProps } from "@webpack/types";
+import { Channel, Message, User } from "discord-types/general";
 
-import { useAuthor, useUsernameHook } from "../hooks";
-import { ThreadChannel } from "../types";
+import { cl } from "..";
+import { useMember, useUsernameHook } from "../hooks";
 import { _memo } from "../utils";
 
-interface UsernameProps {
+interface UsernameProps extends TextProps {
+    user: User | null;
     message?: Message | null;
-    channel: ThreadChannel;
+    channel: Channel;
     renderColon?: boolean;
 }
 
-export const Username = _memo<UsernameProps>(function Username({ message, channel, renderColon }) {
-    const author = useAuthor(channel, message);
-    const username = author?.nick ?? "";
+export const Username = _memo<UsernameProps>(function Username({
+    user,
+    message,
+    channel,
+    renderColon,
+    className,
+    ...props
+}) {
+    const member = useMember(user, channel);
+    const username = member?.nick ?? "";
 
     const useUsername = useUsernameHook({
-        user: message?.author,
+        user,
         channelId: channel.id,
-        guildId: channel.guild_id,
+        guildId: channel.getGuildId(),
         messageId: message?.id,
         stopPropagation: true,
     });
 
-    const usernameElement = useUsername(author)(username, channel.id);
+    const usernameElement = useUsername(member)(username, channel.id);
 
     return (
         <Text
             tag="span"
-            className="vc-better-forums-username"
+            className={cl("vc-better-forums-username", className)}
             variant="text-sm/semibold"
             color="currentColor"
+            {...props}
         >
             {usernameElement}
             {renderColon ? ": " : null}

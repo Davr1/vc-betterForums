@@ -32,8 +32,8 @@ export const Typing = _memo<TypingProps>(function Typing({ channel, users }) {
             />
             <TypingText
                 channel={channel}
-                renderDots={false}
                 className="vc-better-forums-typing-text"
+                userIds={users}
             />
         </div>
     );

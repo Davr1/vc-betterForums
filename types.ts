@@ -131,3 +131,10 @@ export interface Attachment {
 }
 
 export type EmojiSize = "reaction" | "jumbo";
+
+export interface Member extends Partial<Omit<FullGuildMember, "avatar" | "avatarDecoration">> {
+    colorRoleName?: string;
+    guildMemberAvatar?: FullGuildMember["avatar"];
+    guildMemberAvatarDecoration?: FullGuildMember["avatarDecoration"];
+    primaryGuild?: FullUser["primaryGuild"];
+}

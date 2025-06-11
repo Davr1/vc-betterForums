@@ -64,7 +64,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
             {isMuted ? null : typingUsers.length === 0 && mostRecentMessage ? (
                 <>
                     <div className="vc-better-forums-latest-message-content">
-                        <Username channel={channel} message={mostRecentMessage} renderColon />
+                        <Username channel={channel} user={mostRecentMessage.author} renderColon />
                         <MessageContent
                             channel={channel}
                             message={mostRecentMessage}

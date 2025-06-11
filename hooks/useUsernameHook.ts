@@ -9,16 +9,15 @@ import { Channel, Guild, User } from "discord-types/general";
 import { Message } from "esbuild";
 import { ReactNode } from "react";
 
-import { useAuthor } from "../hooks";
+import { Member } from "../types";
 
 export const useUsernameHook: (
     options: Partial<{
-        user: User;
+        user: User | null;
         channelId: Channel["id"];
         guildId: Guild["id"];
         messageId: Message["id"];
         stopPropagation: boolean;
     }>
-) => (
-    author: ReturnType<typeof useAuthor>
-) => (username: string, channelId: Channel["id"]) => ReactNode = findByCodeLazy("useUsernameHook");
+) => (member: Member) => (username: string, channelId: Channel["id"]) => ReactNode =
+    findByCodeLazy("useUsernameHook");

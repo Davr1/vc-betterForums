@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-export { useAuthor } from "./useAuthor";
 export { useChannelName } from "./useChannelName";
 export { useCheckPermissions } from "./useCheckPermissions";
 export { useDefaultEmoji } from "./useDefaultEmoji";
