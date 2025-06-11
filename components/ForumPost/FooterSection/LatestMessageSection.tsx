@@ -5,12 +5,16 @@
  */
 
 import { getIntlMessage } from "@utils/discord";
-import { Text, useCallback, useStateFromStores } from "@webpack/common";
+import { Text, useCallback } from "@webpack/common";
 
 import { cl } from "../../..";
-import { useForumPostState, useMessageCount, useTypingUsers } from "../../../hooks";
-import { settings } from "../../../settings";
-import { ThreadMessageStore } from "../../../stores";
+import {
+    useForumPostState,
+    useMessageCount,
+    useRecentMessage,
+    useTypingUsers,
+} from "../../../hooks";
+import { settings, ShowReplyPreview } from "../../../settings";
 import { ThreadChannel } from "../../../types";
 import { _memo, Kangaroo } from "../../../utils";
 import { Icons } from "../../icons";
@@ -27,10 +31,8 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
     channel,
 }) {
     const { showReplyPreview } = settings.use(["showReplyPreview"]);
-    const { isMuted } = useForumPostState(channel);
-    const mostRecentMessage = useStateFromStores([ThreadMessageStore], () =>
-        ThreadMessageStore.getMostRecentMessage(channel.id)
-    );
+    const { isMuted, hasJoined, hasUnreads, isNew } = useForumPostState(channel);
+    const mostRecentMessage = useRecentMessage(channel);
 
     const { messageCount, messageCountText, unreadCount, unreadCountText } = useMessageCount(
         channel.id
@@ -52,20 +54,24 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
 
     if (messageCount === 0 && typingUsers.length === 0) return <FooterSection.Spacer />;
 
+    const visibleReplyContent =
+        !!mostRecentMessage &&
+        !isMuted &&
+        (showReplyPreview === ShowReplyPreview.ALWAYS ||
+            (showReplyPreview === ShowReplyPreview.FOLLOWED_ONLY && hasJoined) ||
+            (showReplyPreview === ShowReplyPreview.UNREADS_ONLY && (hasUnreads || isNew)));
+
     return (
         <FooterSection
             className={cl("vc-better-forums-latest-message", {
                 "vc-better-forums-unread": !!unreadCount && !isMuted,
-                "vc-better-forums-empty-section":
-                    (!mostRecentMessage && typingUsers.length === 0) ||
-                    isMuted ||
-                    !showReplyPreview,
+                "vc-better-forums-empty-section": !visibleReplyContent && typingUsers.length === 0,
             })}
             icon={<Icons.ChatIcon />}
             text={messageCountText}
             onClick={clickHandler}
         >
-            {isMuted || !showReplyPreview ? null : typingUsers.length > 0 ? (
+            {!visibleReplyContent && typingUsers.length === 0 ? null : typingUsers.length > 0 ? (
                 <Typing channel={channel} users={typingUsers} />
             ) : (
                 mostRecentMessage && (

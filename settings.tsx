@@ -23,6 +23,13 @@ export enum MaxTagCount {
     ALL = 6,
 }
 
+export enum ShowReplyPreview {
+    NEVER,
+    UNREADS_ONLY,
+    FOLLOWED_ONLY,
+    ALWAYS,
+}
+
 export const settings = definePluginSettings({
     keepState: {
         type: OptionType.BOOLEAN,
@@ -71,9 +78,21 @@ export const settings = definePluginSettings({
         default: true,
     },
     showReplyPreview: {
-        type: OptionType.BOOLEAN,
-        description: "Show a preview of the latest thread reply in active threads",
-        default: true,
+        type: OptionType.SELECT,
+        description: "Show a preview of the latest message posted in a thread",
+        options: [
+            { label: "Always", value: ShowReplyPreview.ALWAYS },
+            {
+                label: "Only unread messages",
+                value: ShowReplyPreview.UNREADS_ONLY,
+                default: true,
+            },
+            {
+                label: "All messages in followed threads only",
+                value: ShowReplyPreview.FOLLOWED_ONLY,
+            },
+            { label: "Never", value: ShowReplyPreview.NEVER },
+        ],
     },
     maxReactionCount: {
         type: OptionType.SLIDER,
