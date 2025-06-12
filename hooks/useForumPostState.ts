@@ -4,25 +4,37 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { GuildStore, useStateFromStores } from "@webpack/common";
+import { GuildStore, SnowflakeUtils, useStateFromStores } from "@webpack/common";
 import { Channel, Guild } from "discord-types/general";
 
 import { JoinedThreadsStore, ReadStateStore } from "../stores";
 import { ForumPostState } from "../types";
+
+function getJoinedAtTime(guild: Guild): number {
+    return +guild.joinedAt || +new Date(guild.joinedAt) || Date.now();
+}
 
 export function useForumPostState(channel: Channel): ForumPostState {
     return useStateFromStores(
         [GuildStore, ReadStateStore, JoinedThreadsStore],
         () => {
             const guild: Guild | null = GuildStore.getGuild(channel.getGuildId());
+            const joinedAt = guild ? getJoinedAtTime(guild) : Date.now();
+
+            const hasOpened = ReadStateStore.hasOpenedThread(channel.id);
             const isActive = !!guild && !channel.isArchivedThread();
-            const isNew =
-                isActive && ReadStateStore.isNewForumThread(channel.id, channel.parent_id, guild);
-            const hasUnreads = isActive && ReadStateStore.isForumPostUnread(channel.id);
             const isMuted = JoinedThreadsStore.isMuted(channel.id);
             const hasJoined = JoinedThreadsStore.hasJoined(channel.id);
+            const hasUnreads = isActive && ReadStateStore.isForumPostUnread(channel.id);
 
-            return { isActive, isNew, hasUnreads, isMuted, hasJoined };
+            const isNew =
+                isActive &&
+                !hasOpened &&
+                SnowflakeUtils.extractTimestamp(channel.id) > joinedAt &&
+                (ReadStateStore.isNewForumThread(channel.id, channel.parent_id, guild) ||
+                    hasUnreads);
+
+            return { isActive, isNew, hasUnreads, isMuted, hasJoined, hasOpened };
         },
         [channel]
     );

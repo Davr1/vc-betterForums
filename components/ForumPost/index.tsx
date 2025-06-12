@@ -52,7 +52,7 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
 
     const { firstMessage } = useFirstMessage(channel);
     const { firstMedia } = useForumPostMetadata({ firstMessage });
-    const { messageCountText } = useMessageCount(channel.id);
+    const { messageCountText } = useMessageCount(channel);
 
     const { ref: ringTarget, width, height } = useFocusRing<HTMLDivElement>();
     const { handleLeftClick, handleRightClick } = useForumPostEvents({

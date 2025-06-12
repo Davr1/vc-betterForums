@@ -45,6 +45,7 @@ export interface ForumPostState {
     isActive: boolean;
     isMuted: boolean;
     hasJoined: boolean;
+    hasOpened: boolean;
 }
 
 export interface DiscordTag {

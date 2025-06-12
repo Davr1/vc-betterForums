@@ -64,7 +64,7 @@ export function useTags(channel: ThreadChannel): TagType[] {
 
     const appliedTags = useStateFromStores(
         [ChannelStore],
-        () => (channel.appliedTags ?? []).map(tagId => availableTags[tagId]),
+        () => (channel.appliedTags ?? []).map(tagId => availableTags[tagId]).filter(Boolean),
         [channel.appliedTags]
     );
 

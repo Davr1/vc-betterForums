@@ -7,8 +7,9 @@
 import { useMemo, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
-import { ForumPostUnreadCountStore, ReadStateStore, ThreadMessageStore } from "../stores";
+import { ForumPostUnreadCountStore, ThreadMessageStore } from "../stores";
 import { MessageCount } from "../types";
+import { useForumPostState } from "./useForumPostState";
 
 function roundNumber(n: number): number {
     const magnitude = Math.pow(10, Math.floor(Math.log10(n)));
@@ -25,22 +26,16 @@ function formatUnreadCount(count: number | undefined | null, totalCount: number)
     return formatMessageCount(Math.min(count, totalCount));
 }
 
-export function useMessageCount(channelId: Channel["id"]): MessageCount {
+export function useMessageCount(channel: Channel): MessageCount {
     const messageCount = useStateFromStores(
         [ThreadMessageStore],
-        () => ThreadMessageStore.getCount(channelId) ?? 0
+        () => ThreadMessageStore.getCount(channel.id) ?? 0
     );
 
-    const hasUnreads = useStateFromStores(
-        [ReadStateStore],
-        () =>
-            ReadStateStore.hasTrackedUnread(channelId) &&
-            ReadStateStore.hasOpenedThread(channelId) &&
-            !!ReadStateStore.getTrackedAckMessageId(channelId)
-    );
+    const { hasUnreads } = useForumPostState(channel);
 
     const unreadCount = useStateFromStores([ForumPostUnreadCountStore], () =>
-        hasUnreads ? ForumPostUnreadCountStore.getCount(channelId) ?? null : null
+        hasUnreads ? ForumPostUnreadCountStore.getCount(channel.id) ?? null : null
     );
 
     const messageCountText = useMemo(() => formatMessageCount(messageCount), [messageCount]);

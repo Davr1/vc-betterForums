@@ -52,6 +52,7 @@ interface ReadStateStore extends FluxStore {
     ): boolean;
     isForumPostUnread(channelId: Channel["id"]): boolean;
     lastMessageId(channelId: Channel["id"]): Message["id"] | null;
+    getOldestUnreadMessageId(channelId: Channel["id"]): Message["id"] | null;
 }
 
 interface RelationshipStore extends FluxStore, Stores.RelationshipStore {

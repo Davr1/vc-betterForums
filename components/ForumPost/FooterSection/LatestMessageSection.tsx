@@ -37,9 +37,8 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
     const hasTypingUsers = typingUsers.length > 0;
 
     const forumState = useForumPostState(channel);
-    const { messageCount, messageCountText, unreadCount, unreadCountText } = useMessageCount(
-        channel.id
-    );
+    const { messageCount, messageCountText, unreadCount, unreadCountText } =
+        useMessageCount(channel);
 
     const { isReplyPreview, isTypingIndicator, isEmpty } = usePreview(
         forumState,
@@ -93,7 +92,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
                                 visibleIcons
                             />
                         </div>
-                        {unreadCount !== null && (
+                        {!!unreadCount && (
                             <Text variant="text-sm/semibold" color="text-brand">
                                 {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
                                     count: unreadCountText,
