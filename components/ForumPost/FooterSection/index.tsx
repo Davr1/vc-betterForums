@@ -16,11 +16,27 @@ interface FooterSectionProps extends HTMLAttributes<HTMLDivElement> {
     className?: string;
     icon?: ReactNode;
     text?: string;
+    active?: boolean;
 }
 
-export function FooterSection({ children, className, icon, text, ...props }: FooterSectionProps) {
+export function FooterSection({
+    children,
+    className,
+    icon,
+    text,
+    active,
+    onClick,
+    ...props
+}: FooterSectionProps) {
     return (
-        <div className={cl("vc-better-forums-footer-section", className)} {...props}>
+        <div
+            className={cl("vc-better-forums-footer-section", className, {
+                "vc-better-forums-footer-section-clickable": onClick,
+                "vc-better-forums-footer-section-active": active,
+            })}
+            onClick={onClick}
+            {...props}
+        >
             {icon}
             <Text
                 variant="text-sm/semibold"

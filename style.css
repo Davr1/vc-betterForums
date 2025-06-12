@@ -162,8 +162,36 @@
     user-select: none;
     outline: 1px solid transparent;
     outline-offset: -1px;
-    transition: all 150ms ease;
+    transition: all 150ms ease, color 100ms ease, background-color 100ms ease,
+        outline-color 100ms ease;
     interpolate-size: allow-keywords;
+}
+
+[data-list-id^="forum-channel-list"]:not([class*="scrolling"])
+    .vc-better-forums-footer-section-clickable:not(.vc-better-forums-footer-section-active) {
+    cursor: pointer;
+
+    &:hover {
+        color: var(--text-primary);
+        background-color: var(--background-mod-normal);
+        outline-color: var(--border-faint);
+    }
+
+    &:active {
+        color: var(--text-primary);
+        background-color: var(--background-mod-strong);
+        outline-color: var(--border-strong);
+    }
+}
+
+.vc-better-forums-footer-section-active {
+    &,
+    &:active,
+    &:hover {
+        color: var(--text-brand);
+        background-color: var(--opacity-blurple-24);
+        outline-color: var(--blurple-50);
+    }
 }
 
 .vc-better-forums-latest-message {
@@ -210,12 +238,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     margin-right: 2px;
-}
-
-.vc-better-forums-unread {
-    color: var(--text-brand);
-    background-color: var(--opacity-blurple-24);
-    outline-color: var(--blurple-50);
 }
 
 .vc-better-forums-icon {

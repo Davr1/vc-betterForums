@@ -7,6 +7,7 @@
 import { useMemo, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
+import { settings } from "../settings";
 import { ForumPostUnreadCountStore, ThreadMessageStore } from "../stores";
 import { MessageCount } from "../types";
 import { useForumPostState } from "./useForumPostState";
@@ -27,22 +28,27 @@ function formatUnreadCount(count: number | undefined | null, totalCount: number)
 }
 
 export function useMessageCount(channel: Channel): MessageCount {
+    const { useExactCounts } = settings.use(["useExactCounts"]);
+    const { hasUnreads } = useForumPostState(channel);
+
     const messageCount = useStateFromStores(
         [ThreadMessageStore],
         () => ThreadMessageStore.getCount(channel.id) ?? 0
     );
-
-    const { hasUnreads } = useForumPostState(channel);
+    const messageCountText = useMemo(
+        () => (useExactCounts ? `${messageCount}` : formatMessageCount(messageCount)),
+        [messageCount, useExactCounts]
+    );
 
     const unreadCount = useStateFromStores([ForumPostUnreadCountStore], () =>
         hasUnreads ? ForumPostUnreadCountStore.getCount(channel.id) ?? null : null
     );
-
-    const messageCountText = useMemo(() => formatMessageCount(messageCount), [messageCount]);
-    const unreadCountText = useMemo(
-        () => (hasUnreads ? formatUnreadCount(unreadCount, messageCount) : null),
-        [hasUnreads, messageCount, unreadCount]
-    );
+    const unreadCountText = useMemo(() => {
+        if (unreadCount === null) return null;
+        return useExactCounts
+            ? `${unreadCount || "1+"}`
+            : formatUnreadCount(unreadCount, messageCount);
+    }, [messageCount, unreadCount, useExactCounts]);
 
     return { messageCount, messageCountText, unreadCount, unreadCountText };
 }

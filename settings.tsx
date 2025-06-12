@@ -72,6 +72,11 @@ export const settings = definePluginSettings({
                 value === MessagePreviewLineCount.ALL ? getIntlMessage("FORM_LABEL_ALL") : value,
         },
     },
+    useExactCounts: {
+        type: OptionType.BOOLEAN,
+        description: "Don't round displayed numbers",
+        default: false,
+    },
     showThreadMembers: {
         type: OptionType.BOOLEAN,
         description: "Show members in the thread footer",

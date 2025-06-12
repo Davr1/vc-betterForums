@@ -32,6 +32,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
 }) {
     const mostRecentMessage = useRecentMessage(channel);
     const hasRecentMessage = !!mostRecentMessage;
+    const messageId = mostRecentMessage?.id ?? channel.lastMessageId;
 
     const typingUsers = useTypingUsers(channel.id);
     const hasTypingUsers = typingUsers.length > 0;
@@ -47,29 +48,23 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
     );
 
     const clickHandler = useCallback(() => {
-        if (!mostRecentMessage?.id) return;
-
         // wait until router navigation
         setImmediate(() =>
-            Kangaroo.jumpToMessage({
-                channelId: channel.id,
-                messageId: mostRecentMessage.id,
-                flash: true,
-            })
+            Kangaroo.jumpToMessage({ channelId: channel.id, messageId, flash: true })
         );
-    }, [channel.id, mostRecentMessage?.id]);
+    }, [channel.id, messageId]);
 
     if (isEmpty && messageCount === 0) return <FooterSection.Spacer />;
 
     return (
         <FooterSection
             className={cl("vc-better-forums-latest-message", {
-                "vc-better-forums-unread": !!unreadCount && !forumState.isMuted,
                 "vc-better-forums-empty-section": isEmpty,
             })}
             icon={<Icons.ChatIcon />}
             text={messageCountText}
-            onClick={clickHandler}
+            onClick={messageId ? clickHandler : undefined}
+            active={!!unreadCount && !forumState.isMuted}
         >
             {isTypingIndicator ? (
                 <Typing channel={channel} users={typingUsers} />
