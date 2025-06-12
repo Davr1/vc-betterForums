@@ -162,22 +162,46 @@
     user-select: none;
     outline: 1px solid transparent;
     outline-offset: -1px;
-    transition: 150ms ease;
-    transition-property: background-color, outline-color, color;
+    transition: all 150ms ease;
+    interpolate-size: allow-keywords;
+}
+
+.vc-better-forums-latest-message {
+    flex-grow: 1;
+
+    @starting-style {
+        /* skip initial resize animation on first render */
+        .vc-better-forums-latest-message-content {
+            width: auto;
+            margin-right: auto;
+        }
+    }
 }
 
 .vc-better-forums-latest-message,
 .vc-better-forums-latest-message-content {
-    flex-grow: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .vc-better-forums-latest-message-content {
+    margin-right: auto;
+    width: auto;
     display: flex;
     gap: 4px;
     align-items: center;
+    transition: all 150ms ease;
+
+    @starting-style {
+        width: 0;
+        margin-right: 0;
+    }
+
+    .vc-better-forums-latest-message.vc-better-forums-empty-section & {
+        width: 0;
+        margin-right: 0;
+    }
 }
 
 .vc-better-forums-footer-section-text {
@@ -266,6 +290,7 @@
 .vc-better-forums-empty-section {
     flex-grow: 0;
     margin-right: auto;
+    width: auto;
 }
 
 .vc-better-forums-timestamp {

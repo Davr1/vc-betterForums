@@ -11,10 +11,10 @@ import { cl } from "../../..";
 import {
     useForumPostState,
     useMessageCount,
+    usePreview,
     useRecentMessage,
     useTypingUsers,
 } from "../../../hooks";
-import { settings, ShowReplyPreview } from "../../../settings";
 import { ThreadChannel } from "../../../types";
 import { _memo, Kangaroo } from "../../../utils";
 import { Icons } from "../../icons";
@@ -30,19 +30,27 @@ interface LatestMessageSectionProps {
 export const LatestMessageSection = _memo<LatestMessageSectionProps>(function LatestMessageSection({
     channel,
 }) {
-    const { showReplyPreview } = settings.use(["showReplyPreview"]);
-    const { isMuted, hasJoined, hasUnreads, isNew } = useForumPostState(channel);
     const mostRecentMessage = useRecentMessage(channel);
+    const hasRecentMessage = !!mostRecentMessage;
 
+    const typingUsers = useTypingUsers(channel.id);
+    const hasTypingUsers = typingUsers.length > 0;
+
+    const forumState = useForumPostState(channel);
     const { messageCount, messageCountText, unreadCount, unreadCountText } = useMessageCount(
         channel.id
     );
 
-    const typingUsers = useTypingUsers(channel.id);
+    const { isReplyPreview, isTypingIndicator, isEmpty } = usePreview(
+        forumState,
+        hasRecentMessage,
+        hasTypingUsers
+    );
 
     const clickHandler = useCallback(() => {
         if (!mostRecentMessage?.id) return;
 
+        // wait until router navigation
         setImmediate(() =>
             Kangaroo.jumpToMessage({
                 channelId: channel.id,
@@ -52,34 +60,27 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
         );
     }, [channel.id, mostRecentMessage?.id]);
 
-    if (messageCount === 0 && typingUsers.length === 0) return <FooterSection.Spacer />;
-
-    const visibleReplyContent =
-        !!mostRecentMessage &&
-        !isMuted &&
-        (showReplyPreview === ShowReplyPreview.ALWAYS ||
-            (showReplyPreview === ShowReplyPreview.FOLLOWED_ONLY && hasJoined) ||
-            (showReplyPreview === ShowReplyPreview.UNREADS_ONLY && (hasUnreads || isNew)));
+    if (isEmpty && messageCount === 0) return <FooterSection.Spacer />;
 
     return (
         <FooterSection
             className={cl("vc-better-forums-latest-message", {
-                "vc-better-forums-unread": !!unreadCount && !isMuted,
-                "vc-better-forums-empty-section": !visibleReplyContent && typingUsers.length === 0,
+                "vc-better-forums-unread": !!unreadCount && !forumState.isMuted,
+                "vc-better-forums-empty-section": isEmpty,
             })}
             icon={<Icons.ChatIcon />}
             text={messageCountText}
             onClick={clickHandler}
         >
-            {!visibleReplyContent && typingUsers.length === 0 ? null : typingUsers.length > 0 ? (
+            {isTypingIndicator ? (
                 <Typing channel={channel} users={typingUsers} />
             ) : (
-                mostRecentMessage && (
+                isReplyPreview && (
                     <>
                         <div className="vc-better-forums-latest-message-content">
                             <Username
                                 channel={channel}
-                                user={mostRecentMessage.author}
+                                user={mostRecentMessage!.author}
                                 renderColon
                                 renderBadge
                             />
