@@ -5,14 +5,14 @@
  */
 
 import { Text } from "@webpack/common";
-import { HTMLAttributes, ReactNode } from "react";
+import { HTMLProps, ReactNode } from "react";
 
 import { cl } from "../../..";
 import { LatestMessageSection } from "./LatestMessageSection";
 import { MembersSection } from "./MembersSection";
 import { Spacer } from "./Spacer";
 
-interface FooterSectionProps extends HTMLAttributes<HTMLDivElement> {
+interface FooterSectionProps extends HTMLProps<HTMLDivElement> {
     className?: string;
     icon?: ReactNode;
     text?: string;

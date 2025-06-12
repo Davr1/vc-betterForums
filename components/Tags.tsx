@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Text, Tooltip } from "@webpack/common";
-import { ReactNode } from "react";
+import { Text, Tooltip, useCallback } from "@webpack/common";
+import { MouseEvent, ReactNode } from "react";
 
 import { cl } from "..";
 import { CustomTag, Tag as TagType } from "../types";
@@ -14,15 +14,25 @@ import { Emoji } from "./Emoji";
 interface TagProps {
     tag: TagType;
     className?: string;
+    onContextMenu?: (event: MouseEvent<HTMLDivElement>, tag: TagType) => void;
 }
 
-export function Tag({ tag, className }: TagProps) {
+export function Tag({ tag, className, onContextMenu }: TagProps) {
+    const handleContextMenu = useCallback(
+        (event: MouseEvent<HTMLDivElement>) => {
+            if (!onContextMenu) return;
+            event.stopPropagation();
+            onContextMenu(event, tag);
+        },
+        [tag, onContextMenu]
+    );
+
     if (tag.custom) return <CustomTag {...tag} />;
 
     const { emojiId, emojiName, name } = tag;
 
     return (
-        <div className={cl(className, "vc-better-forums-tag")}>
+        <div className={cl(className, "vc-better-forums-tag")} onContextMenu={handleContextMenu}>
             <Emoji
                 emojiId={emojiId}
                 emojiName={emojiName}
