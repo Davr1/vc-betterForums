@@ -95,12 +95,6 @@ interface Section {
     usersById: Record<BasicUser["userId"], BasicUser>;
 }
 
-interface ThreadMemberListStore extends FluxStore {
-    getMemberListSections(
-        channelId: Channel["id"]
-    ): Record<Section["sectionId"], Section> | undefined;
-}
-
 interface JoinedThreadsStore extends FluxStore {
     hasJoined(threadId: Channel["id"]): boolean;
     isMuted(threadId: Channel["id"]): boolean;
@@ -166,7 +160,6 @@ export const LurkingStore: LurkingStore = findStoreLazy("LurkingStore");
 export const RelationshipStore: RelationshipStore = findStoreLazy("RelationshipStore");
 export const GuildMemberStore: GuildMemberStore = findStoreLazy("GuildMemberStore");
 export const PermissionStore: PermissionStore = findStoreLazy("PermissionStore");
-export const ThreadMemberListStore: ThreadMemberListStore = findStoreLazy("ThreadMemberListStore");
 export const JoinedThreadsStore: JoinedThreadsStore = findStoreLazy("JoinedThreadsStore");
 
 export { MissingGuildMemberStore } from "./MissingGuildMemberStore";

@@ -12,6 +12,7 @@ import { Guild, User } from "discord-types/general";
 import { FluxEventHandlers, GuildMemberRequesterStore } from "./";
 
 interface _MissingGuildMemberStore extends FluxStore {
+    reset(): void;
     isMember(guildId: Guild["id"], userId: User["id"]): boolean;
     requestMembersBulk(guildId: Guild["id"], userIds: User["id"][]): void;
 }
@@ -58,11 +59,6 @@ export const MissingGuildMemberStore = proxyLazyWebpack(() => {
             }
         }
 
-        _reset() {
-            this.missingMembers = new Map();
-            this.emitChange();
-        }
-
         _handleChunk(chunk: Chunk) {
             this._modify(chunk.guildId, set => {
                 chunk.members.forEach(({ user }) => set.delete(user.id));
@@ -79,6 +75,10 @@ export const MissingGuildMemberStore = proxyLazyWebpack(() => {
         }
 
         public isMember(guildId: Guild["id"], userId: User["id"]): boolean {
+            /* Unlike GuildMemberStore, the default assumption is that any user is a member of the given guild,
+            until proven otherwise. Since this is only used by the thread component, this assumption is correct
+            more often than not (user that posted the thread must have also been a guild member at some point),
+            and reduces flashes with incorrect state during loading. */
             return !this.missingMembers.get(guildId)?.has(userId);
         }
 
@@ -87,11 +87,16 @@ export const MissingGuildMemberStore = proxyLazyWebpack(() => {
                 .filter(id => this.isMember(guildId, id))
                 .forEach(id => GuildMemberRequesterStore.requestMember(guildId, id));
         }
+
+        public reset() {
+            this.missingMembers = new Map();
+            this.emitChange();
+        }
     }
 
     const eventHandlers: FluxEventHandlers<FluxEvents> = {
-        CONNECTION_CLOSED: () => store._reset(),
-        CONNECTION_OPEN: () => store._reset(),
+        CONNECTION_CLOSED: () => store.reset(),
+        CONNECTION_OPEN: () => store.reset(),
         GUILD_MEMBERS_CHUNK_BATCH: ({ chunks }) =>
             chunks.forEach(chunk => store._handleChunk(chunk)),
         GUILD_MEMBER_ADD: ({ guildId, user }) => store._handleJoin(guildId, user.id),
