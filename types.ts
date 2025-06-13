@@ -39,14 +39,18 @@ export interface MessageCount {
     unreadCountText: string | number | null;
 }
 
-export interface ForumPostState {
-    isNew: boolean;
-    hasUnreads: boolean;
-    isActive: boolean;
-    isMuted: boolean;
-    hasJoined: boolean;
-    hasOpened: boolean;
-}
+export type ForumPostState = Record<
+    | "isNew"
+    | "hasUnreads"
+    | "isActive"
+    | "isMuted"
+    | "hasJoined"
+    | "hasOpened"
+    | "isLocked"
+    | "isAbandoned"
+    | "isPinned",
+    boolean
+>;
 
 export interface DiscordTag {
     id: string;
@@ -54,7 +58,7 @@ export interface DiscordTag {
     name: string;
     emojiId: null | string;
     emojiName: null | string;
-    moderated: boolean;
+    color?: CustomTagColor;
 }
 
 export type CustomTagColor = "blue" | "green" | "red" | "teal" | "yellow" | "orange";
@@ -72,7 +76,7 @@ export interface CustomTagDefinition {
     id: CustomTag["id"];
     name: string | (() => string);
     icon?: () => ReactNode;
-    condition: (channel: ThreadChannel, context: ForumPostState) => boolean;
+    condition: (context: ForumPostState) => boolean;
     color?: CustomTag["color"];
 }
 

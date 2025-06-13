@@ -5,13 +5,15 @@
  */
 
 import { DataStore } from "@api/index";
+import { getIntlMessage } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
 import { findByPropsLazy } from "@webpack";
 import { React } from "@webpack/common";
 import { Channel, Message } from "discord-types/general";
 import { ComponentType } from "react";
 
-import { ThreadChannel } from "./types";
+import { Icons } from "./components/icons";
+import { CustomTagDefinition, ThreadChannel } from "./types";
 
 export function indexedDBStorageFactory<T>() {
     return {
@@ -47,3 +49,40 @@ export const threadUtils: {
     joinThread(thread: ThreadChannel): void;
     leaveThread(thread: ThreadChannel): void;
 } = findByPropsLazy("joinThread", "leaveThread");
+
+export const tagDefinitions = [
+    {
+        id: "new",
+        name: () => getIntlMessage("NEW"),
+        condition: ({ isNew }) => isNew,
+        color: "blue",
+    },
+    {
+        id: "pinned",
+        name: () => getIntlMessage("PINNED_POST"),
+        icon: () => <Icons.PinIcon />,
+        condition: ({ isPinned }) => isPinned,
+        color: "blue",
+    },
+    {
+        id: "archived",
+        name: () => getIntlMessage("THREAD_BROWSER_ARCHIVED"),
+        icon: () => <Icons.ScrollIcon />,
+        condition: ({ isActive }) => !isActive,
+        color: "red",
+    },
+    {
+        id: "locked",
+        name: "Locked",
+        icon: () => <Icons.LockIcon />,
+        condition: ({ isLocked }) => isLocked,
+        color: "orange",
+    },
+    {
+        id: "abandoned",
+        name: "Abandoned",
+        icon: () => <Icons.NoneIcon />,
+        condition: ({ isAbandoned }) => isAbandoned,
+        color: "red",
+    },
+] as const satisfies CustomTagDefinition[];

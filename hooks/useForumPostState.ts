@@ -7,7 +7,12 @@
 import { GuildStore, SnowflakeUtils, useStateFromStores } from "@webpack/common";
 import { Channel, Guild } from "discord-types/general";
 
-import { JoinedThreadsStore, ReadStateStore } from "../stores";
+import {
+    GuildMemberStore,
+    JoinedThreadsStore,
+    MissingGuildMemberStore,
+    ReadStateStore,
+} from "../stores";
 import { ForumPostState } from "../types";
 
 function getJoinedAtTime(guild: Guild): number {
@@ -16,16 +21,19 @@ function getJoinedAtTime(guild: Guild): number {
 
 export function useForumPostState(channel: Channel): ForumPostState {
     return useStateFromStores(
-        [GuildStore, ReadStateStore, JoinedThreadsStore],
+        [GuildStore, ReadStateStore, JoinedThreadsStore, GuildMemberStore, MissingGuildMemberStore],
         () => {
             const guild: Guild | null = GuildStore.getGuild(channel.getGuildId());
             const joinedAt = guild ? getJoinedAtTime(guild) : Date.now();
 
-            const hasOpened = ReadStateStore.hasOpenedThread(channel.id);
             const isActive = !!guild && !channel.isArchivedThread();
+            const hasUnreads = isActive && ReadStateStore.isForumPostUnread(channel.id);
             const isMuted = JoinedThreadsStore.isMuted(channel.id);
             const hasJoined = JoinedThreadsStore.hasJoined(channel.id);
-            const hasUnreads = isActive && ReadStateStore.isForumPostUnread(channel.id);
+            const hasOpened = ReadStateStore.hasOpenedThread(channel.id);
+            const isLocked = channel.threadMetadata?.locked === true;
+            const isPinned = channel.hasFlag(2);
+            const isAbandoned = !MissingGuildMemberStore.isMember(guild.id, channel.ownerId);
 
             const isNew =
                 isActive &&
@@ -34,7 +42,17 @@ export function useForumPostState(channel: Channel): ForumPostState {
                 (ReadStateStore.isNewForumThread(channel.id, channel.parent_id, guild) ||
                     hasUnreads);
 
-            return { isActive, isNew, hasUnreads, isMuted, hasJoined, hasOpened };
+            return {
+                isActive,
+                isNew,
+                hasUnreads,
+                isMuted,
+                hasJoined,
+                hasOpened,
+                isLocked,
+                isPinned,
+                isAbandoned,
+            };
         },
         [channel]
     );

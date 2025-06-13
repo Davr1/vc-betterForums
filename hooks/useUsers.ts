@@ -7,7 +7,7 @@
 import { useEffect, UserStore, useStateFromStores } from "@webpack/common";
 import { Guild, User } from "discord-types/general";
 
-import { GuildMemberRequesterStore } from "../stores";
+import { MissingGuildMemberStore } from "../stores";
 
 export function useUsers(guildId: Guild["id"], userIds: User["id"][], limit?: number) {
     const users = useStateFromStores(
@@ -16,9 +16,10 @@ export function useUsers(guildId: Guild["id"], userIds: User["id"][], limit?: nu
         [userIds, limit]
     );
 
-    useEffect(() => {
-        userIds.forEach(user => GuildMemberRequesterStore.requestMember(guildId, user));
-    }, [userIds, guildId]);
+    useEffect(
+        () => MissingGuildMemberStore.requestMembersBulk(guildId, userIds),
+        [guildId, userIds]
+    );
 
     return users;
 }

@@ -70,32 +70,30 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
                 <Typing channel={channel} users={typingUsers} />
             ) : (
                 isReplyPreview && (
-                    <>
-                        <div className="vc-better-forums-latest-message-content">
-                            <Username
-                                channel={channel}
-                                user={mostRecentMessage!.author}
-                                renderColon
-                                renderBadge
-                            />
-                            <MessageContent
-                                channel={channel}
-                                message={mostRecentMessage}
-                                messageClassName="vc-better-forums-message-content-inline"
-                                variant={unreadCount ? "text-sm/semibold" : "text-sm/normal"}
-                                lineClamp={1}
-                                visibleIcons
-                            />
-                        </div>
-                        {!!unreadCount && (
-                            <Text variant="text-sm/semibold" color="text-brand">
-                                {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
-                                    count: unreadCountText,
-                                })}
-                            </Text>
-                        )}
-                    </>
+                    <div className="vc-better-forums-latest-message-content">
+                        <Username
+                            channel={channel}
+                            user={mostRecentMessage!.author}
+                            renderColon
+                            renderBadge
+                        />
+                        <MessageContent
+                            channel={channel}
+                            message={mostRecentMessage}
+                            messageClassName="vc-better-forums-message-content-inline"
+                            variant={unreadCount ? "text-sm/semibold" : "text-sm/normal"}
+                            lineClamp={1}
+                            visibleIcons
+                        />
+                    </div>
                 )
+            )}
+            {!!unreadCount && (
+                <Text variant="text-sm/semibold" color="text-brand">
+                    {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
+                        count: unreadCountText,
+                    })}
+                </Text>
             )}
         </FooterSection>
     );

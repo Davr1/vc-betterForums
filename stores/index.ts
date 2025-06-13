@@ -5,9 +5,15 @@
  */
 
 import { findStoreLazy } from "@webpack";
-import { FluxStore } from "@webpack/types";
+import { FluxEvents, FluxStore } from "@webpack/types";
 import { Channel, Guild, Message, User } from "discord-types/general";
 import * as Stores from "discord-types/stores";
+
+export type FluxEventHandlers<T extends Partial<Record<FluxEvents, unknown>>> = {
+    [K in keyof T]?: (data: T[K]) => void;
+} & {
+    [K in FluxEvents]?: (data: T[K]) => void;
+};
 
 interface ChannelSectionStore extends FluxStore {
     getCurrentSidebarChannelId: (parentChannelId: Channel["id"]) => Channel["id"] | null;
@@ -162,3 +168,5 @@ export const GuildMemberStore: GuildMemberStore = findStoreLazy("GuildMemberStor
 export const PermissionStore: PermissionStore = findStoreLazy("PermissionStore");
 export const ThreadMemberListStore: ThreadMemberListStore = findStoreLazy("ThreadMemberListStore");
 export const JoinedThreadsStore: JoinedThreadsStore = findStoreLazy("JoinedThreadsStore");
+
+export { MissingGuildMemberStore } from "./MissingGuildMemberStore";

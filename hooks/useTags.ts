@@ -4,11 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { getIntlMessage } from "@utils/discord";
 import { ChannelStore, useMemo, useStateFromStores } from "@webpack/common";
 
-import { Icons } from "../components/icons";
-import { useForumPostState } from "../hooks";
+import { settings } from "../settings";
 import {
     CustomTag,
     CustomTagDefinition,
@@ -17,36 +15,11 @@ import {
     Tag as TagType,
     ThreadChannel,
 } from "../types";
-
-const tagDefinitions: CustomTagDefinition[] = [
-    {
-        id: "new",
-        name: () => getIntlMessage("NEW"),
-        condition: (_, { isNew }) => isNew,
-    },
-    {
-        id: "pinned",
-        name: () => getIntlMessage("PINNED_POST"),
-        icon: () => <Icons.PinIcon />,
-        condition: channel => channel.hasFlag(2),
-    },
-    {
-        id: "archived",
-        name: () => getIntlMessage("THREAD_BROWSER_ARCHIVED"),
-        icon: () => <Icons.ArchiveIcon />,
-        condition: channel => channel.isArchivedThread(),
-        color: "orange",
-    },
-    {
-        id: "locked",
-        name: "Locked",
-        icon: () => <Icons.LockIcon />,
-        condition: channel => channel.threadMetadata?.locked === true,
-        color: "orange",
-    },
-];
+import { tagDefinitions } from "../utils";
+import { useForumPostState } from "./";
 
 export function useTags(channel: ThreadChannel): TagType[] {
+    const { customTags: customTagOverrides } = settings.use(["customTags"]);
     const context = useForumPostState(channel);
 
     const availableTags = useStateFromStores(
@@ -70,8 +43,9 @@ export function useTags(channel: ThreadChannel): TagType[] {
 
     const customTags: CustomTag[] = useMemo(
         () =>
-            tagDefinitions
-                .filter(def => def.condition(channel, context))
+            (tagDefinitions as CustomTagDefinition[])
+                .filter(tag => customTagOverrides[tag.id])
+                .filter(def => def.condition(context))
                 .map(({ id, name, icon, color }) => ({
                     id,
                     name: typeof name === "function" ? name() : name,
@@ -79,7 +53,7 @@ export function useTags(channel: ThreadChannel): TagType[] {
                     custom: true,
                     color,
                 })),
-        [channel, context]
+        [channel, context, customTagOverrides]
     );
 
     return useMemo(() => [...customTags, ...appliedTags], [appliedTags, customTags]);

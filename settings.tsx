@@ -5,9 +5,17 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import { ErrorBoundary } from "@components/index";
 import { makeRange } from "@components/PluginSettings/components";
 import { getIntlMessage } from "@utils/discord";
+import { Margins } from "@utils/margins";
 import { OptionType } from "@utils/types";
+import { Checkbox, Flex, Forms } from "@webpack/common";
+
+import { cl } from ".";
+import { Tag } from "./components/Tags";
+import { CustomTagDefinition, Tag as TagType } from "./types";
+import { tagDefinitions } from "./utils";
 
 export enum MaxReactionCount {
     OFF = 0,
@@ -29,6 +37,50 @@ export enum ShowReplyPreview {
     FOLLOWED_ONLY,
     ALWAYS,
 }
+
+interface TagSettingProps {
+    tag: TagType;
+}
+
+function TagSetting({ tag }: TagSettingProps) {
+    const { customTags } = settings.use(["customTags"]);
+    const value = customTags[tag.id];
+
+    return (
+        <Flex align={Flex.Align.CENTER} grow={0} className="vc-better-forums-tag-setting">
+            <Checkbox
+                value={value}
+                onChange={(_, newValue) => (settings.store.customTags[tag.id] = newValue)}
+                size={20}
+            />
+            <Tag tag={tag} className={cl({ "vc-better-forums-tag-disabled": !value })} />
+        </Flex>
+    );
+}
+
+const TagSettings = ErrorBoundary.wrap(() => {
+    return (
+        <Forms.FormSection>
+            <Forms.FormTitle tag="h3">Custom tags</Forms.FormTitle>
+            <Forms.FormText className={Margins.bottom8} type={Forms.FormText.Types.DESCRIPTION}>
+                Custom tags provided by the plugin
+            </Forms.FormText>
+            <Flex justify={Flex.Justify.BETWEEN}>
+                {Object.values(tagDefinitions as CustomTagDefinition[])
+                    .map<TagType>(({ id, name, icon, color }) => ({
+                        id,
+                        name: typeof name === "function" ? name() : name,
+                        icon: icon?.(),
+                        custom: true,
+                        color,
+                    }))
+                    .map(tag => (
+                        <TagSetting tag={tag} key={tag.id} />
+                    ))}
+            </Flex>
+        </Forms.FormSection>
+    );
+});
 
 export const settings = definePluginSettings({
     keepState: {
@@ -115,5 +167,10 @@ export const settings = definePluginSettings({
                     ? getIntlMessage("FORM_LABEL_ALL")
                     : value,
         },
+    },
+    customTags: {
+        type: OptionType.COMPONENT,
+        component: TagSettings,
+        default: Object.fromEntries(Object.values(tagDefinitions).map(({ id }) => [id, true])),
     },
 });

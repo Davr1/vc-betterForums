@@ -23,7 +23,7 @@ export function useMember(user: FullUser | null, channel: Channel): Member {
         () =>
             !guildId || !userId
                 ? null
-                : (GuildMemberStore.getMember(guildId, userId) as FullGuildMember),
+                : (GuildMemberStore.getMember(guildId, userId) as FullGuildMember | null),
         [guildId, userId]
     );
 

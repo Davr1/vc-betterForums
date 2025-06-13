@@ -8,7 +8,7 @@ import { Text, Tooltip, useCallback } from "@webpack/common";
 import { MouseEvent, ReactNode } from "react";
 
 import { cl } from "..";
-import { CustomTag, Tag as TagType } from "../types";
+import { Tag as TagType } from "../types";
 import { Emoji } from "./Emoji";
 
 interface TagProps {
@@ -27,21 +27,25 @@ export function Tag({ tag, className, onContextMenu }: TagProps) {
         [tag, onContextMenu]
     );
 
-    if (tag.custom) return <CustomTag {...tag} />;
-
-    const { emojiId, emojiName, name } = tag;
-
     return (
-        <div className={cl(className, "vc-better-forums-tag")} onContextMenu={handleContextMenu}>
-            <Emoji
-                emojiId={emojiId}
-                emojiName={emojiName}
-                size="reaction"
-                animated={false}
-                className="vc-better-forums-tag-emoji"
-            />
+        <div
+            className={cl(className, "vc-better-forums-tag")}
+            onContextMenu={handleContextMenu}
+            data-color={tag.color}
+        >
+            {tag.custom ? (
+                tag.icon
+            ) : (
+                <Emoji
+                    emojiId={tag.emojiId}
+                    emojiName={tag.emojiName}
+                    size="reaction"
+                    animated={false}
+                    className="vc-better-forums-tag-emoji"
+                />
+            )}
             <Text variant="text-xs/bold" lineClamp={1} color="currentColor">
-                {name}
+                {tag.name}
             </Text>
         </div>
     );
@@ -67,20 +71,5 @@ export function MoreTags({ tags, renderTag }: MoreTagsProps) {
                 </div>
             )}
         </Tooltip>
-    );
-}
-
-interface CustomTagProps extends CustomTag {
-    className?: string;
-}
-
-export function CustomTag({ name, color = "blue", icon, className }: CustomTagProps) {
-    return (
-        <div className={cl(className, "vc-better-forums-tag-custom")} data-color={color}>
-            {icon}
-            <Text variant="text-xs/bold" lineClamp={1} color="currentColor">
-                {name}
-            </Text>
-        </div>
     );
 }
