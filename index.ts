@@ -15,7 +15,7 @@ import { ForumPost } from "./components/ForumPost";
 import { setForumChannelStore } from "./hooks/useForumChannelState";
 import { settings } from "./settings";
 import { ForumChannelStore, ForumChannelStoreState, MissingGuildMemberStore } from "./stores";
-import { indexedDBStorageFactory } from "./utils";
+import { indexedDBStorageFactory, tagDefinitions } from "./utils";
 
 export const cl = classNameFactory();
 
@@ -24,7 +24,12 @@ const STORAGE_KEY = "BetterForums";
 export default definePlugin({
     name: "BetterForums",
     description: "",
-    authors: [],
+    authors: [
+        {
+            name: "Davri",
+            id: 457579346282938368n,
+        },
+    ],
     settings,
     patches: [
         {
@@ -46,6 +51,7 @@ export default definePlugin({
     start() {
         // Initialize store as soon as Flux is available
         MissingGuildMemberStore.reset();
+        console.log(tagDefinitions.length);
     },
     ForumPost,
     createStore(storeCreator: (_set: unknown, _get: unknown) => ForumChannelStore) {

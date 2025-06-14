@@ -7,9 +7,14 @@
 import { Channel, GuildMember, Message, MessageReaction, User } from "discord-types/general";
 import { ReactNode } from "react";
 
+export interface FullChannel extends Channel {
+    isForumLikeChannel(): this is ForumChannel;
+    isForumChannel(): this is ForumChannel;
+}
+
 export interface ForumChannel extends Channel {
     defaultReactionEmoji: Record<"emojiId" | "emojiName", string | null> | null;
-    availableTags: DiscordTag[] | null;
+    availableTags: DiscordTag[];
 }
 
 export interface ThreadMetadata {
@@ -54,30 +59,30 @@ export type ForumPostState = Record<
 
 export interface DiscordTag {
     id: string;
-    custom?: false;
     name: string;
-    emojiId: null | string;
-    emojiName: null | string;
-    color?: CustomTagColor;
+    emojiId?: null | string;
+    emojiName?: null | string;
 }
 
-export type CustomTagColor = "blue" | "green" | "red" | "teal" | "yellow" | "orange";
+export type CustomTagColor =
+    | "neutral"
+    | "pink"
+    | "blurple"
+    | "blue"
+    | "teal"
+    | "green"
+    | "yellow"
+    | "orange"
+    | "red";
 
-export interface CustomTag {
-    id: string;
-    name: string;
-    custom: true;
-    color?: CustomTagColor;
-    icon?: ReactNode;
-}
-export type Tag = DiscordTag | CustomTag;
-
-export interface CustomTagDefinition {
-    id: CustomTag["id"];
-    name: string | (() => string);
-    icon?: () => ReactNode;
-    condition: (context: ForumPostState) => boolean;
-    color?: CustomTag["color"];
+export interface CustomTag extends DiscordTag {
+    info?: string;
+    custom?: boolean;
+    color?: CustomTagColor | null;
+    invertedColor?: boolean;
+    icon?: string | ReactNode;
+    monochromeIcon?: boolean;
+    condition?: (context: ForumPostState) => boolean;
 }
 
 export interface FullGuildMember extends GuildMember {

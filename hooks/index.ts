@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+export { useAllForumTags } from "./useAllForumTags";
+export { useAppliedTags } from "./useAppliedTags";
 export { useChannelName } from "./useChannelName";
 export { useCheckPermissions } from "./useCheckPermissions";
 export { useDefaultEmoji } from "./useDefaultEmoji";
@@ -21,7 +23,8 @@ export { useMessageContent } from "./useMessageContent";
 export { useMessageCount } from "./useMessageCount";
 export { usePreview } from "./usePreview";
 export { useRecentMessage } from "./useRecentMessage";
-export { useTags } from "./useTags";
+export { useTag } from "./useTag";
+export { useTagIcon } from "./useTagIcon";
 export { useTopReactions } from "./useTopReactions";
 export { useTypingUsers } from "./useTypingUsers";
 export { useUsernameHook } from "./useUsernameHook";

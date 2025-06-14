@@ -6,7 +6,6 @@
 
 import { LazyComponent } from "@utils/lazyReact";
 import {
-    ChannelStore,
     React,
     useLayoutEffect,
     useRef,
@@ -18,6 +17,7 @@ import { Ref } from "react";
 
 import { cl } from "..";
 import { useCheckPermissions, useDefaultEmoji, useTopReactions } from "../hooks";
+import { ChannelStore } from "../stores";
 import { ForumChannel, ReactionType, ThreadChannel } from "../types";
 import { _memo } from "../utils";
 import { ReactionButton, ReactionButtonProps } from "./ReactionButton";

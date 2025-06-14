@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ChannelStore, useStateFromStores } from "@webpack/common";
+import { useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
-import { ChannelState, ForumChannelStore, LayoutType, SortOrder, TagSetting } from "../stores";
+import { ChannelState, ChannelStore, ForumChannelStore, LayoutType, SortOrder, TagSetting } from "../stores";
 
 let useForumChannelStore: () => ForumChannelStore | null = () => null;
 

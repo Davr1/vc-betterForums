@@ -55,11 +55,17 @@
     text-transform: uppercase;
     height: var(--size-md);
     letter-spacing: 0.02rem;
-    user-select: none;
     transition: all 100ms ease;
     border: 1px solid var(--border-subtle);
     background: var(--button-secondary-background);
     color: var(--text-secondary);
+    width: max-content;
+
+    &,
+    * {
+        user-select: none;
+        cursor: pointer;
+    }
 
     .theme-light &:not([data-color]) {
         padding: 1px 5px;
@@ -67,13 +73,44 @@
 
     &[data-color] {
         border: none;
-        color: var(--color);
+    }
+}
+
+.vc-better-forums-tag,
+.vc-better-forums-color-swatch {
+    &[data-color] {
+        color: oklch(from var(--color) calc(l - 0.1) c h);
         background-color: var(--bg);
+    }
+
+    &[data-color][data-inverted-color="true"] {
+        color: oklch(from var(--bg) calc(l + 0.1) c h);
+        background-color: var(--color);
+    }
+
+    &[data-color="neutral"] {
+        --color: var(--neutral-60);
+        --bg: var(--neutral-15);
+    }
+
+    &[data-color="pink"] {
+        --color: var(--pink-65);
+        --bg: var(--pink-15);
+    }
+
+    &[data-color="blurple"] {
+        --color: var(--blurple-60);
+        --bg: var(--blurple-15);
     }
 
     &[data-color="blue"] {
         --color: var(--blue-new-60);
         --bg: var(--blue-new-15);
+    }
+
+    &[data-color="teal"] {
+        --color: var(--teal-new-60);
+        --bg: var(--teal-new-15);
     }
 
     &[data-color="green"] {
@@ -95,11 +132,6 @@
         --color: var(--red-new-60);
         --bg: var(--red-new-15);
     }
-
-    &[data-color="teal"] {
-        --color: var(--teal-new-60);
-        --bg: var(--teal-new-15);
-    }
 }
 
 .vc-better-forums-extra-tags-tooltip {
@@ -111,10 +143,22 @@
     gap: var(--space-xs);
 }
 
-.vc-better-forums-tag-emoji {
+.vc-better-forums-tag-icon,
+.vc-better-forums-tag-icon-monochrome {
     width: var(--size-sm);
     height: var(--size-sm);
     object-fit: contain;
+}
+
+.vc-better-forums-tag-icon {
+    background-size: contain;
+    background-position: center;
+}
+
+.vc-better-forums-tag-icon-monochrome {
+    background-color: currentcolor;
+    mask-size: contain;
+    mask-position: center;
 }
 
 .vc-better-forums-tag-filtered {
@@ -386,10 +430,123 @@
     }
 }
 
-.vc-better-forums-tag-setting {
+.vc-better-forums-tag-settings {
     gap: var(--space-xs);
+}
+
+.vc-better-forums-tag-setting {
+    display: flex;
+    gap: var(--space-xs);
+    align-items: center;
+    background-color: var(--button-secondary-background);
+    padding: var(--space-xs);
+    border-radius: var(--radius-sm);
+
+    > :first-child {
+        flex-grow: 0;
+    }
+
+    > :last-child {
+        margin-left: auto;
+    }
 }
 
 .vc-better-forums-tag-disabled {
     opacity: 0.5;
+}
+
+.vc-better-forums-button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xxs);
+}
+
+.vc-better-forums-icon-container {
+    color: var(--text-muted);
+    margin: -0.25rem;
+    padding: 0.25rem;
+    display: flex;
+    flex-shrink: 0;
+    cursor: pointer;
+
+    &:hover {
+        color: var(--icon-secondary);
+    }
+
+    svg {
+        transition: color 100ms ease;
+    }
+}
+
+.vc-better-forums-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+
+    [class^="checkbox"] {
+        cursor: pointer;
+    }
+}
+
+.vc-better-forums-color-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.vc-better-forums-tag-preview {
+    display: flex;
+    align-items: center;
+    height: 3.2rem;
+    overflow: hidden;
+    mask: linear-gradient(to left, transparent 0%, black 20px);
+    flex-shrink: 0;
+
+    .vc-better-forums-tag {
+        scale: 2;
+        transform-origin: left;
+    }
+}
+
+.vc-better-forums-color-picker {
+    gap: var(--space-xs);
+}
+
+.vc-better-forums-color-swatch {
+    appearance: none;
+    flex: 1 0 0;
+    margin: 0;
+    border-radius: var(--radius-xs);
+    aspect-ratio: 1;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    transition: all 100ms ease;
+
+    input {
+        display: none;
+    }
+
+    .vc-better-forums-color-swatch-tick,
+    .vc-better-forums-color-swatch-empty {
+        pointer-events: none;
+        width: 75%;
+        height: 75%;
+        margin: auto;
+        transition: all 100ms ease;
+    }
+
+    .vc-better-forums-color-swatch-empty {
+        color: var(--text-normal);
+    }
+
+    &:has(input:not(:checked)) {
+        .vc-better-forums-color-swatch-tick {
+            opacity: 0;
+        }
+
+        .vc-better-forums-color-swatch-empty {
+            color: var(--text-muted);
+        }
+    }
 }

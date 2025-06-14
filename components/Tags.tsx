@@ -8,16 +8,19 @@ import { Text, Tooltip, useCallback } from "@webpack/common";
 import { MouseEvent, ReactNode } from "react";
 
 import { cl } from "..";
-import { Tag as TagType } from "../types";
-import { Emoji } from "./Emoji";
+import { useTagIcon } from "../hooks";
+import { CustomTag } from "../types";
 
 interface TagProps {
-    tag: TagType;
+    tag: CustomTag;
     className?: string;
-    onContextMenu?: (event: MouseEvent<HTMLDivElement>, tag: TagType) => void;
+    onContextMenu?: (event: MouseEvent<HTMLDivElement>, tag: CustomTag) => void;
 }
 
 export function Tag({ tag, className, onContextMenu }: TagProps) {
+    const icon = useTagIcon(tag);
+    console.log(icon);
+
     const handleContextMenu = useCallback(
         (event: MouseEvent<HTMLDivElement>) => {
             if (!onContextMenu) return;
@@ -32,17 +35,22 @@ export function Tag({ tag, className, onContextMenu }: TagProps) {
             className={cl(className, "vc-better-forums-tag")}
             onContextMenu={handleContextMenu}
             data-color={tag.color}
+            data-inverted-color={tag.invertedColor}
         >
-            {tag.custom ? (
-                tag.icon
+            {typeof icon === "string" ? (
+                tag.monochromeIcon ? (
+                    <div
+                        className="vc-better-forums-tag-icon-monochrome"
+                        style={{ maskImage: `url('${icon}')` }}
+                    />
+                ) : (
+                    <div
+                        className="vc-better-forums-tag-icon"
+                        style={{ backgroundImage: `url('${icon}')` }}
+                    />
+                )
             ) : (
-                <Emoji
-                    emojiId={tag.emojiId}
-                    emojiName={tag.emojiName}
-                    size="reaction"
-                    animated={false}
-                    className="vc-better-forums-tag-emoji"
-                />
+                tag.icon
             )}
             <Text variant="text-xs/bold" lineClamp={1} color="currentColor">
                 {tag.name}
@@ -52,8 +60,8 @@ export function Tag({ tag, className, onContextMenu }: TagProps) {
 }
 
 interface MoreTagsProps {
-    tags: TagType[];
-    renderTag: (tag: TagType) => ReactNode;
+    tags: CustomTag[];
+    renderTag: (tag: CustomTag) => ReactNode;
 }
 
 export function MoreTags({ tags, renderTag }: MoreTagsProps) {

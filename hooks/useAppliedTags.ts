@@ -4,21 +4,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ChannelStore, useMemo, useStateFromStores } from "@webpack/common";
+import { useMemo, useStateFromStores } from "@webpack/common";
 
 import { settings } from "../settings";
-import {
-    CustomTag,
-    CustomTagDefinition,
-    DiscordTag,
-    ForumChannel,
-    Tag as TagType,
-    ThreadChannel,
-} from "../types";
+import { ChannelStore } from "../stores";
+import { CustomTag, DiscordTag, ForumChannel, ThreadChannel } from "../types";
 import { tagDefinitions } from "../utils";
 import { useForumPostState } from "./";
 
-export function useTags(channel: ThreadChannel): TagType[] {
+export function useAppliedTags(channel: ThreadChannel): CustomTag[] {
     const { customTags: customTagOverrides } = settings.use(["customTags"]);
     const context = useForumPostState(channel);
 
@@ -30,29 +24,26 @@ export function useTags(channel: ThreadChannel): TagType[] {
             return (forumChannel?.availableTags ?? []).reduce((acc, tag) => {
                 acc[tag.id] = tag;
                 return acc;
-            }, {} as Record<DiscordTag["id"], TagType>);
+            }, {} as Record<DiscordTag["id"], DiscordTag>);
         },
         [channel.parent_id]
     );
 
     const appliedTags = useStateFromStores(
         [ChannelStore],
-        () => (channel.appliedTags ?? []).map(tagId => availableTags[tagId]).filter(Boolean),
+        () =>
+            (channel.appliedTags ?? [])
+                .map(tagId => availableTags[tagId])
+                .map<CustomTag>(tag => ({ custom: false, ...tag }))
+                .filter(Boolean),
         [channel.appliedTags]
     );
 
-    const customTags: CustomTag[] = useMemo(
+    const customTags = useMemo(
         () =>
-            (tagDefinitions as CustomTagDefinition[])
+            tagDefinitions
                 .filter(tag => customTagOverrides[tag.id])
-                .filter(def => def.condition(context))
-                .map(({ id, name, icon, color }) => ({
-                    id,
-                    name: typeof name === "function" ? name() : name,
-                    icon: icon?.(),
-                    custom: true,
-                    color,
-                })),
+                .filter(def => !def.condition || def.condition(context)),
         [channel, context, customTagOverrides]
     );
 

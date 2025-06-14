@@ -11,22 +11,24 @@ import { ContextMenuApi, Menu, useCallback } from "@webpack/common";
 import { MouseEvent } from "react";
 
 import { cl } from "../..";
-import { useForumChannelState, useTags } from "../../hooks";
+import { useAppliedTags, useForumChannelState } from "../../hooks";
 import { MaxTagCount, settings } from "../../settings";
-import { Tag as TagType, ThreadChannel } from "../../types";
+import { CustomTag, ThreadChannel } from "../../types";
 import { _memo } from "../../utils";
 import { Icons } from "../icons";
+import { TagEditorModal } from "../Settings";
 import { MoreTags, Tag } from "../Tags";
 
 const DeveloperMode = getUserSettingLazy<boolean>("appearance", "developerMode")!;
 
 interface TagsContextMenuProps {
-    tag: TagType;
+    tag: CustomTag;
 }
 
 function TagsContextMenu({ tag }: TagsContextMenuProps) {
     const isDev = DeveloperMode.useSetting();
     const copy = useCallback(() => copyToClipboard(tag.id), [tag.id]);
+    const edit = useCallback(() => TagEditorModal.open(tag.id), [tag.id]);
 
     return (
         <Menu.Menu
@@ -34,19 +36,20 @@ function TagsContextMenu({ tag }: TagsContextMenuProps) {
             onClose={ContextMenuApi.closeContextMenu}
             aria-label={getIntlMessage("FORUM_TAG_ACTIONS_MENU_LABEL")}
         >
+            <Menu.MenuItem id="edit-tag" label="Edit tag" action={edit} icon={Icons.Pencil} />
             {isDev && !tag.custom && (
                 <Menu.MenuItem
                     id="copy-tag-id"
                     label={getIntlMessage("COPY_ID_FORUM_TAG")}
                     action={copy}
-                    icon={Icons.IdIcon}
+                    icon={Icons.Id}
                 />
             )}
         </Menu.Menu>
     );
 }
 
-TagsContextMenu.open = (event: MouseEvent<HTMLDivElement>, tag: TagType) => {
+TagsContextMenu.open = (event: MouseEvent<HTMLDivElement>, tag: CustomTag) => {
     ContextMenuApi.openContextMenu(event, () => <TagsContextMenu tag={tag} />);
 };
 
@@ -58,11 +61,11 @@ interface TagsProps {
 export const Tags = _memo<TagsProps>(function Tags({ channel, tagsClassName }) {
     const { maxTagCount } = settings.use(["maxTagCount"]);
 
-    const tags = useTags(channel);
+    const tags = useAppliedTags(channel);
     const { tagFilter } = useForumChannelState(channel.parent_id);
 
     const renderTag = useCallback(
-        (tag: TagType) => (
+        (tag: CustomTag) => (
             <Tag
                 tag={tag}
                 className={cl(tagsClassName, {

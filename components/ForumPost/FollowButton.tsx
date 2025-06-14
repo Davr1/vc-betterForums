@@ -20,7 +20,7 @@ export const FollowButton = _memo<FollowButtonProps>(function FollowButton({
     hasJoined = false,
     onClick: handleClick,
 }) {
-    const Icon = hasJoined ? Icons.TickIcon : Icons.BellIcon;
+    const Icon = hasJoined ? Icons.Tick : Icons.Bell;
     const intlKey = hasJoined ? "FORUM_UNFOLLOW_BUTTON" : "FORUM_FOLLOW_BUTTON";
 
     return (

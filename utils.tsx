@@ -7,13 +7,14 @@
 import { DataStore } from "@api/index";
 import { getIntlMessage } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
-import { findByPropsLazy } from "@webpack";
-import { React } from "@webpack/common";
+import { findByPropsLazy, proxyLazyWebpack } from "@webpack";
+import { IconUtils, React } from "@webpack/common";
+import { CustomEmoji, UnicodeEmoji } from "@webpack/types";
 import { Channel, Message } from "discord-types/general";
 import { ComponentType } from "react";
 
 import { Icons } from "./components/icons";
-import { CustomTagDefinition, ThreadChannel } from "./types";
+import { CustomTag, ThreadChannel } from "./types";
 
 export function indexedDBStorageFactory<T>() {
     return {
@@ -50,39 +51,62 @@ export const threadUtils: {
     leaveThread(thread: ThreadChannel): void;
 } = findByPropsLazy("joinThread", "leaveThread");
 
-export const tagDefinitions = [
-    {
-        id: "new",
-        name: () => getIntlMessage("NEW"),
-        condition: ({ isNew }) => isNew,
-        color: "blue",
-    },
-    {
-        id: "pinned",
-        name: () => getIntlMessage("PINNED_POST"),
-        icon: () => <Icons.PinIcon />,
-        condition: ({ isPinned }) => isPinned,
-        color: "blue",
-    },
-    {
-        id: "archived",
-        name: () => getIntlMessage("THREAD_BROWSER_ARCHIVED"),
-        icon: () => <Icons.ScrollIcon />,
-        condition: ({ isActive }) => !isActive,
-        color: "red",
-    },
-    {
-        id: "locked",
-        name: "Locked",
-        icon: () => <Icons.LockIcon />,
-        condition: ({ isLocked }) => isLocked,
-        color: "orange",
-    },
-    {
-        id: "abandoned",
-        name: "Abandoned",
-        icon: () => <Icons.NoneIcon />,
-        condition: ({ isAbandoned }) => isAbandoned,
-        color: "red",
-    },
-] as const satisfies CustomTagDefinition[];
+const EmojiUtils: {
+    getURL: (emojiName: UnicodeEmoji["name"]) => UnicodeEmoji["url"];
+} = findByPropsLazy("getURL", "applyPlatformToThemedEmojiColorPalette");
+
+export function getEmojiURL(
+    { name, id }: { name?: UnicodeEmoji["name"] | null; id?: CustomEmoji["id"] | null },
+    size: number = 48
+): string | null {
+    if (id) return IconUtils.getEmojiURL({ id, animated: false, size });
+    if (name) return EmojiUtils.getURL(name);
+    return null;
+}
+
+export const tagDefinitions = proxyLazyWebpack(() => {
+    const tags = [
+        {
+            id: "new",
+            name: getIntlMessage("NEW"),
+            condition: ({ isNew }) => isNew,
+            color: "blue",
+        },
+        {
+            id: "pinned",
+            name: getIntlMessage("PINNED_POST"),
+            icon: Icons.Pin,
+            condition: ({ isPinned }) => isPinned,
+            color: "blue",
+        },
+        {
+            id: "archived",
+            name: getIntlMessage("THREAD_BROWSER_ARCHIVED"),
+            info: "Post is older than 30 days or it was manually archived",
+            icon: Icons.Scroll,
+            condition: ({ isActive }) => !isActive,
+            color: "neutral",
+        },
+        {
+            id: "locked",
+            name: "Locked",
+            icon: Icons.Lock,
+            condition: ({ isLocked }) => isLocked,
+            color: "orange",
+        },
+        {
+            id: "abandoned",
+            name: "Abandoned",
+            info: "Original poster left the server",
+            icon: Icons.None,
+            condition: ({ isAbandoned }) => isAbandoned,
+            color: "red",
+        },
+    ] as const;
+
+    return tags.map(tag => ({
+        ...tag,
+        icon: "icon" in tag ? <tag.icon /> : null,
+        custom: true,
+    })) satisfies CustomTag[];
+});

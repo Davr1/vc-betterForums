@@ -16,7 +16,7 @@ interface MembersSectionProps {
 
 export const MembersSection = _memo<MembersSectionProps>(function MembersSection({ channel }) {
     return (
-        <FooterSection icon={<Icons.UsersIcon />} text={channel.memberCount.toString()}>
+        <FooterSection icon={<Icons.Users />} text={channel.memberCount.toString()}>
             {channel.memberIdsPreview.length > 0 && (
                 <AvatarPile
                     guildId={channel.getGuildId()}

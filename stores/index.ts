@@ -9,6 +9,8 @@ import { FluxEvents, FluxStore } from "@webpack/types";
 import { Channel, Guild, Message, User } from "discord-types/general";
 import * as Stores from "discord-types/stores";
 
+import { FullChannel } from "../types";
+
 export type FluxEventHandlers<T extends Partial<Record<FluxEvents, unknown>>> = {
     [K in keyof T]?: (data: T[K]) => void;
 } & {
@@ -83,16 +85,8 @@ interface GuildVerificationStore extends FluxStore {
     canChatInGuild(guildId: Guild["id"]): boolean;
 }
 
-interface BasicUser {
-    userId: User["id"];
-    displayName: User["username"];
-    canViewChannel?: boolean;
-}
-
-interface Section {
-    sectionId: "online" | "offline" | (string & {});
-    userIds: BasicUser["userId"][];
-    usersById: Record<BasicUser["userId"], BasicUser>;
+interface ChannelStore extends FluxStore, Stores.ChannelStore {
+    loadAllGuildAndPrivateChannelsFromDisk(): Record<Channel["id"], FullChannel>;
 }
 
 interface JoinedThreadsStore extends FluxStore {
@@ -161,5 +155,6 @@ export const RelationshipStore: RelationshipStore = findStoreLazy("RelationshipS
 export const GuildMemberStore: GuildMemberStore = findStoreLazy("GuildMemberStore");
 export const PermissionStore: PermissionStore = findStoreLazy("PermissionStore");
 export const JoinedThreadsStore: JoinedThreadsStore = findStoreLazy("JoinedThreadsStore");
+export const ChannelStore: ChannelStore = findStoreLazy("ChannelStore");
 
 export { MissingGuildMemberStore } from "./MissingGuildMemberStore";

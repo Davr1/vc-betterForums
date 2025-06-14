@@ -61,7 +61,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
             className={cl("vc-better-forums-latest-message", {
                 "vc-better-forums-empty-section": isEmpty,
             })}
-            icon={<Icons.ChatIcon />}
+            icon={<Icons.Chat />}
             text={messageCountText}
             onClick={messageId ? clickHandler : undefined}
             active={!!unreadCount && !forumState.isMuted}

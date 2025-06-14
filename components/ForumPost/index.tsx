@@ -6,7 +6,7 @@
 
 import { ErrorBoundary } from "@components/index";
 import { getIntlMessage } from "@utils/discord";
-import { ChannelStore, Clickable, Flex, useEffect, useStateFromStores } from "@webpack/common";
+import { Clickable, Flex, useEffect, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 import { ComponentProps, ComponentType, Ref } from "react";
 
@@ -19,7 +19,7 @@ import {
     useForumPostMetadata,
     useMessageCount,
 } from "../../hooks";
-import { ChannelSectionStore } from "../../stores";
+import { ChannelSectionStore, ChannelStore } from "../../stores";
 import { ThreadChannel } from "../../types";
 import { Body } from "./Body";
 import { Footer } from "./Footer";
@@ -68,37 +68,34 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
 
     return (
         <ErrorBoundary>
-            <Flex
-                ref={ringTarget}
-                data-item-id={threadId}
+            <ClickableWithRing
                 onClick={handleLeftClick}
+                focusProps={{ ringTarget }}
                 onContextMenu={handleRightClick}
-                direction={Flex.Direction.VERTICAL}
-                className={cl("vc-better-forums-thread", {
-                    "vc-better-forums-thread-open": isOpen,
+                aria-label={getIntlMessage("FORUM_POST_ARIA_LABEL", {
+                    title: channel.name,
+                    count: messageCountText,
                 })}
-                onScroll={console.log}
             >
-                <ClickableWithRing
-                    onClick={handleLeftClick}
-                    focusProps={{ ringTarget }}
-                    onContextMenu={handleRightClick}
-                    aria-label={getIntlMessage("FORUM_POST_ARIA_LABEL", {
-                        title: channel.name,
-                        count: messageCountText,
+                <Flex
+                    ref={ringTarget}
+                    data-item-id={threadId}
+                    direction={Flex.Direction.VERTICAL}
+                    className={cl("vc-better-forums-thread", {
+                        "vc-better-forums-thread-open": isOpen,
                     })}
-                    style={{ display: "none" }}
-                />
-                <Flex className="vc-better-forums-thread-body-container">
-                    <ForumPost.Body channel={channel} firstMessage={firstMessage} />
-                    {firstMedia && width >= 500 && <ForumPost.Media {...firstMedia} />}
+                >
+                    <Flex className="vc-better-forums-thread-body-container">
+                        <ForumPost.Body channel={channel} firstMessage={firstMessage} />
+                        {firstMedia && width >= 500 && <ForumPost.Media {...firstMedia} />}
+                    </Flex>
+                    <ForumPost.Footer
+                        channel={channel}
+                        firstMessage={firstMessage}
+                        containerWidth={width}
+                    />
                 </Flex>
-                <ForumPost.Footer
-                    channel={channel}
-                    firstMessage={firstMessage}
-                    containerWidth={width}
-                />
-            </Flex>
+            </ClickableWithRing>
         </ErrorBoundary>
     );
 }
