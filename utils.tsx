@@ -7,9 +7,9 @@
 import { DataStore } from "@api/index";
 import { getIntlMessage } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
-import { findByPropsLazy, proxyLazyWebpack } from "@webpack";
+import { findByProps, findByPropsLazy, proxyLazyWebpack } from "@webpack";
 import { IconUtils, React } from "@webpack/common";
-import { CustomEmoji, UnicodeEmoji } from "@webpack/types";
+import { CustomEmoji, Emoji, UnicodeEmoji } from "@webpack/types";
 import { Channel, Message } from "discord-types/general";
 import { ComponentType } from "react";
 
@@ -110,3 +110,24 @@ export const tagDefinitions = proxyLazyWebpack(() => {
         custom: true,
     })) satisfies CustomTag[];
 });
+
+export const dummyChannel: Channel = proxyLazyWebpack(() => {
+    const DmChannel: Channel & { new (base?: Partial<Channel>): Channel } = findByProps(
+        "fromServer",
+        "sortRecipients"
+    );
+
+    return Object.freeze(new DmChannel({ id: "0" }));
+});
+
+export const MessageParserUtils: {
+    parse: (
+        channel: Channel,
+        content: string
+    ) => {
+        content: string;
+        invalidEmojis: Emoji[];
+        validNonShortcutEmojis: Emoji[];
+        tts: boolean;
+    };
+} = findByPropsLazy("parsePreprocessor", "unparse", "parse");

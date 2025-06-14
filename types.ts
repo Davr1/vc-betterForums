@@ -83,6 +83,8 @@ export interface CustomTag extends DiscordTag {
     icon?: string | ReactNode;
     monochromeIcon?: boolean;
     condition?: (context: ForumPostState) => boolean;
+    channelId?: Channel["id"];
+    disabled?: boolean;
 }
 
 export interface FullGuildMember extends GuildMember {

@@ -10,7 +10,7 @@ import { getIntlMessage } from "@utils/discord";
 import { OptionType } from "@utils/types";
 
 import { CustomTagSection } from "./components/Settings";
-import { tagDefinitions } from "./utils";
+import { CustomTag } from "./types";
 
 export enum MaxReactionCount {
     OFF = 0,
@@ -119,15 +119,11 @@ export const settings = definePluginSettings({
                     : value,
         },
     },
-    customTags: {
+    tagOverrides: {
         type: OptionType.COMPONENT,
         component: CustomTagSection,
         default: {
-            new: true,
-            pinned: true,
-            locked: true,
-            abandoned: true,
-            archived: false,
-        } as Record<(typeof tagDefinitions)[number]["id"], boolean>,
+            archived: { disabled: true },
+        } as Record<CustomTag["id"], Partial<CustomTag>>,
     },
 });

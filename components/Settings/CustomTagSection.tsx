@@ -5,7 +5,7 @@
  */
 
 import { Margins } from "@utils/margins";
-import { Button, Checkbox, Flex, Forms, Tooltip, useCallback } from "@webpack/common";
+import { Button, Checkbox, Flex, Forms, Tooltip, useCallback, useMemo } from "@webpack/common";
 
 import { cl } from "../..";
 import { useAllCustomTags } from "../../hooks/useAllCustomTags";
@@ -20,19 +20,33 @@ interface TagItemProps {
 }
 
 function TagItem({ tag }: TagItemProps) {
-    const { customTags } = settings.use(["customTags"]);
-    const value = customTags[tag.id];
+    const { tagOverrides } = settings.use(["tagOverrides"]);
+    const fullTag = useMemo(() => ({ ...tag, ...tagOverrides[tag.id] }), [tag, tagOverrides]);
 
-    const handleChange = useCallback((_: unknown, newValue: boolean) => {
-        settings.store.customTags[tag.id] = newValue;
-    }, []);
+    const handleChange = useCallback(
+        (newTag: Partial<CustomTag>) => {
+            settings.store.tagOverrides[tag.id] = newTag;
+        },
+        [tag.id]
+    );
 
-    const edit = useCallback(() => TagEditorModal.open(tag.id), [tag.id]);
+    const toggle = useCallback(() => {
+        settings.store.tagOverrides[tag.id] ??= {};
+        settings.store.tagOverrides[tag.id].disabled = !fullTag.disabled;
+    }, [fullTag.disabled]);
+
+    const edit = useCallback(
+        () => TagEditorModal.open(tag.id, handleChange),
+        [tag.id, handleChange]
+    );
 
     return (
         <div className="vc-better-forums-tag-setting">
-            <Checkbox value={value} onChange={handleChange} size={20}>
-                <Tag tag={tag} className={cl({ "vc-better-forums-tag-disabled": !value })} />
+            <Checkbox value={!fullTag.disabled} onChange={toggle} size={20}>
+                <Tag
+                    tag={fullTag}
+                    className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
+                />
             </Checkbox>
             {tag.info && (
                 <Tooltip text={tag.info}>
@@ -46,7 +60,7 @@ function TagItem({ tag }: TagItemProps) {
             <Button
                 innerClassName="vc-better-forums-button"
                 size={Button.Sizes.SMALL}
-                disabled={!value}
+                disabled={fullTag.disabled}
                 onClick={edit}
             >
                 <Icons.Pencil />

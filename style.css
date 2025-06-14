@@ -145,20 +145,22 @@
 
 .vc-better-forums-tag-icon,
 .vc-better-forums-tag-icon-monochrome {
-    width: var(--size-sm);
-    height: var(--size-sm);
+    width: 14px;
+    height: 14px;
     object-fit: contain;
 }
 
 .vc-better-forums-tag-icon {
     background-size: contain;
     background-position: center;
+    background-repeat: no-repeat;
 }
 
 .vc-better-forums-tag-icon-monochrome {
     background-color: currentcolor;
     mask-size: contain;
     mask-position: center;
+    mask-repeat: no-repeat;
 }
 
 .vc-better-forums-tag-filtered {
@@ -483,8 +485,9 @@
     flex-direction: column;
     gap: var(--space-md);
 
-    [class^="checkbox"] {
-        cursor: pointer;
+    input[type="checkbox"] {
+        right: 0;
+        left: unset;
     }
 }
 
@@ -549,4 +552,39 @@
             color: var(--text-muted);
         }
     }
+}
+
+.vc-better-forums-emoji-button {
+    color: var(--interactive-normal);
+    transition: color 100ms ease;
+    padding: var(--space-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: var(--space-xxs);
+
+    &:hover {
+        color: var(--interactive-hover);
+    }
+}
+
+.vc-better-forums-custom-input {
+    &.vc-better-forums-custom-input-error {
+        border-color: var(--text-danger) !important;
+        border-width: 2px;
+    }
+
+    &:focus,
+    &:focus-within {
+        border-color: var(--text-link) !important;
+    }
+}
+
+.vc-better-forums-error {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-danger);
+    margin-top: var(--space-sm);
 }

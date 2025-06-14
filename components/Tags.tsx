@@ -19,7 +19,6 @@ interface TagProps {
 
 export function Tag({ tag, className, onContextMenu }: TagProps) {
     const icon = useTagIcon(tag);
-    console.log(icon);
 
     const handleContextMenu = useCallback(
         (event: MouseEvent<HTMLDivElement>) => {

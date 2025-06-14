@@ -13,7 +13,7 @@ import { tagDefinitions } from "../utils";
 import { useForumPostState } from "./";
 
 export function useAppliedTags(channel: ThreadChannel): CustomTag[] {
-    const { customTags: customTagOverrides } = settings.use(["customTags"]);
+    const { tagOverrides } = settings.use(["tagOverrides"]);
     const context = useForumPostState(channel);
 
     const availableTags = useStateFromStores(
@@ -34,18 +34,21 @@ export function useAppliedTags(channel: ThreadChannel): CustomTag[] {
         () =>
             (channel.appliedTags ?? [])
                 .map(tagId => availableTags[tagId])
-                .map<CustomTag>(tag => ({ custom: false, ...tag }))
+                .map<CustomTag>(tag => ({ custom: false, channelId: channel.id, ...tag }))
                 .filter(Boolean),
         [channel.appliedTags]
     );
 
     const customTags = useMemo(
-        () =>
-            tagDefinitions
-                .filter(tag => customTagOverrides[tag.id])
-                .filter(def => !def.condition || def.condition(context)),
-        [channel, context, customTagOverrides]
+        () => tagDefinitions.filter(def => !def.condition || def.condition(context)),
+        [channel, context]
     );
 
-    return useMemo(() => [...customTags, ...appliedTags], [appliedTags, customTags]);
+    return useMemo(
+        () =>
+            [...customTags, ...appliedTags]
+                .map(tag => ({ ...tag, ...tagOverrides[tag.id] }))
+                .filter(tag => !tag.disabled),
+        [appliedTags, customTags]
+    );
 }

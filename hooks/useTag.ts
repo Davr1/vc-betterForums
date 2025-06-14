@@ -10,9 +10,14 @@ import { CustomTag } from "../types";
 import { useAllCustomTags } from "./useAllCustomTags";
 import { useAllForumTags } from "./useAllForumTags";
 
-export function useTag(tagId: CustomTag["id"]): CustomTag | null {
+const unknownTag: CustomTag = { id: "unknown", name: "Unknown tag", custom: true };
+
+export function useTag(tagId: CustomTag["id"]): CustomTag {
     const allForumTags = useAllForumTags();
     const allCustomTags = useAllCustomTags();
 
-    return useMemo(() => allCustomTags.get(tagId) ?? allForumTags.get(tagId) ?? null, [tagId]);
+    return useMemo(
+        () => allCustomTags.get(tagId) ?? allForumTags.get(tagId) ?? unknownTag,
+        [allCustomTags, allForumTags, tagId]
+    );
 }
