@@ -5,19 +5,18 @@
  */
 
 import { Text, Tooltip, useCallback } from "@webpack/common";
-import { MouseEvent, ReactNode } from "react";
+import { HTMLProps, MouseEvent, ReactNode } from "react";
 
 import { cl } from "..";
 import { useTagIcon } from "../hooks";
 import { CustomTag } from "../types";
 
-interface TagProps {
+interface TagProps extends Omit<HTMLProps<HTMLDivElement>, "onContextMenu"> {
     tag: CustomTag;
-    className?: string;
     onContextMenu?: (event: MouseEvent<HTMLDivElement>, tag: CustomTag) => void;
 }
 
-export function Tag({ tag, className, onContextMenu }: TagProps) {
+export function Tag({ tag, className, onContextMenu, ...props }: TagProps) {
     const icon = useTagIcon(tag);
 
     const handleContextMenu = useCallback(
@@ -35,6 +34,7 @@ export function Tag({ tag, className, onContextMenu }: TagProps) {
             onContextMenu={handleContextMenu}
             data-color={tag.color}
             data-inverted-color={tag.invertedColor}
+            {...props}
         >
             {typeof icon === "string" ? (
                 tag.monochromeIcon ? (

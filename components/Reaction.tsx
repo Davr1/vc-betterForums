@@ -4,14 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { LazyComponent } from "@utils/lazyReact";
-import {
-    React,
-    useLayoutEffect,
-    useRef,
-    useState,
-    useStateFromStores,
-} from "@webpack/common";
+import { useLayoutEffect, useRef, useState, useStateFromStores } from "@webpack/common";
 import { Message } from "discord-types/general";
 import { Ref } from "react";
 
@@ -26,46 +19,43 @@ type PartiallyOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 interface ReactionContainerProps
     extends PartiallyOptional<ReactionButtonProps, "me" | "me_burst" | "count" | "burst_count"> {
     visible?: boolean;
+    ref?: Ref<HTMLDivElement>;
 }
 
-const ReactionContainer = LazyComponent(() =>
-    React.forwardRef(function ReactionContainer(
-        {
-            visible = true,
-            count = 0,
-            burst_count = 0,
-            me = false,
-            me_burst = false,
-            useChatFontScaling = false,
-            emojiSize = "reaction",
-            emojiSizeTooltip = "reaction",
-            className = "vc-better-forums-reaction-button",
-            ...props
-        }: ReactionContainerProps,
-        ref: Ref<HTMLDivElement>
-    ) {
-        return (
-            <div
-                ref={ref}
-                className={cl("vc-better-forums-reaction", {
-                    "vc-better-forums-reaction-hidden": !visible,
-                })}
-            >
-                <ReactionButton
-                    count={count}
-                    burst_count={burst_count}
-                    me={me}
-                    me_burst={me_burst}
-                    useChatFontScaling={useChatFontScaling}
-                    emojiSize={emojiSize}
-                    emojiSizeTooltip={emojiSizeTooltip}
-                    className={className}
-                    {...props}
-                />
-            </div>
-        );
-    })
-);
+function ReactionContainer({
+    visible = true,
+    count = 0,
+    burst_count = 0,
+    me = false,
+    me_burst = false,
+    useChatFontScaling = false,
+    emojiSize = "reaction",
+    emojiSizeTooltip = "reaction",
+    className = "vc-better-forums-reaction-button",
+    ref,
+    ...props
+}: ReactionContainerProps) {
+    return (
+        <div
+            ref={ref}
+            className={cl("vc-better-forums-reaction", {
+                "vc-better-forums-reaction-hidden": !visible,
+            })}
+        >
+            <ReactionButton
+                count={count}
+                burst_count={burst_count}
+                me={me}
+                me_burst={me_burst}
+                useChatFontScaling={useChatFontScaling}
+                emojiSize={emojiSize}
+                emojiSizeTooltip={emojiSizeTooltip}
+                className={className}
+                {...props}
+            />
+        </div>
+    );
+}
 
 interface ReactionProps {
     firstMessage: Message;
