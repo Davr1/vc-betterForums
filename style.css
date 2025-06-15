@@ -67,6 +67,11 @@
         cursor: pointer;
     }
 
+    .vc-better-forums-tag-preview & {
+        scale: 2;
+        transform-origin: left;
+    }
+
     .theme-light &:not([data-color]) {
         padding: 1px 5px;
     }
@@ -507,11 +512,6 @@
     overflow: hidden;
     mask: linear-gradient(to left, transparent 0%, black 20px);
     flex-shrink: 0;
-
-    .vc-better-forums-tag {
-        scale: 2;
-        transform-origin: left;
-    }
 }
 
 .vc-better-forums-color-picker {

@@ -13,8 +13,8 @@ import { settings } from "../../settings";
 import { CustomTag } from "../../types";
 import { Icons } from "../icons";
 import { Tag } from "../Tags";
-import { TagEditorModal } from "./";
 import { InfoTooltip } from "./InfoTooltip";
+import { TagEditorModal } from "./TagEditorModal";
 
 interface TagItemProps {
     tag: CustomTag;
@@ -24,22 +24,12 @@ function TagItem({ tag }: TagItemProps) {
     const { tagOverrides } = settings.use(["tagOverrides"]);
     const fullTag = useMemo(() => ({ ...tag, ...tagOverrides[tag.id] }), [tag, tagOverrides]);
 
-    const handleChange = useCallback(
-        (newTag: Partial<CustomTag>) => {
-            settings.store.tagOverrides[tag.id] = newTag;
-        },
-        [tag.id]
-    );
-
     const toggle = useCallback(() => {
         settings.store.tagOverrides[tag.id] ??= {};
         settings.store.tagOverrides[tag.id].disabled = !fullTag.disabled;
     }, [fullTag.disabled]);
 
-    const edit = useCallback(
-        () => TagEditorModal.open(tag.id, handleChange),
-        [tag.id, handleChange]
-    );
+    const openEditor = TagEditorModal.use(tag.id);
 
     return (
         <div className={cl("vc-better-forums-tag-setting", "vc-better-forums-settings-row")}>
@@ -57,7 +47,7 @@ function TagItem({ tag }: TagItemProps) {
                 innerClassName="vc-better-forums-button"
                 size={Button.Sizes.SMALL}
                 disabled={fullTag.disabled}
-                onClick={edit}
+                onClick={openEditor}
             >
                 <Icons.Pencil />
                 Edit

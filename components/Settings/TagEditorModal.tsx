@@ -5,6 +5,7 @@
  */
 
 import { Margins } from "@utils/margins";
+import { parseUrl } from "@utils/misc";
 import {
     ModalCloseButton,
     ModalContent,
@@ -15,6 +16,7 @@ import {
     openModal,
 } from "@utils/modal";
 import {
+    Alerts,
     Button,
     Checkbox,
     Flex,
@@ -22,14 +24,14 @@ import {
     Text,
     TextInput,
     useCallback,
-    useMemo,
     useState,
 } from "@webpack/common";
 
 import { cl } from "../..";
 import { useTag } from "../../hooks";
 import { settings } from "../../settings";
-import { CustomTag, CustomTagColor } from "../../types";
+import { CustomTag } from "../../types";
+import { differentialMerge, Merger } from "../../utils";
 import { Tag } from "../Tags";
 import { ColorPicker } from "./ColorPicker";
 import { IconTextInput } from "./IconTextInput";
@@ -37,64 +39,32 @@ import { InfoTooltip } from "./InfoTooltip";
 
 interface TagEditorModalProps {
     modalProps: ModalProps;
-    tagId: CustomTag["id"];
+    tag: CustomTag;
     modalKey: string;
-    onSubmit?: (tag: Partial<CustomTag>) => void;
+    onSubmit?: (tag: CustomTag) => void;
 }
 
-export function TagEditorModal({ modalProps, tagId, modalKey, onSubmit }: TagEditorModalProps) {
+export function TagEditorModal({
+    modalProps,
+    tag: originalTag,
+    modalKey,
+    onSubmit,
+}: TagEditorModalProps) {
     const { tagOverrides } = settings.use(["tagOverrides"]);
+    const [tag, setTag] = useState(() => ({ ...originalTag, ...tagOverrides[originalTag.id] }));
 
-    const tag = useTag(tagId);
-    const fullTag = useMemo(() => ({ ...tag, ...tagOverrides[tag.id] }), [tag, tagOverrides]);
-
-    const [name, setName] = useState<CustomTag["name"]>(
-        fullTag.name === tag.name ? "" : fullTag.name || ""
-    );
-    const [color, setColor] = useState<CustomTagColor | null>(fullTag.color ?? null);
-    const [invertedColor, setInvertedColor] = useState<boolean>(fullTag.invertedColor ?? false);
-    const [monochromeIcon, setMonochromeIcon] = useState<boolean>(fullTag.monochromeIcon ?? false);
-    const [icon, setIcon] = useState<Pick<CustomTag, "icon" | "emojiName" | "emojiId">>(fullTag);
-
+    const iconText =
+        (typeof tag.icon === "string" && tag.icon.trim()) ||
+        (tag.emojiId ? `<:${tag.emojiName}:${tag.emojiId}>` : tag.emojiName);
     // default svg icons are always monochrome
-    const isReactIcon = !!icon.icon && typeof icon.icon !== "string";
+    const isReactIcon = !iconText && !!originalTag.icon && typeof originalTag.icon !== "string";
 
-    const editedTag = useMemo(() => {
-        const partialTag: Partial<CustomTag> = {};
-
-        const newName = name.trim();
-        const newIcon = (typeof icon.icon === "string" && icon.icon.trim()) || null;
-
-        if (newName && tag.name.trim().toLowerCase() !== newName.toLowerCase()) {
-            partialTag.name = newName;
-        }
-        if (tag.color !== color) {
-            partialTag.color = color;
-        }
-        if (!!tag.invertedColor !== !!invertedColor) {
-            partialTag.invertedColor = invertedColor;
-        }
-        if (!!tag.monochromeIcon !== !!monochromeIcon) {
-            partialTag.monochromeIcon = monochromeIcon;
-        }
-        if ((newIcon || icon.emojiId || icon.emojiName) && tag.icon !== newIcon) {
-            partialTag.icon = newIcon;
-        }
-        if (icon.emojiName && tag.emojiName !== icon.emojiName) {
-            partialTag.emojiName = icon.emojiName;
-        }
-        if (icon.emojiId && tag.emojiId !== icon.emojiId) {
-            partialTag.emojiId = icon.emojiId;
-        }
-
-        return partialTag;
-    }, [tag, name, color, invertedColor, monochromeIcon, icon.icon, icon.emojiId, icon.emojiName]);
+    const update = useCallback((t: Partial<CustomTag>) => setTag(prev => ({ ...prev, ...t })), []);
 
     const handleSubmit = useCallback(() => {
-        onSubmit?.(editedTag);
-
+        onSubmit?.(tag);
         modalProps.onClose();
-    }, [modalProps, editedTag, onSubmit]);
+    }, [modalProps, tag, onSubmit]);
 
     return (
         <ModalRoot {...modalProps}>
@@ -107,44 +77,51 @@ export function TagEditorModal({ modalProps, tagId, modalKey, onSubmit }: TagEdi
 
             <ModalContent className={cl("vc-better-forums-modal-content", Margins.bottom8)}>
                 <Forms.FormSection className="vc-better-forums-tag-preview">
-                    <Tag tag={{ ...tag, ...editedTag }} />
+                    <Tag
+                        tag={{
+                            ...tag,
+                            icon:
+                                tag.emojiId || tag.emojiName ? null : tag.icon || originalTag.icon,
+                            name: tag.name.trim() || originalTag.name,
+                            emojiId: tag.icon ? null : tag.emojiId || originalTag.emojiId,
+                            emojiName: tag.icon ? null : tag.emojiName || originalTag.emojiName,
+                        }}
+                    />
                 </Forms.FormSection>
                 <Forms.FormSection>
                     <Forms.FormTitle tag="h5">Name</Forms.FormTitle>
-                    <TextInput value={name} onChange={setName} placeholder={tag.name} />
+                    <TextInput
+                        value={tag.name}
+                        onChange={name => update({ name })}
+                        placeholder={originalTag.name}
+                    />
                 </Forms.FormSection>
                 <Forms.FormSection>
                     <Forms.FormTitle tag="h5">Color</Forms.FormTitle>
-                    <ColorPicker color={color} onChange={setColor} inverted={invertedColor} />
-                </Forms.FormSection>
-                <Forms.FormSection>
-                    <Forms.FormTitle tag="h5">Icon</Forms.FormTitle>
-                    <IconTextInput
-                        defaultValue={
-                            (typeof icon.icon === "string" && icon.icon) ||
-                            (icon.emojiId
-                                ? `<:${icon.emojiName}:${icon.emojiId}>`
-                                : icon.emojiName) ||
-                            ""
-                        }
-                        onChange={setIcon}
-                        modalKey={modalKey}
+                    <ColorPicker
+                        color={tag.color ?? null}
+                        onChange={color => update({ color })}
+                        inverted={tag.invertedColor}
                     />
                 </Forms.FormSection>
                 <Forms.FormSection>
                     <Checkbox
-                        value={invertedColor}
-                        onChange={() => setInvertedColor(value => !value)}
+                        value={!!tag.invertedColor}
+                        onChange={() => update({ invertedColor: !tag.invertedColor })}
                         reverse
                     >
                         <Forms.FormTitle tag="h5">Invert colors</Forms.FormTitle>
                     </Checkbox>
                 </Forms.FormSection>
                 <Forms.FormSection>
+                    <Forms.FormTitle tag="h5">Icon</Forms.FormTitle>
+                    <IconTextInput defaultValue={iconText} onChange={update} modalKey={modalKey} />
+                </Forms.FormSection>
+                <Forms.FormSection>
                     <Checkbox
-                        value={isReactIcon || monochromeIcon}
+                        value={(isReactIcon || tag.monochromeIcon) ?? false}
                         disabled={isReactIcon}
-                        onChange={() => setMonochromeIcon(value => !value)}
+                        onChange={() => update({ monochromeIcon: !tag.monochromeIcon })}
                         reverse
                     >
                         <Forms.FormTitle tag="h5">
@@ -174,19 +151,55 @@ export function TagEditorModal({ modalProps, tagId, modalKey, onSubmit }: TagEdi
     );
 }
 
-TagEditorModal.open = (tagId: CustomTag["id"], onSubmit?: (tag: Partial<CustomTag>) => void) => {
+const merger: Merger<CustomTag> = {
+    name: (p1, p2) => !!p2?.trim() && p1?.trim().toLowerCase() !== p2.trim().toLowerCase(),
+    color: true,
+    invertedColor: (p1, p2) => !!p1 !== !!p2,
+    monochromeIcon: (p1, p2) => !!p1 !== !!p2,
+    emojiName: (p1, p2) => !!p2 && p1 !== p2,
+    emojiId: (p1, p2) => !!p2 && p1 !== p2,
+    icon: (oldIcon, newIcon, [, newObj]) => {
+        const oldUrl = (typeof oldIcon === "string" && oldIcon.trim()) || null;
+        const newUrl = (typeof newIcon === "string" && newIcon.trim()) || null;
+
+        // an emoji is already used for an icon, null will replace original icon
+        if (!newUrl && (newObj.emojiId || newObj.emojiName)) return true;
+
+        // no invalid urls!
+        if (!newUrl || !parseUrl(newUrl)) return false;
+
+        return oldUrl !== newUrl;
+    },
+};
+
+TagEditorModal.use = (tagId: CustomTag["id"]) => {
     const modalKey = `tag_editor_modal_${tagId}`;
-    openModal(
-        props => (
-            <TagEditorModal
-                modalProps={props}
-                tagId={tagId}
-                modalKey={modalKey}
-                onSubmit={onSubmit}
-            />
-        ),
-        {
-            modalKey,
-        }
+    const tag = useTag(tagId);
+
+    const handleSubmit = useCallback(
+        (t: CustomTag) => {
+            settings.store.tagOverrides[tagId] = differentialMerge(tag, t, merger);
+        },
+        [tagId, tag]
     );
+
+    return useCallback(() => {
+        if (!tag || !tagId)
+            return Alerts.show({
+                title: "Unknown tag",
+                body: `The tag ${tagId} was not in the cache.`,
+            });
+
+        openModal(
+            props => (
+                <TagEditorModal
+                    modalProps={props}
+                    tag={tag}
+                    modalKey={modalKey}
+                    onSubmit={handleSubmit}
+                />
+            ),
+            { modalKey }
+        );
+    }, [tagId, modalKey, tag, handleSubmit]);
 };

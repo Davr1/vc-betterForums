@@ -28,7 +28,7 @@ interface TagsContextMenuProps {
 function TagsContextMenu({ tag }: TagsContextMenuProps) {
     const isDev = DeveloperMode.useSetting();
     const copy = useCallback(() => copyToClipboard(tag.id), [tag.id]);
-    const edit = useCallback(() => TagEditorModal.open(tag.id), [tag.id]);
+    const openEditor = TagEditorModal.use(tag.id);
 
     return (
         <Menu.Menu
@@ -36,7 +36,7 @@ function TagsContextMenu({ tag }: TagsContextMenuProps) {
             onClose={ContextMenuApi.closeContextMenu}
             aria-label={getIntlMessage("FORUM_TAG_ACTIONS_MENU_LABEL")}
         >
-            <Menu.MenuItem id="edit-tag" label="Edit tag" action={edit} icon={Icons.Pencil} />
+            <Menu.MenuItem id="edit-tag" label="Edit tag" action={openEditor} icon={Icons.Pencil} />
             {isDev && !tag.custom && (
                 <Menu.MenuItem
                     id="copy-tag-id"

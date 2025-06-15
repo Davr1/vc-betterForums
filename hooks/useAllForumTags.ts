@@ -7,15 +7,13 @@
 import { useStateFromStores } from "@webpack/common";
 
 import { ChannelStore } from "../stores";
-import { CustomTag, ForumChannel } from "../types";
+import { CustomTag } from "../types";
 
 export function useAllForumTags(): Map<CustomTag["id"], CustomTag> {
     return useStateFromStores([ChannelStore], () => {
-        const forumChannels = Object.values(
-            ChannelStore.loadAllGuildAndPrivateChannelsFromDisk()
-        ).filter(
-            channel => channel.isForumLikeChannel() && channel.availableTags.length > 0
-        ) as unknown[] as ForumChannel[];
+        const forumChannels = Object.values(ChannelStore.loadAllGuildAndPrivateChannelsFromDisk())
+            .filter(channel => channel.isForumLikeChannel())
+            .filter(channel => channel.availableTags.length > 0);
 
         const tags = forumChannels.flatMap(channel =>
             channel.availableTags.map(tag => ({ ...tag, channelId: channel.id }))

@@ -106,7 +106,7 @@ export const tagDefinitions = proxyLazyWebpack(() => {
 
     return tags.map(tag => ({
         ...tag,
-        icon: "icon" in tag ? <tag.icon /> : null,
+        icon: "icon" in tag ? <tag.icon size={14} /> : null,
         custom: true,
     })) satisfies CustomTag[];
 });
@@ -123,3 +123,27 @@ export const dummyChannel: Channel = proxyLazyWebpack(() => {
 export const MessageParserUtils: {
     parse: (channel: Channel, content: string) => ParsedContent;
 } = findByPropsLazy("parsePreprocessor", "unparse", "parse");
+
+export type Merger<T extends object> = {
+    [K in keyof T]?: boolean | ((p1: T[K], p2: T[K], objs: [T, T]) => boolean);
+};
+
+export function differentialMerge<T extends object>(
+    obj1: Partial<T>,
+    obj2: Partial<T>,
+    merger: Merger<T>
+): Partial<T> {
+    const mergerKeys = new Set(Reflect.ownKeys(merger));
+    const keys = new Set([...Reflect.ownKeys(obj1), ...Reflect.ownKeys(obj2)]);
+
+    const obj: Partial<T> = {};
+    for (const key of keys.intersection(mergerKeys)) {
+        if (
+            typeof merger[key] === "boolean"
+                ? merger[key]
+                : merger[key]?.(obj1[key], obj2[key], [obj1, obj2])
+        )
+            obj[key] = obj2[key];
+    }
+    return obj;
+}

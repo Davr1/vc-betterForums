@@ -13,7 +13,7 @@ export interface FullChannel extends Channel {
     isForumChannel(): this is ForumChannel;
 }
 
-export interface ForumChannel extends Channel {
+export interface ForumChannel extends FullChannel {
     defaultReactionEmoji: Record<"emojiId" | "emojiName", string | null> | null;
     availableTags: DiscordTag[];
 }

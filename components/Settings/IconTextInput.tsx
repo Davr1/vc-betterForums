@@ -40,13 +40,13 @@ export const IconTextInput = _memo(function IconTextInput({
     onChange,
     modalKey,
 }: IconTextInputProps) {
-    const [error, setError] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleChange = useCallback(
         ({ content, invalidEmojis, validNonShortcutEmojis }: ParsedEditorContent) => {
-            const [emoji] = [...invalidEmojis, ...validNonShortcutEmojis];
+            const [emoji, ...rest] = [...invalidEmojis, ...validNonShortcutEmojis];
             const icon: Icon = { icon: null, emojiId: null, emojiName: null };
-            setError(false);
+            setError(rest.length > 0 ? "Only one emoji can be specified" : null);
 
             switch (true) {
                 case !!parseUrl(content): {
@@ -62,8 +62,8 @@ export const IconTextInput = _memo(function IconTextInput({
                     }
                     break;
                 }
-                default: {
-                    setError(content.length > 0);
+                case content.length > 0: {
+                    setError("Invalid URL or emoji");
                 }
             }
 
@@ -92,7 +92,7 @@ export const IconTextInput = _memo(function IconTextInput({
             {error && (
                 <Text variant="text-sm/medium" className="vc-better-forums-error">
                     <Icons.Error />
-                    <span>Invalid URL or emoji</span>
+                    <span>{error}</span>
                 </Text>
             )}
         </ErrorBoundary>
