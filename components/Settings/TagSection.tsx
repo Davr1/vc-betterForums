@@ -8,10 +8,10 @@ import { Margins } from "@utils/margins";
 import { Button, Checkbox, Flex, Forms, useCallback, useMemo } from "@webpack/common";
 
 import { cl } from "../..";
-import { useAllForumTags } from "../../hooks";
-import { useAllCustomTags } from "../../hooks/useAllCustomTags";
+import { useAllCustomTags, useAllForumTags } from "../../hooks";
 import { settings } from "../../settings";
 import { CustomTag } from "../../types";
+import { _memo } from "../../utils";
 import { Icons } from "../icons";
 import { Tag } from "../Tags";
 import { InfoTooltip } from "./InfoTooltip";
@@ -21,7 +21,7 @@ interface TagItemProps {
     tag: CustomTag;
 }
 
-function TagItem({ tag }: TagItemProps) {
+const TagItem = _memo<TagItemProps>(function TagItem({ tag }) {
     const { tagOverrides } = settings.use(["tagOverrides"]);
     const fullTag = useMemo(() => ({ ...tag, ...tagOverrides[tag.id] }), [tag, tagOverrides]);
 
@@ -46,7 +46,7 @@ function TagItem({ tag }: TagItemProps) {
             <Tag
                 tag={fullTag}
                 className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
-                onClick={toggle}
+                onClick={tag.custom ? toggle : undefined}
             />
             <InfoTooltip
                 text={tag.info}
@@ -84,7 +84,7 @@ function TagItem({ tag }: TagItemProps) {
             </Flex>
         </div>
     );
-}
+});
 
 export function TagSection() {
     const customTags = useAllCustomTags();

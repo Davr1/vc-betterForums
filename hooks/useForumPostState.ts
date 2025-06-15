@@ -20,27 +20,27 @@ function getJoinedAtTime(guild: Guild): number {
 }
 
 export function useForumPostState(channel: Channel): ForumPostState {
+    const { id, ownerId, parent_id, guild_id } = channel;
+    const isArchived = channel.isArchivedThread();
+    const isLocked = channel.threadMetadata?.locked === true;
+    const isPinned = channel.hasFlag(2);
+
     return useStateFromStores(
         [GuildStore, ReadStateStore, JoinedThreadsStore, GuildMemberStore, MissingGuildMemberStore],
         () => {
-            const guild: Guild | null = GuildStore.getGuild(channel.getGuildId());
+            const guild: Guild | null = GuildStore.getGuild(guild_id);
             const joinedAt = guild ? getJoinedAtTime(guild) : Date.now();
 
-            const isActive = !!guild && !channel.isArchivedThread();
-            const hasUnreads = isActive && ReadStateStore.isForumPostUnread(channel.id);
-            const isMuted = JoinedThreadsStore.isMuted(channel.id);
-            const hasJoined = JoinedThreadsStore.hasJoined(channel.id);
-            const hasOpened = ReadStateStore.hasOpenedThread(channel.id);
-            const isLocked = channel.threadMetadata?.locked === true;
-            const isPinned = channel.hasFlag(2);
-            const isAbandoned = !MissingGuildMemberStore.isMember(guild.id, channel.ownerId);
+            const isActive = !!guild && !isArchived;
+            const hasUnreads = isActive && ReadStateStore.isForumPostUnread(id);
+            const isMuted = JoinedThreadsStore.isMuted(id);
+            const hasJoined = JoinedThreadsStore.hasJoined(id);
+            const hasOpened = ReadStateStore.hasOpenedThread(id);
+            const isAbandoned = !MissingGuildMemberStore.isMember(guild_id, ownerId);
 
-            const isNew =
-                isActive &&
-                !hasOpened &&
-                SnowflakeUtils.extractTimestamp(channel.id) > joinedAt &&
-                (ReadStateStore.isNewForumThread(channel.id, channel.parent_id, guild) ||
-                    hasUnreads);
+            const createdAfterJoin = SnowflakeUtils.extractTimestamp(id) > joinedAt;
+            const isNewThread = ReadStateStore.isNewForumThread(id, parent_id, guild);
+            const isNew = isActive && !hasOpened && createdAfterJoin && (isNewThread || hasUnreads);
 
             return {
                 isActive,
@@ -54,6 +54,6 @@ export function useForumPostState(channel: Channel): ForumPostState {
                 isAbandoned,
             };
         },
-        [channel]
+        [id, guild_id, isArchived, isLocked, isPinned, ownerId, parent_id]
     );
 }

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+export { useAllCustomTags } from "./useAllCustomTags";
 export { useAllForumTags } from "./useAllForumTags";
 export { useAppliedTags } from "./useAppliedTags";
 export { useChannelName } from "./useChannelName";

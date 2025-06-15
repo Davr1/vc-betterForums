@@ -7,6 +7,7 @@
 import { User } from "discord-types/general";
 
 import { useUsers } from "../hooks";
+import { _memo } from "../utils";
 import { FacePile, FacePileProps } from "./FacePile";
 
 interface AvatarPileProps extends Omit<FacePileProps, "users"> {
@@ -17,7 +18,12 @@ const renderMoreUsers = (text: string) => (
     <div className="vc-better-forums-extra-member-count">{text}</div>
 );
 
-export function AvatarPile({ guildId, userIds, max = 99, ...props }: AvatarPileProps) {
+export const AvatarPile = _memo<AvatarPileProps>(function AvatarPile({
+    guildId,
+    userIds,
+    max = 99,
+    ...props
+}) {
     const users = useUsers(guildId, userIds, 5);
     return (
         <FacePile
@@ -29,4 +35,4 @@ export function AvatarPile({ guildId, userIds, max = 99, ...props }: AvatarPileP
             {...props}
         />
     );
-}
+});

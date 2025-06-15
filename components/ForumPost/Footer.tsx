@@ -9,6 +9,7 @@ import { Message } from "discord-types/general";
 
 import { MaxReactionCount, settings } from "../../settings";
 import { ThreadChannel } from "../../types";
+import { _memo } from "../../utils";
 import { DefaultReaction, Reactions } from "../Reaction";
 import { FooterSection } from "./FooterSection";
 
@@ -18,7 +19,11 @@ interface FooterProps {
     containerWidth?: number;
 }
 
-export function Footer({ channel, firstMessage, containerWidth }: FooterProps) {
+export const Footer = _memo<FooterProps>(function Footer({
+    channel,
+    firstMessage,
+    containerWidth,
+}) {
     const { maxReactionCount, showThreadMembers } = settings.use([
         "maxReactionCount",
         "showThreadMembers",
@@ -45,4 +50,4 @@ export function Footer({ channel, firstMessage, containerWidth }: FooterProps) {
                 ))}
         </Flex>
     );
-}
+});

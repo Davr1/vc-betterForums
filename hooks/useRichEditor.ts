@@ -11,16 +11,16 @@ import { ParsedContent } from "../types";
 import { dummyChannel, MessageParserUtils } from "../utils";
 
 type Submit = Partial<{ shouldClear: boolean; shouldRefocus: boolean }> | void;
-export type ParsedEditorContent = ParsedContent & { raw: string };
+
 interface Options {
     defaultValue?: string | null;
-    handleChange?: (value: ParsedEditorContent) => void;
-    handleSubmit?: (value: ParsedEditorContent) => Submit | Promise<Submit>;
+    handleChange?: (value: ParsedContent) => void;
+    handleSubmit?: (value: ParsedContent) => Submit | Promise<Submit>;
     type?: Partial<RichEditorType>;
 }
 
-function parse(value: string): ParsedEditorContent {
-    return { ...MessageParserUtils.parse(dummyChannel, value.trim()), raw: value };
+function parse(value: string): ParsedContent {
+    return MessageParserUtils.parse(dummyChannel, value.trim());
 }
 
 export function useRichEditor({ defaultValue = "", handleChange, handleSubmit, type }: Options) {

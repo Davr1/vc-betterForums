@@ -11,15 +11,19 @@ import { ForumPostMessagesStore, ThreadMessageStore } from "../stores";
 import { ThreadChannel } from "../types";
 
 export function useRecentMessage(channel: ThreadChannel): Message | null {
-    return useStateFromStores([ThreadMessageStore, ForumPostMessagesStore, MessageStore], () => {
-        const recentMessage = ThreadMessageStore.getMostRecentMessage(channel.id);
-        const { firstMessage } = ForumPostMessagesStore.getMessage(channel.id);
+    return useStateFromStores(
+        [ThreadMessageStore, ForumPostMessagesStore, MessageStore],
+        () => {
+            const recentMessage = ThreadMessageStore.getMostRecentMessage(channel.id);
+            const { firstMessage } = ForumPostMessagesStore.getMessage(channel.id);
 
-        if (recentMessage && recentMessage.id !== firstMessage?.id) return recentMessage;
+            if (recentMessage && recentMessage.id !== firstMessage?.id) return recentMessage;
 
-        // channel.lastMessageId and recentMessage.id can be out of sync
-        if (channel.lastMessageId === firstMessage?.id) return null;
+            // channel.lastMessageId and recentMessage.id can be out of sync
+            if (channel.lastMessageId === firstMessage?.id) return null;
 
-        return MessageStore.getMessage(channel.id, channel.lastMessageId) ?? null;
-    });
+            return MessageStore.getMessage(channel.id, channel.lastMessageId) ?? null;
+        },
+        [channel.id, channel.lastMessageId]
+    );
 }

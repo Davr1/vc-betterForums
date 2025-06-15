@@ -28,10 +28,14 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
 }) {
     const { content, firstMedia } = useForumPostMetadata({ firstMessage: message });
 
-    const { isBlocked, isIgnored } = useStateFromStores([RelationshipStore], () => ({
-        isBlocked: !!message && RelationshipStore.isBlockedForMessage(message),
-        isIgnored: !!message && RelationshipStore.isIgnoredForMessage(message),
-    }));
+    const { isBlocked, isIgnored } = useStateFromStores(
+        [RelationshipStore],
+        () => ({
+            isBlocked: !!message && RelationshipStore.isBlockedForMessage(message),
+            isIgnored: !!message && RelationshipStore.isIgnoredForMessage(message),
+        }),
+        [message]
+    );
 
     const {
         content: messageContent,

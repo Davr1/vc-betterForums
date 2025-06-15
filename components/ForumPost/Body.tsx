@@ -10,7 +10,7 @@ import { Message } from "discord-types/general";
 import { useChannelName, useForumPostState } from "../../hooks";
 import { settings } from "../../settings";
 import { ThreadChannel } from "../../types";
-import { threadUtils } from "../../utils";
+import { _memo, threadUtils } from "../../utils";
 import { MessageContent } from "../MessageContent";
 import { Timestamp } from "../Timestamp";
 import { Username } from "../Username";
@@ -22,7 +22,7 @@ interface BodyProps {
     firstMessage: Message | null;
 }
 
-export function Body({ channel, firstMessage }: BodyProps) {
+export const Body = _memo<BodyProps>(function Body({ channel, firstMessage }) {
     const { hasUnreads, isMuted, hasJoined } = useForumPostState(channel);
     const { messagePreviewLineCount, showFollowButton } = settings.use([
         "messagePreviewLineCount",
@@ -80,4 +80,4 @@ export function Body({ channel, firstMessage }: BodyProps) {
             />
         </Flex>
     );
-}
+});

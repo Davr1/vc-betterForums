@@ -10,13 +10,14 @@ import { HTMLProps, MouseEvent, ReactNode } from "react";
 import { cl } from "..";
 import { useTagIcon } from "../hooks";
 import { CustomTag } from "../types";
+import { _memo } from "../utils";
 
 interface TagProps extends Omit<HTMLProps<HTMLDivElement>, "onContextMenu"> {
     tag: CustomTag;
     onContextMenu?: (event: MouseEvent<HTMLDivElement>, tag: CustomTag) => void;
 }
 
-export function Tag({ tag, className, onContextMenu, ...props }: TagProps) {
+export const Tag = _memo<TagProps>(function Tag({ tag, className, onContextMenu, ...props }) {
     const icon = useTagIcon(tag);
 
     const handleContextMenu = useCallback(
@@ -56,14 +57,14 @@ export function Tag({ tag, className, onContextMenu, ...props }: TagProps) {
             </Text>
         </div>
     );
-}
+});
 
 interface MoreTagsProps {
     tags: CustomTag[];
     renderTag: (tag: CustomTag) => ReactNode;
 }
 
-export function MoreTags({ tags, renderTag }: MoreTagsProps) {
+export const MoreTags = _memo<MoreTagsProps>(function MoreTags({ tags, renderTag }) {
     return (
         <Tooltip
             text={tags.map(renderTag)}
@@ -79,4 +80,4 @@ export function MoreTags({ tags, renderTag }: MoreTagsProps) {
             )}
         </Tooltip>
     );
-}
+});

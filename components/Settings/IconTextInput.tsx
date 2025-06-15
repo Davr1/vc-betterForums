@@ -10,8 +10,7 @@ import { Text, useCallback, useRef, useState } from "@webpack/common";
 
 import { cl } from "../..";
 import { useRichEditor } from "../../hooks";
-import { ParsedEditorContent } from "../../hooks/useRichEditor";
-import { CustomTag } from "../../types";
+import { CustomTag, ParsedContent } from "../../types";
 import { _memo } from "../../utils";
 import { Icons } from "../icons";
 import { defineRichEditorType, DraftType, Layout, RichEditor, ToolbarType } from "../RichEditor";
@@ -45,7 +44,7 @@ export const IconTextInput = _memo(function IconTextInput({
     const [error, setError] = useState<string | null>(null);
 
     const handleChange = useCallback(
-        ({ content, invalidEmojis, validNonShortcutEmojis }: ParsedEditorContent) => {
+        ({ content, invalidEmojis, validNonShortcutEmojis }: ParsedContent) => {
             const [emoji, ...rest] = [...invalidEmojis, ...validNonShortcutEmojis];
             const icon: Icon = { icon: null, emojiId: null, emojiName: null };
             setError(rest.length > 0 ? "Only one emoji can be specified" : null);

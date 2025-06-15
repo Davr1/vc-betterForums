@@ -33,15 +33,18 @@ export function useMessageCount(channel: Channel): MessageCount {
 
     const messageCount = useStateFromStores(
         [ThreadMessageStore],
-        () => ThreadMessageStore.getCount(channel.id) ?? 0
+        () => ThreadMessageStore.getCount(channel.id) ?? 0,
+        [channel.id]
     );
     const messageCountText = useMemo(
         () => (useExactCounts ? `${messageCount}` : formatMessageCount(messageCount)),
         [messageCount, useExactCounts]
     );
 
-    const unreadCount = useStateFromStores([ForumPostUnreadCountStore], () =>
-        hasUnreads ? ForumPostUnreadCountStore.getCount(channel.id) ?? null : null
+    const unreadCount = useStateFromStores(
+        [ForumPostUnreadCountStore],
+        () => (hasUnreads ? ForumPostUnreadCountStore.getCount(channel.id) ?? null : null),
+        [hasUnreads, channel.id]
     );
     const unreadCountText = useMemo(() => {
         if (unreadCount === null) return null;

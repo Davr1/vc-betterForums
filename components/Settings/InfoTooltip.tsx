@@ -7,6 +7,7 @@
 import { Tooltip } from "@webpack/common";
 
 import { cl } from "../..";
+import { _memo } from "../../utils";
 import { Icons } from "../icons";
 
 interface InfoTooltipProps {
@@ -14,7 +15,7 @@ interface InfoTooltipProps {
     className?: string;
 }
 
-export function InfoTooltip({ text, className }: InfoTooltipProps) {
+export const InfoTooltip = _memo<InfoTooltipProps>(function InfoTooltip({ text, className }) {
     if (!text?.trim()) return null;
 
     return (
@@ -26,4 +27,4 @@ export function InfoTooltip({ text, className }: InfoTooltipProps) {
             )}
         </Tooltip>
     );
-}
+});

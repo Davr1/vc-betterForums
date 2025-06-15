@@ -450,7 +450,8 @@
 .vc-better-forums-tag-setting {
     background-color: var(--button-secondary-background);
     padding: var(--space-xs);
-    border-radius: var(--radius-sm);
+    padding-left: var(--space-sm);
+    border-radius: var(--radius-md);
 
     > :first-child {
         flex-grow: 0;
