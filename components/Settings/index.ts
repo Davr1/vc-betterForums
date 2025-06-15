@@ -4,5 +4,5 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-export { CustomTagSection } from "./CustomTagSection";
 export { TagEditorModal } from "./TagEditorModal";
+export { TagSection } from "./TagSection";

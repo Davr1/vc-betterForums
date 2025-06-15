@@ -49,6 +49,6 @@ export function useAppliedTags(channel: ThreadChannel): CustomTag[] {
             [...customTags, ...appliedTags]
                 .map(tag => ({ ...tag, ...tagOverrides[tag.id] }))
                 .filter(tag => !tag.disabled),
-        [appliedTags, customTags]
+        [appliedTags, customTags, tagOverrides]
     );
 }

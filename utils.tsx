@@ -128,15 +128,16 @@ export type Merger<T extends object> = {
     [K in keyof T]?: boolean | ((p1: T[K], p2: T[K], objs: [T, T]) => boolean);
 };
 
-export function differentialMerge<T extends object>(
-    obj1: Partial<T>,
+export function diffObjects<T extends object, TMerged extends boolean = false>(
+    obj1: T,
     obj2: Partial<T>,
-    merger: Merger<T>
-): Partial<T> {
+    merger: Merger<T>,
+    returnMerged?: TMerged
+): TMerged extends true ? T : Partial<T> {
     const mergerKeys = new Set(Reflect.ownKeys(merger));
     const keys = new Set([...Reflect.ownKeys(obj1), ...Reflect.ownKeys(obj2)]);
 
-    const obj: Partial<T> = {};
+    const obj = (returnMerged ? { ...obj1 } : {}) as ReturnType<typeof diffObjects<T, TMerged>>;
     for (const key of keys.intersection(mergerKeys)) {
         if (
             typeof merger[key] === "boolean"

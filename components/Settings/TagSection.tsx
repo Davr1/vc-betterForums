@@ -29,11 +29,15 @@ function TagItem({ tag }: TagItemProps) {
         settings.store.tagOverrides[tag.id].disabled = !fullTag.disabled;
     }, [fullTag.disabled]);
 
+    const reset = useCallback(() => {
+        settings.store.tagOverrides[tag.id] = { disabled: fullTag.disabled };
+    }, [fullTag.disabled]);
+
     const openEditor = TagEditorModal.use(tag.id);
 
     return (
         <div className={cl("vc-better-forums-tag-setting", "vc-better-forums-settings-row")}>
-            <Checkbox value={!fullTag.disabled} onChange={toggle} size={20}>
+            <Checkbox value={!fullTag.disabled} onChange={toggle} size={20} disabled={!tag.custom}>
                 <Tag
                     tag={fullTag}
                     className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
@@ -43,20 +47,30 @@ function TagItem({ tag }: TagItemProps) {
                 text={tag.info}
                 className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
             />
-            <Button
-                innerClassName="vc-better-forums-button"
-                size={Button.Sizes.SMALL}
-                disabled={fullTag.disabled}
-                onClick={openEditor}
-            >
-                <Icons.Pencil />
-                Edit
-            </Button>
+            <Flex justify={Flex.Justify.END}>
+                <Button
+                    color={Button.Colors.TRANSPARENT}
+                    look={Button.Looks.LINK}
+                    size={Button.Sizes.SMALL}
+                    onClick={reset}
+                >
+                    Reset
+                </Button>
+                <Button
+                    innerClassName="vc-better-forums-button"
+                    size={Button.Sizes.SMALL}
+                    disabled={fullTag.disabled}
+                    onClick={openEditor}
+                >
+                    <Icons.Pencil />
+                    Edit
+                </Button>
+            </Flex>
         </div>
     );
 }
 
-export function CustomTagSection() {
+export function TagSection() {
     const customTags = useAllCustomTags();
 
     return (
@@ -67,11 +81,11 @@ export function CustomTagSection() {
             </Forms.FormText>
             <Flex direction={Flex.Direction.VERTICAL} className="vc-better-forums-settings-stack">
                 {customTags.values().map(tag => (
-                    <CustomTagSection.Item tag={tag} key={tag.id} />
+                    <TagSection.Item tag={tag} key={tag.id} />
                 ))}
             </Flex>
         </Forms.FormSection>
     );
 }
 
-CustomTagSection.Item = TagItem;
+TagSection.Item = TagItem;

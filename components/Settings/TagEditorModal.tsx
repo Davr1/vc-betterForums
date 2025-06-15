@@ -24,6 +24,7 @@ import {
     Text,
     TextInput,
     useCallback,
+    useMemo,
     useState,
 } from "@webpack/common";
 
@@ -31,7 +32,7 @@ import { cl } from "../..";
 import { useTag } from "../../hooks";
 import { settings } from "../../settings";
 import { CustomTag } from "../../types";
-import { differentialMerge, Merger } from "../../utils";
+import { diffObjects, Merger } from "../../utils";
 import { Tag } from "../Tags";
 import { ColorPicker } from "./ColorPicker";
 import { IconTextInput } from "./IconTextInput";
@@ -53,11 +54,10 @@ export function TagEditorModal({
     const { tagOverrides } = settings.use(["tagOverrides"]);
     const [tag, setTag] = useState(() => ({ ...originalTag, ...tagOverrides[originalTag.id] }));
 
-    const iconText =
-        (typeof tag.icon === "string" && tag.icon.trim()) ||
-        (tag.emojiId ? `<:${tag.emojiName}:${tag.emojiId}>` : tag.emojiName);
-    // default svg icons are always monochrome
-    const isReactIcon = !iconText && !!originalTag.icon && typeof originalTag.icon !== "string";
+    const fullTag = useMemo(() => diffObjects(originalTag, tag, merger, true), [originalTag, tag]);
+
+    // default svg icons are always monochromatic
+    const isReactIcon = typeof fullTag.icon === "object" && !!fullTag.icon;
 
     const update = useCallback((t: Partial<CustomTag>) => setTag(prev => ({ ...prev, ...t })), []);
 
@@ -77,16 +77,7 @@ export function TagEditorModal({
 
             <ModalContent className={cl("vc-better-forums-modal-content", Margins.bottom8)}>
                 <Forms.FormSection className="vc-better-forums-tag-preview">
-                    <Tag
-                        tag={{
-                            ...tag,
-                            icon:
-                                tag.emojiId || tag.emojiName ? null : tag.icon || originalTag.icon,
-                            name: tag.name.trim() || originalTag.name,
-                            emojiId: tag.icon ? null : tag.emojiId || originalTag.emojiId,
-                            emojiName: tag.icon ? null : tag.emojiName || originalTag.emojiName,
-                        }}
-                    />
+                    <Tag tag={fullTag} />
                 </Forms.FormSection>
                 <Forms.FormSection>
                     <Forms.FormTitle tag="h5">Name</Forms.FormTitle>
@@ -115,7 +106,7 @@ export function TagEditorModal({
                 </Forms.FormSection>
                 <Forms.FormSection>
                     <Forms.FormTitle tag="h5">Icon</Forms.FormTitle>
-                    <IconTextInput defaultValue={iconText} onChange={update} modalKey={modalKey} />
+                    <IconTextInput onChange={update} modalKey={modalKey} {...fullTag} />
                 </Forms.FormSection>
                 <Forms.FormSection>
                     <Checkbox
@@ -178,7 +169,7 @@ TagEditorModal.use = (tagId: CustomTag["id"]) => {
 
     const handleSubmit = useCallback(
         (t: CustomTag) => {
-            settings.store.tagOverrides[tagId] = differentialMerge(tag, t, merger);
+            settings.store.tagOverrides[tagId] = diffObjects(tag, t, merger);
         },
         [tagId, tag]
     );

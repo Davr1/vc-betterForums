@@ -455,10 +455,6 @@
     > :first-child {
         flex-grow: 0;
     }
-
-    > :last-child {
-        margin-left: auto;
-    }
 }
 
 .vc-better-forums-tag-disabled {

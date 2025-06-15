@@ -9,7 +9,7 @@ import { makeRange } from "@components/PluginSettings/components";
 import { getIntlMessage } from "@utils/discord";
 import { OptionType } from "@utils/types";
 
-import { CustomTagSection } from "./components/Settings";
+import { TagSection } from "./components/Settings";
 import { CustomTag } from "./types";
 
 export enum MaxReactionCount {
@@ -121,7 +121,7 @@ export const settings = definePluginSettings({
     },
     tagOverrides: {
         type: OptionType.COMPONENT,
-        component: CustomTagSection,
+        component: TagSection,
         default: {
             archived: { disabled: true },
         } as Record<CustomTag["id"], Partial<CustomTag>>,

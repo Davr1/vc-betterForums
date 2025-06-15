@@ -6,7 +6,7 @@
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { parseUrl } from "@utils/misc";
-import { Text, useCallback, useState } from "@webpack/common";
+import { Text, useCallback, useRef, useState } from "@webpack/common";
 
 import { cl } from "../..";
 import { useRichEditor } from "../../hooks";
@@ -29,14 +29,16 @@ const type = defineRichEditorType({
 
 type Icon = Pick<CustomTag, "icon" | "emojiId" | "emojiName">;
 
-interface IconTextInputProps {
-    defaultValue?: string | null;
+interface IconTextInputProps extends Icon {
+    defaultValue?: Icon;
     onChange?: (icon: Icon) => void;
     modalKey?: string;
 }
 
 export const IconTextInput = _memo(function IconTextInput({
-    defaultValue,
+    icon,
+    emojiId,
+    emojiName,
     onChange,
     modalKey,
 }: IconTextInputProps) {
@@ -72,7 +74,16 @@ export const IconTextInput = _memo(function IconTextInput({
         [onChange]
     );
 
-    const props = useRichEditor({ defaultValue, handleChange, type });
+    // the input itself is uncontrolled in order to prevent rerenders with incorrect state
+    // (after text is cleared with a cursor selection, the icon url is set to null
+    // and replaced with an svg icon instead - this would override any pasted text
+    // on the next render)
+    const { current } = useRef(
+        (typeof icon === "string" && icon.trim()) ||
+            (emojiId ? `<:${emojiName}:${emojiId}>` : emojiName)
+    );
+
+    const props = useRichEditor({ defaultValue: current, handleChange, type });
 
     return (
         <ErrorBoundary>
