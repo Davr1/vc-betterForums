@@ -10,6 +10,10 @@ import { Channel } from "discord-types/general";
 interface RichEditorProps {
     channel: Partial<Channel>;
     textValue?: string;
+    richValue?: {
+        type: string;
+        children: { text: string }[];
+    }[];
     className?: string;
     innerClassName?: string;
     editorClassName?: string;
@@ -40,10 +44,7 @@ interface RichEditorProps {
     parentModalKey?: string;
 }
 
-export const RichEditor = findComponentByCodeLazy<RichEditorProps>(
-    "renderApplicationCommandIcon",
-    "handleMaybeShowAutocomplete"
-);
+export const RichEditor = findComponentByCodeLazy<RichEditorProps>('"chat input type must be set"');
 
 export enum Layout {
     DEFAULT = 0,

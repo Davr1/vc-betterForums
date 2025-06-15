@@ -6,7 +6,7 @@
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { parseUrl } from "@utils/misc";
-import { Text, useCallback, useState } from "@webpack/common";
+import { Text, useCallback, useMemo, useState } from "@webpack/common";
 
 import { cl } from "../..";
 import { CustomTag } from "../../types";
@@ -51,6 +51,9 @@ export const IconTextInput = _memo(function IconTextInput({
 }: IconTextInputProps) {
     const [error, setError] = useState(false);
     const [text, setText] = useState(defaultValue?.trim() || "");
+    const richValue = useMemo(() => {
+        return text.split("\n").map(line => ({ type: "line", children: [{ text: line }] }));
+    }, [text]);
 
     const handleChange = useCallback(
         (_: unknown, value: string) => {
@@ -87,6 +90,7 @@ export const IconTextInput = _memo(function IconTextInput({
                 })}
                 channel={dummyChannel}
                 textValue={text}
+                richValue={richValue}
                 onChange={handleChange}
                 placeholder="Enter image URL or emoji"
                 allowNewLines={false}

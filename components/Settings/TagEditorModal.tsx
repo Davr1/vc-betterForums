@@ -120,7 +120,11 @@ export function TagEditorModal({ modalProps, tagId, modalKey, onSubmit }: TagEdi
                     <Forms.FormTitle tag="h5">Icon</Forms.FormTitle>
                     <IconTextInput
                         defaultValue={
-                            (typeof icon.icon === "string" && icon.icon) || icon.emojiName || ""
+                            (typeof icon.icon === "string" && icon.icon) ||
+                            (icon.emojiId
+                                ? `<:${icon.emojiName}:${icon.emojiId}>`
+                                : icon.emojiName) ||
+                            ""
                         }
                         onChange={setIcon}
                         modalKey={modalKey}
