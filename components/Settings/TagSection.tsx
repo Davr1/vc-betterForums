@@ -93,10 +93,10 @@ export function TagSection() {
     const { tagOverrides } = settings.use(["tagOverrides"]);
     const overridenTags = useMemo(
         () =>
-            Object.entries(tagOverrides)
-                .filter(([id, tag]) => !tag.custom && forumTags.has(id))
-                .map(([id, tag]) => ({ ...forumTags.get(id), ...tag } as CustomTag)),
-        []
+            Object.keys(tagOverrides)
+                .map(id => forumTags.get(id))
+                .filter(Boolean) as CustomTag[],
+        [tagOverrides, forumTags]
     );
 
     return (
