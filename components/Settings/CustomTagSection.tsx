@@ -5,7 +5,7 @@
  */
 
 import { Margins } from "@utils/margins";
-import { Button, Checkbox, Flex, Forms, Tooltip, useCallback, useMemo } from "@webpack/common";
+import { Button, Checkbox, Flex, Forms, useCallback, useMemo } from "@webpack/common";
 
 import { cl } from "../..";
 import { useAllCustomTags } from "../../hooks/useAllCustomTags";
@@ -14,6 +14,7 @@ import { CustomTag } from "../../types";
 import { Icons } from "../icons";
 import { Tag } from "../Tags";
 import { TagEditorModal } from "./";
+import { InfoTooltip } from "./InfoTooltip";
 
 interface TagItemProps {
     tag: CustomTag;
@@ -41,22 +42,17 @@ function TagItem({ tag }: TagItemProps) {
     );
 
     return (
-        <div className="vc-better-forums-tag-setting">
+        <div className={cl("vc-better-forums-tag-setting", "vc-better-forums-settings-row")}>
             <Checkbox value={!fullTag.disabled} onChange={toggle} size={20}>
                 <Tag
                     tag={fullTag}
                     className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
                 />
             </Checkbox>
-            {tag.info && (
-                <Tooltip text={tag.info}>
-                    {props => (
-                        <div className="vc-better-forums-icon-container" {...props}>
-                            <Icons.Info size={20} />
-                        </div>
-                    )}
-                </Tooltip>
-            )}
+            <InfoTooltip
+                text={tag.info}
+                className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
+            />
             <Button
                 innerClassName="vc-better-forums-button"
                 size={Button.Sizes.SMALL}
@@ -79,7 +75,7 @@ export function CustomTagSection() {
             <Forms.FormText className={Margins.bottom8} type={Forms.FormText.Types.DESCRIPTION}>
                 Custom tags provided by the plugin
             </Forms.FormText>
-            <Flex direction={Flex.Direction.VERTICAL} className="vc-better-forums-tag-settings">
+            <Flex direction={Flex.Direction.VERTICAL} className="vc-better-forums-settings-stack">
                 {customTags.values().map(tag => (
                     <CustomTagSection.Item tag={tag} key={tag.id} />
                 ))}

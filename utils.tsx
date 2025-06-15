@@ -9,12 +9,12 @@ import { getIntlMessage } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
 import { findByProps, findByPropsLazy, proxyLazyWebpack } from "@webpack";
 import { IconUtils, React } from "@webpack/common";
-import { CustomEmoji, Emoji, UnicodeEmoji } from "@webpack/types";
+import { CustomEmoji, UnicodeEmoji } from "@webpack/types";
 import { Channel, Message } from "discord-types/general";
 import { ComponentType } from "react";
 
 import { Icons } from "./components/icons";
-import { CustomTag, ThreadChannel } from "./types";
+import { CustomTag, ParsedContent, ThreadChannel } from "./types";
 
 export function indexedDBStorageFactory<T>() {
     return {
@@ -121,13 +121,5 @@ export const dummyChannel: Channel = proxyLazyWebpack(() => {
 });
 
 export const MessageParserUtils: {
-    parse: (
-        channel: Channel,
-        content: string
-    ) => {
-        content: string;
-        invalidEmojis: Emoji[];
-        validNonShortcutEmojis: Emoji[];
-        tts: boolean;
-    };
+    parse: (channel: Channel, content: string) => ParsedContent;
 } = findByPropsLazy("parsePreprocessor", "unparse", "parse");

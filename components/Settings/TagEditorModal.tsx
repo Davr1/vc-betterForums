@@ -33,6 +33,7 @@ import { CustomTag, CustomTagColor } from "../../types";
 import { Tag } from "../Tags";
 import { ColorPicker } from "./ColorPicker";
 import { IconTextInput } from "./IconTextInput";
+import { InfoTooltip } from "./InfoTooltip";
 
 interface TagEditorModalProps {
     modalProps: ModalProps;
@@ -146,7 +147,12 @@ export function TagEditorModal({ modalProps, tagId, modalKey, onSubmit }: TagEdi
                         onChange={() => setMonochromeIcon(value => !value)}
                         reverse
                     >
-                        <Forms.FormTitle tag="h5">Use monochrome icon</Forms.FormTitle>
+                        <Forms.FormTitle tag="h5">
+                            <div className="vc-better-forums-settings-row">
+                                <span>Use monochrome icon</span>
+                                <InfoTooltip text="Removes icon colors for better contrast" />
+                            </div>
+                        </Forms.FormTitle>
                     </Checkbox>
                 </Forms.FormSection>
             </ModalContent>

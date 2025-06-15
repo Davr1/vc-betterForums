@@ -7,13 +7,10 @@
 import { findComponentByCodeLazy } from "@webpack";
 import { Channel } from "discord-types/general";
 
-interface RichEditorProps {
+export interface RichEditorProps {
     channel: Partial<Channel>;
     textValue?: string;
-    richValue?: {
-        type: string;
-        children: { text: string }[];
-    }[];
+    richValue?: SlateNode[];
     className?: string;
     innerClassName?: string;
     editorClassName?: string;
@@ -27,10 +24,10 @@ interface RichEditorProps {
     renderAppLauncherButton?: boolean;
     renderAppCommandButton?: boolean;
     renderLeftAccessories?: boolean;
-    onChange: (_a: unknown, textValue: string, rawValue: string) => void;
+    onChange: (_a: unknown, textValue: string, richValue: SlateNode[]) => void;
     onSubmit?: (submitValue: {
         value: string;
-    }) => Promise<{ shouldClear?: boolean; shouldRefocus?: boolean }>;
+    }) => Promise<Partial<{ shouldClear: boolean; shouldRefocus: boolean }>>;
     onFocus?: () => void;
     onBlur?: () => void;
     canMentionRoles?: boolean;
@@ -45,6 +42,11 @@ interface RichEditorProps {
 }
 
 export const RichEditor = findComponentByCodeLazy<RichEditorProps>('"chat input type must be set"');
+
+export interface SlateNode {
+    type: string;
+    children: { text: string }[];
+}
 
 export enum Layout {
     DEFAULT = 0,
@@ -130,3 +132,5 @@ export interface RichEditorType {
 }
 
 type RichEditorButton<T extends string = string> = Partial<Record<T | "button", boolean>>;
+
+export const defineRichEditorType = <T extends Partial<RichEditorType>>(type: T) => type;

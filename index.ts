@@ -15,7 +15,7 @@ import { ForumPost } from "./components/ForumPost";
 import { setForumChannelStore } from "./hooks/useForumChannelState";
 import { settings } from "./settings";
 import { ForumChannelStore, ForumChannelStoreState, MissingGuildMemberStore } from "./stores";
-import { indexedDBStorageFactory, tagDefinitions } from "./utils";
+import { indexedDBStorageFactory } from "./utils";
 
 export const cl = classNameFactory();
 
@@ -51,7 +51,6 @@ export default definePlugin({
     start() {
         // Initialize store as soon as Flux is available
         MissingGuildMemberStore.reset();
-        console.log(tagDefinitions.length);
     },
     ForumPost,
     createStore(storeCreator: (_set: unknown, _get: unknown) => ForumChannelStore) {

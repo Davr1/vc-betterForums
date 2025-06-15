@@ -23,6 +23,7 @@ export { useMessageContent } from "./useMessageContent";
 export { useMessageCount } from "./useMessageCount";
 export { usePreview } from "./usePreview";
 export { useRecentMessage } from "./useRecentMessage";
+export { useRichEditor } from "./useRichEditor";
 export { useTag } from "./useTag";
 export { useTagIcon } from "./useTagIcon";
 export { useTopReactions } from "./useTopReactions";

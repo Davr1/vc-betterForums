@@ -432,14 +432,17 @@
     }
 }
 
-.vc-better-forums-tag-settings {
+.vc-better-forums-settings-stack {
     gap: var(--space-xs);
 }
 
-.vc-better-forums-tag-setting {
+.vc-better-forums-settings-row {
     display: flex;
     gap: var(--space-xs);
     align-items: center;
+}
+
+.vc-better-forums-tag-setting {
     background-color: var(--button-secondary-background);
     padding: var(--space-xs);
     border-radius: var(--radius-sm);
@@ -467,7 +470,7 @@
     color: var(--text-muted);
     margin: -0.25rem;
     padding: 0.25rem;
-    display: flex;
+    display: inline-flex;
     flex-shrink: 0;
     cursor: pointer;
 

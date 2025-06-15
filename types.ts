@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Emoji } from "@webpack/types";
 import { Channel, GuildMember, Message, MessageReaction, User } from "discord-types/general";
 import { ReactNode } from "react";
 
@@ -149,4 +150,11 @@ export interface Member extends Partial<Omit<FullGuildMember, "avatar" | "avatar
     guildMemberAvatar?: FullGuildMember["avatar"];
     guildMemberAvatarDecoration?: FullGuildMember["avatarDecoration"];
     primaryGuild?: FullUser["primaryGuild"];
+}
+
+export interface ParsedContent {
+    content: string;
+    invalidEmojis: Emoji[];
+    validNonShortcutEmojis: Emoji[];
+    tts: boolean;
 }
