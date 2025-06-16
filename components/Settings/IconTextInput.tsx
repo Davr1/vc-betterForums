@@ -6,24 +6,25 @@
 
 import ErrorBoundary from "@components/ErrorBoundary";
 import { parseUrl } from "@utils/misc";
-import { Text, useCallback, useRef, useState } from "@webpack/common";
+import { Text, useCallback, useState } from "@webpack/common";
 
 import { cl } from "../..";
 import { useRichEditor } from "../../hooks";
 import { CustomTag, ParsedContent } from "../../types";
 import { _memo } from "../../utils";
 import { Icons } from "../icons";
-import { defineRichEditorType, DraftType, Layout, RichEditor, ToolbarType } from "../RichEditor";
+import { defineRichEditorType, Layout, RichEditor, ToolbarType } from "../RichEditor";
 
 const type = defineRichEditorType({
     emojis: { button: true },
-    drafts: { autoSave: false, type: DraftType.ChannelMessage },
+    drafts: { autoSave: false },
     expressionPicker: { onlyEmojis: true },
     submit: { disableEnterToSubmit: true },
     users: { allowMentioning: false },
     layout: Layout.INLINE,
     toolbarType: ToolbarType.NONE,
     disableAutoFocus: true,
+    autocomplete: { alwaysUseLayer: true, small: true },
 });
 
 type Icon = Pick<CustomTag, "icon" | "emojiId" | "emojiName">;
@@ -73,16 +74,11 @@ export const IconTextInput = _memo(function IconTextInput({
         [onChange]
     );
 
-    // the input itself is uncontrolled in order to prevent rerenders with incorrect state
-    // (after text is cleared with a cursor selection, the icon url is set to null
-    // and replaced with an svg icon instead - this would override any pasted text
-    // on the next render)
-    const { current } = useRef(
+    const defaultValue =
         (typeof icon === "string" && icon.trim()) ||
-            (emojiId ? `<:${emojiName}:${emojiId}>` : emojiName)
-    );
+        (emojiId ? `<:${emojiName}:${emojiId}>` : emojiName);
 
-    const props = useRichEditor({ defaultValue: current, handleChange, type });
+    const props = useRichEditor({ defaultValue, handleChange, type });
 
     return (
         <ErrorBoundary>

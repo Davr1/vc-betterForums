@@ -5,13 +5,13 @@
  */
 
 import { Margins } from "@utils/margins";
-import { Button, Checkbox, Flex, Forms, useCallback, useMemo } from "@webpack/common";
+import { Button, Checkbox, Flex, Forms, Parser, Text, useCallback, useMemo } from "@webpack/common";
 
 import { cl } from "../..";
 import { useAllCustomTags, useAllForumTags } from "../../hooks";
 import { settings } from "../../settings";
 import { CustomTag } from "../../types";
-import { _memo } from "../../utils";
+import { _memo, closeAllScreens } from "../../utils";
 import { Icons } from "../icons";
 import { Tag } from "../Tags";
 import { InfoTooltip } from "./InfoTooltip";
@@ -42,16 +42,30 @@ const TagItem = _memo<TagItemProps>(function TagItem({ tag }) {
 
     return (
         <div className={cl("vc-better-forums-tag-setting", "vc-better-forums-settings-row")}>
-            {tag.custom && <Checkbox value={!fullTag.disabled} onChange={toggle} size={20} />}
-            <Tag
-                tag={fullTag}
-                className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
-                onClick={tag.custom ? toggle : undefined}
-            />
-            <InfoTooltip
-                text={tag.info}
-                className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
-            />
+            <Flex
+                className={cl("vc-better-forums-settings-row", "vc-better-forums-tag-info")}
+                justify={Flex.Justify.START}
+                align={Flex.Align.CENTER}
+            >
+                {tag.custom && <Checkbox value={!fullTag.disabled} onChange={toggle} size={20} />}
+                <Tag
+                    tag={fullTag}
+                    className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
+                />
+                <InfoTooltip
+                    text={tag.info}
+                    className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
+                />
+                {tag.channelId && (
+                    <Text
+                        variant="text-sm/normal"
+                        className="vc-better-forums-channel-mention"
+                        onClick={closeAllScreens}
+                    >
+                        {Parser.parse(`<#${tag.channelId}>`)}
+                    </Text>
+                )}
+            </Flex>
             <Flex justify={Flex.Justify.END}>
                 {tag.custom ? (
                     <Button

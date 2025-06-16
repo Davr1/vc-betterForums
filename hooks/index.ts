@@ -14,6 +14,7 @@ export { useFirstMessage } from "./useFirstMessage";
 export { useFocusRing } from "./useFocusRing";
 export { useFormatTimestamp } from "./useFormatTimestamp";
 export { useForumChannelState } from "./useForumChannelState";
+export { useForumChannelStore } from "./useForumChannelStore";
 export { useForumPostComposerStore } from "./useForumPostComposerStore";
 export { useForumPostEvents } from "./useForumPostEvents";
 export { useForumPostMetadata } from "./useForumPostMetadata";

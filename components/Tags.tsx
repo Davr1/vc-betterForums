@@ -12,12 +12,21 @@ import { useTagIcon } from "../hooks";
 import { CustomTag } from "../types";
 import { _memo } from "../utils";
 
-interface TagProps extends Omit<HTMLProps<HTMLDivElement>, "onContextMenu"> {
+interface TagProps extends Omit<HTMLProps<HTMLDivElement>, "onContextMenu" | "onClick"> {
     tag: CustomTag;
+    filtered?: boolean;
+    onClick?: (event: MouseEvent<HTMLDivElement>, tag: CustomTag) => void;
     onContextMenu?: (event: MouseEvent<HTMLDivElement>, tag: CustomTag) => void;
 }
 
-export const Tag = _memo<TagProps>(function Tag({ tag, className, onContextMenu, ...props }) {
+export const Tag = _memo<TagProps>(function Tag({
+    tag,
+    className,
+    onClick,
+    onContextMenu,
+    filtered,
+    ...props
+}) {
     const icon = useTagIcon(tag);
 
     const handleContextMenu = useCallback(
@@ -29,9 +38,22 @@ export const Tag = _memo<TagProps>(function Tag({ tag, className, onContextMenu,
         [tag, onContextMenu]
     );
 
+    const handleClick = useCallback(
+        (event: MouseEvent<HTMLDivElement>) => {
+            if (!onClick) return;
+            event.stopPropagation();
+            onClick(event, tag);
+        },
+        [tag, onClick]
+    );
+
     return (
         <div
-            className={cl(className, "vc-better-forums-tag")}
+            className={cl(className, "vc-better-forums-tag", {
+                "vc-better-forums-tag-filtered": filtered,
+                "vc-better-forums-tag-clickable": !!onClick,
+            })}
+            onClick={handleClick}
             onContextMenu={handleContextMenu}
             data-color={tag.color}
             data-inverted-color={tag.invertedColor}

@@ -12,7 +12,7 @@ import definePlugin from "@utils/types";
 import { zustandCreate, zustandPersist } from "@webpack/common";
 
 import { ForumPost } from "./components/ForumPost";
-import { setForumChannelStore } from "./hooks/useForumChannelState";
+import { setForumChannelStore } from "./hooks/useForumChannelStore";
 import { settings } from "./settings";
 import { ForumChannelStore, ForumChannelStoreState, MissingGuildMemberStore } from "./stores";
 import { indexedDBStorageFactory } from "./utils";
@@ -46,6 +46,13 @@ export default definePlugin({
                 replace: "let $1=$self.createStore",
             },
             predicate: () => settings.store.keepState,
+        },
+        {
+            find: "delete window.localStorage",
+            replacement: {
+                match: "delete window.localStorage",
+                replace: "",
+            },
         },
     ],
     start() {

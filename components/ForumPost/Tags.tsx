@@ -10,8 +10,7 @@ import { getIntlMessage } from "@utils/discord";
 import { ContextMenuApi, Menu, useCallback } from "@webpack/common";
 import { MouseEvent } from "react";
 
-import { cl } from "../..";
-import { useAppliedTags, useForumChannelState } from "../../hooks";
+import { useAppliedTags, useForumChannelState, useForumChannelStore } from "../../hooks";
 import { MaxTagCount, settings } from "../../settings";
 import { CustomTag, ThreadChannel } from "../../types";
 import { _memo } from "../../utils";
@@ -64,14 +63,20 @@ export const Tags = _memo<TagsProps>(function Tags({ channel, tagsClassName }) {
     const tags = useAppliedTags(channel);
     const { tagFilter } = useForumChannelState(channel.parent_id);
 
+    const store = useForumChannelStore();
+    const toggleTagFilter = useCallback(
+        (_: unknown, tag: CustomTag) => store?.toggleTagFilter(channel.parent_id, tag.id),
+        [channel.parent_id]
+    );
+
     const renderTag = useCallback(
         (tag: CustomTag) => (
             <Tag
                 tag={tag}
-                className={cl(tagsClassName, {
-                    "vc-better-forums-tag-filtered": tagFilter.has(tag.id),
-                })}
+                className={tagsClassName}
+                filtered={tagFilter.has(tag.id)}
                 key={tag.id}
+                onClick={tag.custom ? undefined : toggleTagFilter}
                 onContextMenu={TagsContextMenu.open}
             />
         ),

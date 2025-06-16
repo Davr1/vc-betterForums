@@ -9,7 +9,7 @@ import { FluxEvents, FluxStore } from "@webpack/types";
 import { Channel, Guild, Message, User } from "discord-types/general";
 import * as Stores from "discord-types/stores";
 
-import { FullChannel } from "../types";
+import { DiscordTag, FullChannel } from "../types";
 
 export type FluxEventHandlers<T extends Partial<Record<FluxEvents, unknown>>> = {
     [K in keyof T]?: (data: T[K]) => void;
@@ -125,6 +125,7 @@ export interface ChannelState {
 
 export interface ForumChannelStore extends ForumChannelStoreState {
     getChannelState(channelId: Channel["id"]): ChannelState | undefined;
+    toggleTagFilter(channelId: Channel["id"], tagId: DiscordTag["id"]): void;
 }
 
 export interface ForumChannelStoreState {

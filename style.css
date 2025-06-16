@@ -45,6 +45,34 @@
     transition: color 150ms ease;
 }
 
+.vc-better-forums-badge-container {
+    display: contents;
+
+    > * {
+        margin: 0 0 0 0.25rem !important;
+    }
+}
+
+.vc-better-forums-tag-info {
+    min-width: 0;
+    mask: linear-gradient(to left, transparent 0%, black 20px);
+
+    * {
+        flex-grow: 0;
+    }
+}
+
+.vc-better-forums-message-content-inline {
+    height: 1lh;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    > * {
+        vertical-align: text-top;
+    }
+}
+
 .vc-better-forums-tag {
     display: flex;
     justify-content: center;
@@ -55,7 +83,7 @@
     text-transform: uppercase;
     height: var(--size-md);
     letter-spacing: 0.02rem;
-    transition: all 100ms ease;
+    transition: all 150ms ease;
     border: 1px solid var(--border-subtle);
     background: var(--button-secondary-background);
     color: var(--text-secondary);
@@ -64,7 +92,6 @@
     &,
     * {
         user-select: none;
-        cursor: pointer;
     }
 
     .vc-better-forums-tag-preview & {
@@ -72,18 +99,60 @@
         transform-origin: left;
     }
 
+    &.vc-better-forums-tag-filtered {
+        background-color: var(--message-reacted-background);
+        color: var(--message-reacted-text);
+        border-color: var(--brand-500);
+    }
+
+    &.vc-better-forums-tag-clickable {
+        &,
+        * {
+            cursor: pointer;
+        }
+
+        &:hover {
+            color: var(--text-primary);
+            background-color: var(--button-secondary-background-hover);
+        }
+
+        &:active {
+            color: var(--text-primary);
+            background-color: var(--button-secondary-background-active);
+        }
+
+        &.vc-better-forums-tag-filtered {
+            &:hover {
+                color: var(--text-primary);
+                background-color: var(--opacity-blurple-32);
+            }
+
+            &:active {
+                color: var(--text-primary);
+                background-color: var(--opacity-blurple-12);
+            }
+        }
+
+        &:not(.vc-better-forums-tag-filtered)[data-color] {
+            &:hover {
+                filter: brightness(1.15);
+            }
+
+            &:active {
+                filter: brightness(0.95);
+            }
+        }
+    }
+
     .theme-light &:not([data-color]) {
         padding: 1px 5px;
     }
-
-    &[data-color] {
-        border: none;
-    }
 }
 
-.vc-better-forums-tag,
+.vc-better-forums-tag:not(.vc-better-forums-tag-filtered),
 .vc-better-forums-color-swatch {
     &[data-color] {
+        border: none;
         color: oklch(from var(--color) calc(l - 0.1) c h);
         background-color: var(--bg);
     }
@@ -168,12 +237,6 @@
     mask-repeat: no-repeat;
 }
 
-.vc-better-forums-tag-filtered {
-    background-color: var(--message-reacted-background);
-    color: var(--message-reacted-text);
-    border-color: var(--brand-500);
-}
-
 .vc-better-forums-message-content {
     line-height: 1.5 !important;
 }
@@ -183,17 +246,6 @@
     color: inherit;
     font: inherit;
     user-select: none;
-}
-
-.vc-better-forums-message-content-inline {
-    height: 1lh;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    > * {
-        vertical-align: text-top;
-    }
 }
 
 .vc-better-forums-reaction-button {
@@ -429,14 +481,6 @@
     }
 }
 
-.vc-better-forums-badge-container {
-    display: contents;
-
-    > * {
-        margin: 0 0 0 0.25rem !important;
-    }
-}
-
 .vc-better-forums-settings-stack {
     gap: var(--space-xs);
 }
@@ -452,10 +496,6 @@
     padding: var(--space-xs);
     padding-left: var(--space-sm);
     border-radius: var(--radius-md);
-
-    > :first-child {
-        flex-grow: 0;
-    }
 }
 
 .vc-better-forums-tag-disabled {
@@ -587,4 +627,8 @@
     gap: var(--space-sm);
     color: var(--text-danger);
     margin-top: var(--space-sm);
+}
+
+.vc-better-forums-channel-mention {
+    white-space: nowrap;
 }
