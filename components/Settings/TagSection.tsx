@@ -28,6 +28,7 @@ import { Icons } from "../icons";
 import { Tag } from "../Tags";
 import { InfoTooltip } from "./InfoTooltip";
 import { TagEditorModal } from "./TagEditorModal";
+import { TagRevertPreview } from "./TagRevertPreview";
 
 interface TagItemProps {
     tag: Partial<CustomTag> & Pick<CustomTag, "id">;
@@ -51,17 +52,11 @@ const TagItem = _memo<TagItemProps>(function TagItem({ tag }) {
         () =>
             Alerts.show({
                 title: "Do you really want to remove this tag override?",
-                body: (
-                    <Flex className="vc-better-forums-tag-revert-preview">
-                        <Tag tag={fullTag} />
-                        <Icons.RightArrow size={20} />
-                        <Tag tag={tag} />
-                    </Flex>
-                ),
+                body: <TagRevertPreview tag={fullTag} revertedTag={tag} />,
                 confirmText: "Yes",
                 cancelText: "No",
                 onConfirm: () => {
-                    delete settings.store.tagOverrides[tag.id];
+                    delete settings.store.tagOverrides[fullTag.id];
                 },
             }),
         [tag, fullTag]

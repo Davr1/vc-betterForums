@@ -37,6 +37,7 @@ import { Tag } from "../Tags";
 import { ColorPicker } from "./ColorPicker";
 import { IconTextInput } from "./IconTextInput";
 import { InfoTooltip } from "./InfoTooltip";
+import { TagRevertPreview } from "./TagRevertPreview";
 
 interface TagEditorModalProps {
     modalProps: ModalProps;
@@ -65,6 +66,25 @@ export function TagEditorModal({
         onSubmit?.(tag);
         modalProps.onClose();
     }, [modalProps, tag, onSubmit]);
+
+    const deleteTag = useCallback(
+        () =>
+            Alerts.show({
+                title: "Do you really want to remove this tag override?",
+                body: <TagRevertPreview tag={fullTag} revertedTag={originalTag} />,
+                confirmText: "Yes",
+                cancelText: "No",
+                onConfirm: () => {
+                    if (fullTag.custom) {
+                        settings.store.tagOverrides[fullTag.id] = { disabled: fullTag.disabled };
+                    } else {
+                        delete settings.store.tagOverrides[fullTag.id];
+                    }
+                    modalProps.onClose();
+                },
+            }),
+        [originalTag, fullTag]
+    );
 
     return (
         <ModalRoot {...modalProps}>
@@ -125,18 +145,32 @@ export function TagEditorModal({
                 </Forms.FormSection>
             </ModalContent>
 
-            <ModalFooter justify={Flex.Justify.END} direction={Flex.Direction.HORIZONTAL}>
-                <Button
-                    color={Button.Colors.TRANSPARENT}
-                    look={Button.Looks.LINK}
-                    size={Button.Sizes.SMALL}
-                    onClick={() => modalProps.onClose()}
-                >
-                    Cancel
-                </Button>
-                <Button onClick={handleSubmit} size={Button.Sizes.SMALL}>
-                    Save
-                </Button>
+            <ModalFooter
+                justify={Flex.Justify.BETWEEN}
+                direction={Flex.Direction.HORIZONTAL_REVERSE}
+            >
+                <Flex className="vc-better-forums-settings-row" grow={0}>
+                    <Button
+                        color={Button.Colors.PRIMARY}
+                        size={Button.Sizes.SMALL}
+                        onClick={() => modalProps.onClose()}
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSubmit} size={Button.Sizes.SMALL}>
+                        Save
+                    </Button>
+                </Flex>
+                {fullTag.id in tagOverrides && (
+                    <Button
+                        color={Button.Colors.RED}
+                        look={Button.Looks.LINK}
+                        size={Button.Sizes.SMALL}
+                        onClick={deleteTag}
+                    >
+                        Remove
+                    </Button>
+                )}
             </ModalFooter>
         </ModalRoot>
     );
