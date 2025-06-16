@@ -47,13 +47,6 @@ export default definePlugin({
             },
             predicate: () => settings.store.keepState,
         },
-        {
-            find: "delete window.localStorage",
-            replacement: {
-                match: "delete window.localStorage",
-                replace: "",
-            },
-        },
     ],
     start() {
         // Initialize store as soon as Flux is available
