@@ -1,3 +1,6 @@
+# BetterForums
+![Preview](https://gist.github.com/Davr1/97750831d8260764477c089ecb3879b9/raw/Preview.png)
+
 # Installation
 
 In order to use custom plugins within Vencord, you must compile the source code yourself. For this you will need git and nodejs installed.
