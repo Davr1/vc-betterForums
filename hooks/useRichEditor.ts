@@ -50,7 +50,7 @@ export function useRichEditor({ defaultValue, handleChange, handleSubmit, type }
             setRichValue(richValue);
             handleChange?.(parse(value));
         },
-        [handleChange]
+        [handleChange, textValue]
     );
 
     const onSubmit: RichEditorProps["onSubmit"] = useCallback(
