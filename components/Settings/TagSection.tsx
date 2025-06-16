@@ -5,7 +5,19 @@
  */
 
 import { Margins } from "@utils/margins";
-import { Button, Checkbox, Flex, Forms, Parser, Text, useCallback, useMemo } from "@webpack/common";
+import {
+    Alerts,
+    Button,
+    Checkbox,
+    Flex,
+    Forms,
+    Parser,
+    Text,
+    TextInput,
+    useCallback,
+    useMemo,
+    useState,
+} from "@webpack/common";
 
 import { cl } from "../..";
 import { useAllCustomTags, useAllForumTags } from "../../hooks";
@@ -35,9 +47,25 @@ const TagItem = _memo<TagItemProps>(function TagItem({ tag }) {
         settings.store.tagOverrides[tag.id] = { disabled: fullTag.disabled };
     }, [fullTag.disabled]);
 
-    const deleteTag = useCallback(() => {
-        delete settings.store.tagOverrides[tag.id];
-    }, []);
+    const deleteTag = useCallback(
+        () =>
+            Alerts.show({
+                title: "Do you really want to remove this tag override?",
+                body: (
+                    <Flex className="vc-better-forums-tag-revert-preview">
+                        <Tag tag={fullTag} />
+                        <Icons.RightArrow size={20} />
+                        <Tag tag={tag} />
+                    </Flex>
+                ),
+                confirmText: "Yes",
+                cancelText: "No",
+                onConfirm: () => {
+                    delete settings.store.tagOverrides[tag.id];
+                },
+            }),
+        [tag, fullTag]
+    );
 
     const openEditor = TagEditorModal.use(tag.id);
 
@@ -113,6 +141,25 @@ export function TagSection() {
         [tagOverrides, forumTags]
     );
 
+    const [newTagId, setNewTagId] = useState("");
+    const createTagOverride = useCallback(() => {
+        const id = newTagId.trim();
+        if (id in settings.store.tagOverrides)
+            return Alerts.show({
+                title: "Tag override already exists",
+                body: "Please choose a different id",
+            });
+
+        if (!forumTags.has(id))
+            return Alerts.show({
+                title: "Forum tag doesn't exist",
+                body: "Did you copy the wrong id?",
+            });
+
+        settings.store.tagOverrides[id] = {};
+        setNewTagId("");
+    }, [newTagId]);
+
     return (
         <>
             <Forms.FormSection>
@@ -134,14 +181,29 @@ export function TagSection() {
                 <Forms.FormText className={Margins.bottom8} type={Forms.FormText.Types.DESCRIPTION}>
                     Tags from individual discord forums
                 </Forms.FormText>
-                <Flex
-                    direction={Flex.Direction.VERTICAL}
-                    className="vc-better-forums-settings-stack"
-                >
-                    {overridenTags.map(tag => (
-                        <TagSection.Item tag={tag} key={tag.id} />
-                    ))}
-                </Flex>
+                {overridenTags.length > 0 && (
+                    <Flex
+                        direction={Flex.Direction.VERTICAL}
+                        className="vc-better-forums-settings-stack"
+                    >
+                        {overridenTags.map(tag => (
+                            <TagSection.Item tag={tag} key={tag.id} />
+                        ))}
+                    </Flex>
+                )}
+            </Forms.FormSection>
+            <Forms.FormSection className="vc-better-forums-settings-row">
+                <TextInput
+                    value={newTagId}
+                    onChange={setNewTagId}
+                    placeholder="Tag ID"
+                    className="vc-better-forums-number-input"
+                    type="number"
+                    pattern="\d{17,19}"
+                />
+                <Button onClick={createTagOverride} disabled={!newTagId.trim()}>
+                    Create override
+                </Button>
             </Forms.FormSection>
         </>
     );

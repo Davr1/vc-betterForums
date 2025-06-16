@@ -73,6 +73,22 @@
     }
 }
 
+.vc-better-forums-tag-revert-preview {
+    margin-block: 1rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 30px minmax(0, 1fr);
+    justify-content: space-around;
+    place-items: center;
+    min-width: 0;
+    max-width: 100%;
+    position: relative;
+
+    > * {
+        max-width: 100%;
+        overflow: hidden;
+    }
+}
+
 .vc-better-forums-tag {
     display: flex;
     justify-content: center;
@@ -222,6 +238,7 @@
     width: 14px;
     height: 14px;
     object-fit: contain;
+    flex-shrink: 0;
 }
 
 .vc-better-forums-tag-icon {
@@ -606,6 +623,15 @@
 
     &:hover {
         color: var(--interactive-hover);
+    }
+}
+
+.vc-better-forums-number-input {
+    flex-grow: 1;
+
+    input::-webkit-inner-spin-button,
+    input::-webkit-outer-spin-button {
+        display: none;
     }
 }
 
