@@ -19,6 +19,19 @@ This plugin completely replaces the forum list item component and introduces new
 - **Follow button** - allows you to quickly follow/unfollow a thread
 - **Exact counts** - message counts can either be rounded to the nearest power of 10, or display the true count
 
+# Tag customization
+Tags can be customized in two places. First is the context menu on thread tags, second is the plugin settings menu.
+The following attributes can be changed:
+- **Name** - any length, can't be empty
+- **Color** - 9 color options based on Discord's color palettes, and one colorless option
+  - **Inverted color** - switches background and foreground colors
+- **Icon** - either an emoji, or an image URL (must be allowed by Vencord's CSP rules)
+  - **Monochrome icon** - applies your chosen icon as a mask, can improve contrast when used along with light background colors
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/06e5c3d4-d5b3-478c-8db5-bd56d98aee92" width="60%"/>
+</p>
+All overrides are saved as a diff, so properties that weren't changed (or appear the same visually) are ignored. This also means that you can change one attribute and the rest are inherited from the original tag.
+
 # Installation
 
 In order to use custom plugins within Vencord, you must compile the source code yourself. For this you will need git and nodejs installed.
