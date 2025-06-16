@@ -36,7 +36,7 @@ export function useAppliedTags(channel: ThreadChannel): CustomTag[] {
                 .map(tagId => availableTags[tagId])
                 .map<CustomTag>(tag => ({ custom: false, channelId: channel.id, ...tag }))
                 .filter(Boolean),
-        [channel.appliedTags]
+        [channel.appliedTags, availableTags]
     );
 
     const customTags = useMemo(

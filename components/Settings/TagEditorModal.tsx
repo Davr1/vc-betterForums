@@ -178,7 +178,7 @@ export function TagEditorModal({
 
 const merger: Merger<CustomTag> = {
     name: (p1, p2) => !!p2?.trim() && p1?.trim().toLowerCase() !== p2.trim().toLowerCase(),
-    color: (p1, p2) => !!p1 !== !!p2 && p1 !== p2,
+    color: (p1, p2) => !!p1 !== !!p2 || p1 !== p2,
     invertedColor: (p1, p2) => !!p1 !== !!p2,
     monochromeIcon: (p1, p2) => !!p1 !== !!p2,
     emojiName: (p1, p2) => !!p2 && p1 !== p2,
