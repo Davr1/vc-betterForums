@@ -89,6 +89,10 @@
     }
 }
 
+.vc-better-forums-latest-message-content-wrapper * {
+    font: inherit;
+}
+
 .vc-better-forums-tag {
     display: flex;
     justify-content: center;
@@ -326,6 +330,7 @@
 }
 
 .vc-better-forums-latest-message,
+.vc-better-forums-latest-message-content-wrapper,
 .vc-better-forums-latest-message-content {
     overflow: hidden;
     text-overflow: ellipsis;

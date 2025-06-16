@@ -83,7 +83,7 @@ export const tagDefinitions = proxyLazyWebpack(() => {
         {
             id: "archived",
             name: getIntlMessage("THREAD_BROWSER_ARCHIVED"),
-            info: "Post is older than 30 days or it was manually archived",
+            info: "Post is older than 30 days",
             icon: Icons.Scroll,
             condition: ({ isActive }) => !isActive,
             color: "neutral",

@@ -8,6 +8,7 @@ import { Text, useStateFromStores } from "@webpack/common";
 import { TextProps } from "@webpack/types";
 import { Channel, Message } from "discord-types/general";
 
+import { cl } from "..";
 import { useForumPostMetadata, useMessageContent } from "../hooks";
 import { RelationshipStore } from "../stores";
 import { _memo } from "../utils";
@@ -22,6 +23,7 @@ interface MessageContentProps extends Omit<TextProps, "children"> {
 export const MessageContent = _memo<MessageContentProps>(function MessageContent({
     channel,
     message,
+    className,
     messageClassName = "vc-better-forums-message-content",
     visibleIcons,
     ...props
@@ -62,6 +64,7 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
             }}
             color="currentColor"
             variant="text-sm/normal"
+            className={cl(className, "vc-better-forums-latest-message-content-wrapper")}
             {...props}
         >
             {messageContent}
