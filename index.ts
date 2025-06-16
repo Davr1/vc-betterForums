@@ -23,7 +23,7 @@ const STORAGE_KEY = "BetterForums";
 
 export default definePlugin({
     name: "BetterForums",
-    description: "",
+    description: "Complete forum list view redesign with QoL features.",
     authors: [
         {
             name: "Davri",
