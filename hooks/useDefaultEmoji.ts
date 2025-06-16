@@ -11,13 +11,14 @@ import { ForumChannel } from "../types";
 
 export function useDefaultEmoji(channel: ForumChannel): ReactionEmoji | null {
     const emoji = channel.defaultReactionEmoji;
-    if (!emoji) return null;
 
     const customEmoji = useStateFromStores(
         [EmojiStore],
-        () => EmojiStore.getUsableCustomEmojiById(emoji.emojiId),
-        [emoji.emojiId]
+        () => emoji?.emojiId && EmojiStore.getUsableCustomEmojiById(emoji.emojiId),
+        [emoji?.emojiId]
     );
+
+    if (!emoji) return null;
 
     if (emoji.emojiId && customEmoji) return customEmoji;
 
