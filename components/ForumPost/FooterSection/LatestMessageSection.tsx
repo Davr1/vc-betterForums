@@ -15,6 +15,7 @@ import {
     useRecentMessage,
     useTypingUsers,
 } from "../../../hooks";
+import { settings } from "../../../settings";
 import { ThreadChannel } from "../../../types";
 import { _memo, Kangaroo } from "../../../utils";
 import { Icons } from "../../icons";
@@ -30,6 +31,8 @@ interface LatestMessageSectionProps {
 export const LatestMessageSection = _memo<LatestMessageSectionProps>(function LatestMessageSection({
     channel,
 }) {
+    const { highlightNewMessages } = settings.use(["highlightNewMessages"]);
+
     const mostRecentMessage = useRecentMessage(channel);
     const hasRecentMessage = !!mostRecentMessage;
     const messageId = mostRecentMessage?.id ?? channel.lastMessageId;
@@ -64,7 +67,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
             icon={<Icons.Chat />}
             text={messageCountText}
             onClick={messageId ? clickHandler : undefined}
-            active={!!unreadCount && !forumState.isMuted}
+            active={highlightNewMessages && !!unreadCount && !forumState.isMuted}
         >
             {isTypingIndicator ? (
                 <Typing channel={channel} users={typingUsers} />

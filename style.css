@@ -144,7 +144,7 @@
         }
     }
 
-    .theme-light &:not([data-color]) {
+    .theme-light &:is(:not([data-color]), .vc-better-forums-tag-filtered) {
         padding: 1px 5px;
     }
 }

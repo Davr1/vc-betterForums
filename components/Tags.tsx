@@ -75,7 +75,7 @@ export const Tag = _memo<TagProps>(function Tag({
                 tag.icon
             )}
             <Text variant="text-xs/bold" lineClamp={1} color="currentColor">
-                {tag.name}
+                {tag.name ?? "Unknown tag"}
             </Text>
         </div>
     );

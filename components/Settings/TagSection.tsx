@@ -18,12 +18,13 @@ import { InfoTooltip } from "./InfoTooltip";
 import { TagEditorModal } from "./TagEditorModal";
 
 interface TagItemProps {
-    tag: CustomTag;
+    tag: Partial<CustomTag> & Pick<CustomTag, "id">;
 }
 
 const TagItem = _memo<TagItemProps>(function TagItem({ tag }) {
     const { tagOverrides } = settings.use(["tagOverrides"]);
     const fullTag = useMemo(() => ({ ...tag, ...tagOverrides[tag.id] }), [tag, tagOverrides]);
+    const unavailable = fullTag.disabled || (!fullTag.custom && !fullTag.channelId);
 
     const toggle = useCallback(() => {
         settings.store.tagOverrides[tag.id] ??= {};
@@ -50,11 +51,11 @@ const TagItem = _memo<TagItemProps>(function TagItem({ tag }) {
                 {tag.custom && <Checkbox value={!fullTag.disabled} onChange={toggle} size={20} />}
                 <Tag
                     tag={fullTag}
-                    className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
+                    className={cl({ "vc-better-forums-tag-disabled": unavailable })}
                 />
                 <InfoTooltip
                     text={tag.info}
-                    className={cl({ "vc-better-forums-tag-disabled": fullTag.disabled })}
+                    className={cl({ "vc-better-forums-tag-disabled": unavailable })}
                 />
                 {tag.channelId && (
                     <Text
@@ -83,13 +84,12 @@ const TagItem = _memo<TagItemProps>(function TagItem({ tag }) {
                         size={Button.Sizes.SMALL}
                         onClick={deleteTag}
                     >
-                        Delete
+                        Remove
                     </Button>
                 )}
                 <Button
                     innerClassName="vc-better-forums-button"
                     size={Button.Sizes.SMALL}
-                    disabled={fullTag.disabled}
                     onClick={openEditor}
                 >
                     <Icons.Pencil />
@@ -108,8 +108,8 @@ export function TagSection() {
     const overridenTags = useMemo(
         () =>
             Object.keys(tagOverrides)
-                .map(id => forumTags.get(id))
-                .filter(Boolean) as CustomTag[],
+                .filter(id => !customTags.has(id))
+                .map(id => ({ ...forumTags.get(id), id })),
         [tagOverrides, forumTags]
     );
 

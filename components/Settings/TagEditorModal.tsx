@@ -144,7 +144,7 @@ export function TagEditorModal({
 
 const merger: Merger<CustomTag> = {
     name: (p1, p2) => !!p2?.trim() && p1?.trim().toLowerCase() !== p2.trim().toLowerCase(),
-    color: true,
+    color: (p1, p2) => !!p1 !== !!p2 && p1 !== p2,
     invertedColor: (p1, p2) => !!p1 !== !!p2,
     monochromeIcon: (p1, p2) => !!p1 !== !!p2,
     emojiName: (p1, p2) => !!p2 && p1 !== p2,
@@ -169,16 +169,17 @@ TagEditorModal.use = (tagId: CustomTag["id"]) => {
 
     const handleSubmit = useCallback(
         (t: CustomTag) => {
+            if (!tag) return;
             settings.store.tagOverrides[tagId] = diffObjects(tag, t, merger);
         },
         [tagId, tag]
     );
 
     return useCallback(() => {
-        if (!tag || !tagId)
+        if (!tag)
             return Alerts.show({
                 title: "Unknown tag",
-                body: `The tag ${tagId} was not in the cache.`,
+                body: `The tag ${tagId} was not found in the cache.\nConsider switching accounts or removing this tag override.`,
             });
 
         openModal(

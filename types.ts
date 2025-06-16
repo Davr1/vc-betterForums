@@ -76,7 +76,8 @@ export type CustomTagColor =
     | "orange"
     | "red";
 
-export interface CustomTag extends DiscordTag {
+export interface CustomTag extends Omit<DiscordTag, "name"> {
+    name?: string;
     info?: string;
     custom?: boolean;
     color?: CustomTagColor | null;

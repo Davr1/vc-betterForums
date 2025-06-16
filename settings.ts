@@ -102,6 +102,12 @@ export const settings = definePluginSettings({
             { label: "Never", value: ShowReplyPreview.NEVER },
         ],
     },
+    highlightNewMessages: {
+        type: OptionType.BOOLEAN,
+        description:
+            "Highlights new messages with a blue border and background. Doesn't apply to muted threads.",
+        default: false,
+    },
     maxReactionCount: {
         type: OptionType.SLIDER,
         description: "Maximum number of reactions to show in the thread footer",
