@@ -4,13 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Text, useStateFromStores } from "@webpack/common";
+import { Text } from "@webpack/common";
 import { TextProps } from "@webpack/types";
 import { Channel, Message } from "discord-types/general";
 
 import { cl } from "..";
-import { useForumPostMetadata, useMessageContent } from "../hooks";
-import { RelationshipStore } from "../stores";
+import { useMessageContent } from "../hooks";
 import { _memo } from "../utils";
 
 interface MessageContentProps extends Omit<TextProps, "children"> {
@@ -28,29 +27,13 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
     visibleIcons,
     ...props
 }) {
-    const { content, firstMedia } = useForumPostMetadata({ firstMessage: message });
-
-    const { isBlocked, isIgnored } = useStateFromStores(
-        [RelationshipStore],
-        () => ({
-            isBlocked: !!message && RelationshipStore.isBlockedForMessage(message),
-            isIgnored: !!message && RelationshipStore.isIgnoredForMessage(message),
-        }),
-        [message]
-    );
-
     const {
         content: messageContent,
         systemMessage,
         leadingIcon,
         trailingIcon,
     } = useMessageContent({
-        channel,
         message,
-        content,
-        hasMediaAttachment: !!firstMedia,
-        isAuthorBlocked: isBlocked,
-        isAuthorIgnored: isIgnored,
         className: messageClassName,
         iconSize: 16,
         iconClassName: "vc-better-forums-message-icon",

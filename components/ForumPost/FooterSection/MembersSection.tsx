@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { lodash, useStateFromStores } from "@webpack/common";
+
+import { ThreadMembersStore } from "../../../stores";
 import { ThreadChannel } from "../../../types";
 import { _memo } from "../../../utils";
 import { AvatarPile } from "../../AvatarPile";
@@ -15,14 +18,24 @@ interface MembersSectionProps {
 }
 
 export const MembersSection = _memo<MembersSectionProps>(function MembersSection({ channel }) {
+    const { count, memberIds } = useStateFromStores(
+        [ThreadMembersStore],
+        () => ({
+            count: ThreadMembersStore.getMemberCount(channel.id) ?? 0,
+            memberIds: ThreadMembersStore.getMemberIdsPreview(channel.id) ?? [],
+        }),
+        [channel.id],
+        lodash.isEqual
+    );
+
     return (
-        <FooterSection icon={<Icons.Users />} text={channel.memberCount.toString()}>
-            {channel.memberIdsPreview.length > 0 && (
+        <FooterSection icon={<Icons.Users />} text={`${count}`}>
+            {memberIds.length > 0 && (
                 <AvatarPile
                     guildId={channel.getGuildId()}
-                    userIds={channel.memberIdsPreview}
+                    userIds={memberIds}
                     size={16}
-                    count={channel.memberCount}
+                    count={count}
                 />
             )}
         </FooterSection>

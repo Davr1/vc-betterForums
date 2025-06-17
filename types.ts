@@ -119,11 +119,6 @@ export enum ReactionType {
 
 export interface MessageFormattingOptions {
     message: Message | null;
-    channel: Channel;
-    content: ReactNode;
-    hasMediaAttachment: boolean;
-    isAuthorBlocked?: boolean;
-    isAuthorIgnored?: boolean;
     className?: string;
     iconSize?: number;
     iconClassName?: string;

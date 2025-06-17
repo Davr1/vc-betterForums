@@ -4,158 +4,45 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findStoreLazy } from "@webpack";
-import { FluxEvents, FluxStore } from "@webpack/types";
-import { Channel, Guild, Message, User } from "discord-types/general";
-import * as Stores from "discord-types/stores";
+import { findStoreLazy, proxyLazyWebpack } from "@webpack";
+import {
+    ChannelStore as _ChannelStore,
+    GuildMemberStore as _GuildMemberStore,
+    PermissionStore as _PermissionStore,
+    ReadStateStore as _ReadStateStore,
+    RelationshipStore as _RelationshipStore,
+} from "@webpack/common";
+import { FluxStore } from "@webpack/types";
 
-import { DiscordTag, FullChannel } from "../types";
+import { ExtendedStores as S } from "./types";
+export * from "./types";
 
-export type FluxEventHandlers<T extends Partial<Record<FluxEvents, unknown>>> = {
-    [K in keyof T]?: (data: T[K]) => void;
-} & {
-    [K in FluxEvents]?: (data: T[K]) => void;
-};
-
-interface ChannelSectionStore extends FluxStore {
-    getCurrentSidebarChannelId: (parentChannelId: Channel["id"]) => Channel["id"] | null;
+function f<T extends FluxStore>(store: string | (() => Partial<T>)): T {
+    return typeof store === "string" ? findStoreLazy(store) : (proxyLazyWebpack(store) as T);
 }
 
-interface ForumPostMessagesStore extends FluxStore {
-    isLoading(channelId: Channel["id"]): boolean;
-
-    getMessage(channelId: Channel["id"]): { firstMessage: Message | null };
-}
-
-interface ThreadMessageStore extends FluxStore {
-    getCount(channelId: Channel["id"]): number | null;
-    getMostRecentMessage(channelId: Channel["id"]): Message | null;
-}
-
-interface ForumPostUnreadCountStore extends FluxStore {
-    getCount(channelId: Channel["id"]): number | undefined;
-}
-
-interface GuildMemberRequesterStore extends FluxStore {
-    requestMember(guildId: Guild["id"], userId: User["id"]): void;
-}
-
-interface TypingStore extends FluxStore {
-    getTypingUsers(channelId: Channel["id"]): Record<User["id"], number>;
-}
-
-interface ForumSearchStore extends FluxStore {
-    getSearchQuery(channelId: Channel["id"]): string | undefined;
-    getHasSearchResults(channelId: Channel["id"]): boolean;
-}
-
-interface ReadStateStore extends FluxStore {
-    hasTrackedUnread(channelId: Channel["id"]): boolean;
-    hasOpenedThread(channelId: Channel["id"]): boolean;
-    getTrackedAckMessageId(channelId: Channel["id"]): Message["id"] | null;
-    isNewForumThread(
-        channelId: Channel["id"],
-        parentChannelId: Channel["id"],
-        guild: Guild
-    ): boolean;
-    isForumPostUnread(channelId: Channel["id"]): boolean;
-    lastMessageId(channelId: Channel["id"]): Message["id"] | null;
-    getOldestUnreadMessageId(channelId: Channel["id"]): Message["id"] | null;
-}
-
-interface RelationshipStore extends FluxStore, Stores.RelationshipStore {
-    isBlockedOrIgnored(userId: User["id"]): boolean;
-    isBlockedForMessage(message: Message): boolean;
-    isIgnoredForMessage(message: Message): boolean;
-}
-
-interface GuildMemberStore extends FluxStore, Stores.GuildMemberStore {
-    isCurrentUserGuest(guildId: Guild["id"]): boolean;
-}
-
-interface LurkingStore extends FluxStore {
-    isLurking(guildId: Guild["id"]): boolean;
-}
-
-interface PermissionStore extends FluxStore {
-    can(permission: BigInt, channel: Channel): boolean;
-}
-
-interface GuildVerificationStore extends FluxStore {
-    canChatInGuild(guildId: Guild["id"]): boolean;
-}
-
-interface ChannelStore extends FluxStore, Stores.ChannelStore {
-    loadAllGuildAndPrivateChannelsFromDisk(): Record<Channel["id"], FullChannel>;
-}
-
-interface JoinedThreadsStore extends FluxStore {
-    hasJoined(threadId: Channel["id"]): boolean;
-    isMuted(threadId: Channel["id"]): boolean;
-}
-
-export enum LayoutType {
-    DEFAULT = 0,
-    LIST = 1,
-    GRID = 2,
-}
-
-export enum SortOrder {
-    LATEST_ACTIVITY = 0,
-    CREATION_DATE = 1,
-}
-
-export enum TagSetting {
-    MATCH_SOME = "match_some",
-    MATCH_ALL = "match_all",
-}
-
-export enum Duration {
-    DURATION_AGO = 0,
-    POSTED_DURATION_AGO = 1,
-}
-
-export interface ChannelState {
-    layoutType: LayoutType;
-    sortOrder: SortOrder;
-    tagFilter: Set<string>;
-    scrollPosition: 0;
-    tagSetting: TagSetting;
-}
-
-export interface ForumChannelStore extends ForumChannelStoreState {
-    getChannelState(channelId: Channel["id"]): ChannelState | undefined;
-    toggleTagFilter(channelId: Channel["id"], tagId: DiscordTag["id"]): void;
-}
-
-export interface ForumChannelStoreState {
-    channelStates: Record<Channel["id"], ChannelState>;
-}
-
-export interface ForumPostComposerStore {
-    setCardHeight(channelId: Channel["id"], height: number): void;
-}
-
-export const ChannelSectionStore: ChannelSectionStore = findStoreLazy("ChannelSectionStore");
-export const ForumPostMessagesStore: ForumPostMessagesStore =
-    findStoreLazy("ForumPostMessagesStore");
-export const ThreadMessageStore: ThreadMessageStore = findStoreLazy("ThreadMessageStore");
-export const ForumPostUnreadCountStore: ForumPostUnreadCountStore = findStoreLazy(
+export const ChannelSectionStore = f<S.ChannelSectionStore>("ChannelSectionStore");
+export const ForumPostMessagesStore = f<S.ForumPostMessagesStore>("ForumPostMessagesStore");
+export const ForumPostUnreadCountStore = f<S.ForumPostUnreadCountStore>(
     "ForumPostUnreadCountStore"
 );
-export const GuildMemberRequesterStore: GuildMemberRequesterStore = findStoreLazy(
+export const ForumSearchStore = f<S.ForumSearchStore>("ForumSearchStore");
+export const GuildMemberRequesterStore = f<S.GuildMemberRequesterStore>(
     "GuildMemberRequesterStore"
 );
-export const TypingStore: TypingStore = findStoreLazy("TypingStore");
-export const ForumSearchStore: ForumSearchStore = findStoreLazy("ForumSearchStore");
-export const ReadStateStore: ReadStateStore = findStoreLazy("ReadStateStore");
-export const GuildVerificationStore: GuildVerificationStore =
-    findStoreLazy("GuildVerificationStore");
-export const LurkingStore: LurkingStore = findStoreLazy("LurkingStore");
-export const RelationshipStore: RelationshipStore = findStoreLazy("RelationshipStore");
-export const GuildMemberStore: GuildMemberStore = findStoreLazy("GuildMemberStore");
-export const PermissionStore: PermissionStore = findStoreLazy("PermissionStore");
-export const JoinedThreadsStore: JoinedThreadsStore = findStoreLazy("JoinedThreadsStore");
-export const ChannelStore: ChannelStore = findStoreLazy("ChannelStore");
+export const GuildVerificationStore = f<S.GuildVerificationStore>("GuildVerificationStore");
+export const JoinedThreadsStore = f<S.JoinedThreadsStore>("JoinedThreadsStore");
+export const LurkingStore = f<S.LurkingStore>("LurkingStore");
+export const ThreadMembersStore = f<S.ThreadMembersStore>("ThreadMembersStore");
+export const ThreadMessageStore = f<S.ThreadMessageStore>("ThreadMessageStore");
+export const TypingStore = f<S.TypingStore>("TypingStore");
+
+export const ChannelStore = f<S.ChannelStore>(() => _ChannelStore);
+export const GuildMemberStore = f<S.GuildMemberStore>(() => _GuildMemberStore);
+export const PermissionStore = f<S.PermissionStore>(() => _PermissionStore);
+export const ReadStateStore = f<S.ReadStateStore>(() => _ReadStateStore);
+export const RelationshipStore = f<S.RelationshipStore & typeof RelationshipStore>(
+    () => _RelationshipStore
+);
 
 export { MissingGuildMemberStore } from "./MissingGuildMemberStore";

@@ -10,8 +10,9 @@ import { useMemo, useStateFromStores } from "@webpack/common";
 import { Message } from "discord-types/general";
 import { ReactNode } from "react";
 
-import { ForumPostMessagesStore } from "../stores";
+import { ForumPostMessagesStore, RelationshipStore } from "../stores";
 import { MessageFormattingOptions } from "../types";
+import { useForumPostMetadata } from "./";
 
 const getReplyPreview: (
     message: Message,
@@ -25,11 +26,6 @@ const getReplyPreview: (
 
 export function useMessageContent({
     message,
-    channel,
-    content,
-    hasMediaAttachment,
-    isAuthorBlocked,
-    isAuthorIgnored,
     className,
     iconSize,
     iconClassName,
@@ -38,9 +34,23 @@ export function useMessageContent({
 } {
     const isLoading = useStateFromStores(
         [ForumPostMessagesStore],
-        () => ForumPostMessagesStore.isLoading(channel.id),
-        [channel.id]
+        () => !!message?.channel_id && ForumPostMessagesStore.isLoading(message.channel_id),
+        [message?.channel_id]
     );
+
+    const isAuthorBlocked = useStateFromStores(
+        [RelationshipStore],
+        () => !!message && RelationshipStore.isBlockedForMessage(message),
+        [message]
+    );
+
+    const isAuthorIgnored = useStateFromStores(
+        [RelationshipStore],
+        () => !!message && RelationshipStore.isIgnoredForMessage(message),
+        [message]
+    );
+
+    const { content, firstMedia } = useForumPostMetadata({ firstMessage: message });
 
     const { contentPlaceholder, renderedContent, leadingIcon, trailingIcon } = useMemo(() => {
         return !message
@@ -63,7 +73,7 @@ export function useMessageContent({
     if (renderedContent)
         return { content: renderedContent, leadingIcon, trailingIcon, systemMessage: false };
 
-    if (hasMediaAttachment)
+    if (!!firstMedia)
         return { content: getIntlMessage("REPLY_QUOTE_NO_TEXT_CONTENT"), ...systemMessage };
 
     if (!message)

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { GuildStore, SnowflakeUtils, useStateFromStores } from "@webpack/common";
+import { GuildStore, lodash, SnowflakeUtils, useStateFromStores } from "@webpack/common";
 import { Channel, Guild } from "discord-types/general";
 
 import {
@@ -54,6 +54,7 @@ export function useForumPostState(channel: Channel): ForumPostState {
                 isAbandoned,
             };
         },
-        [id, guild_id, isArchived, isLocked, isPinned, ownerId, parent_id]
+        [id, guild_id, isArchived, isLocked, isPinned, ownerId, parent_id],
+        lodash.isEqual
     );
 }
