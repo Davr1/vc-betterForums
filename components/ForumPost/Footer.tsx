@@ -5,17 +5,16 @@
  */
 
 import { Flex } from "@webpack/common";
-import { Message } from "discord-types/general";
 
 import { MaxReactionCount, settings } from "../../settings";
-import { ThreadChannel } from "../../types";
+import { FullMessage, ThreadChannel } from "../../types";
 import { _memo } from "../../utils";
 import { DefaultReaction, Reactions } from "../Reaction";
 import { FooterSection } from "./FooterSection";
 
 interface FooterProps {
     channel: ThreadChannel;
-    firstMessage: Message | null;
+    firstMessage: FullMessage | null;
     containerWidth?: number;
 }
 

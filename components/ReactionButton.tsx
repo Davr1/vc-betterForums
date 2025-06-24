@@ -5,13 +5,12 @@
  */
 
 import { findComponentByCodeLazy } from "@webpack";
-import { Message } from "discord-types/general";
 
-import { EmojiSize, MessageReactionWithBurst, ReactionType } from "../types";
+import { EmojiSize, FullMessage, MessageReactionWithBurst, ReactionType } from "../types";
 
 export interface ReactionButtonProps extends MessageReactionWithBurst {
     className?: string;
-    message: Message;
+    message: FullMessage;
     readOnly?: boolean;
     useChatFontScaling?: boolean;
     isLurking?: boolean;

@@ -5,12 +5,11 @@
  */
 
 import { MessageStore, useStateFromStores } from "@webpack/common";
-import { Message } from "discord-types/general";
 
 import { ForumPostMessagesStore, ThreadMessageStore } from "../stores";
-import { ThreadChannel } from "../types";
+import { FullMessage, ThreadChannel } from "../types";
 
-export function useRecentMessage(channel: ThreadChannel): Message | null {
+export function useRecentMessage(channel: ThreadChannel): FullMessage | null {
     return useStateFromStores(
         [ThreadMessageStore, ForumPostMessagesStore, MessageStore],
         () => {
@@ -22,7 +21,9 @@ export function useRecentMessage(channel: ThreadChannel): Message | null {
             // channel.lastMessageId and recentMessage.id can be out of sync
             if (channel.lastMessageId === firstMessage?.id) return null;
 
-            return MessageStore.getMessage(channel.id, channel.lastMessageId) ?? null;
+            return (
+                (MessageStore.getMessage(channel.id, channel.lastMessageId) as FullMessage) ?? null
+            );
         },
         [channel.id, channel.lastMessageId]
     );

@@ -7,15 +7,14 @@
 import { getIntlMessage } from "@utils/discord";
 import { findByCodeLazy } from "@webpack";
 import { useMemo, useStateFromStores } from "@webpack/common";
-import { Message } from "discord-types/general";
 import { ReactNode } from "react";
 
 import { ForumPostMessagesStore, RelationshipStore } from "../stores";
-import { MessageFormattingOptions } from "../types";
+import { FullMessage, MessageFormattingOptions } from "../types";
 import { useForumPostMetadata } from "./";
 
 const getReplyPreview: (
-    message: Message,
+    message: FullMessage,
     content: ReactNode,
     isBlocked: boolean | undefined,
     isIgnored: boolean | undefined,

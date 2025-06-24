@@ -5,13 +5,12 @@
  */
 
 import { useLayoutEffect, useRef, useState, useStateFromStores } from "@webpack/common";
-import { Message } from "discord-types/general";
 import { Ref } from "react";
 
 import { cl } from "..";
 import { useCheckPermissions, useDefaultEmoji, useTopReactions } from "../hooks";
 import { ChannelStore } from "../stores";
-import { ForumChannel, ReactionType, ThreadChannel } from "../types";
+import { ForumChannel, FullMessage, ReactionType, ThreadChannel } from "../types";
 import { _memo } from "../utils";
 import { ReactionButton, ReactionButtonProps } from "./ReactionButton";
 
@@ -58,7 +57,7 @@ function ReactionContainer({
 }
 
 interface ReactionProps {
-    firstMessage: Message;
+    firstMessage: FullMessage;
     channel: ThreadChannel;
     maxWidth?: number;
     maxCount?: number;

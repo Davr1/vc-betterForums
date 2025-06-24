@@ -5,11 +5,10 @@
  */
 
 import { Flex, Heading, Text, useCallback, UserStore, useStateFromStores } from "@webpack/common";
-import { Message } from "discord-types/general";
 
 import { useChannelName, useForumPostState } from "../../hooks";
 import { settings } from "../../settings";
-import { ThreadChannel } from "../../types";
+import { FullMessage, ThreadChannel } from "../../types";
 import { _memo, threadUtils } from "../../utils";
 import { MessageContent } from "../MessageContent";
 import { Timestamp } from "../Timestamp";
@@ -19,7 +18,7 @@ import { FollowButton } from "./FollowButton";
 
 interface BodyProps {
     channel: ThreadChannel;
-    firstMessage: Message | null;
+    firstMessage: FullMessage | null;
 }
 
 export const Body = _memo<BodyProps>(function Body({ channel, firstMessage }) {

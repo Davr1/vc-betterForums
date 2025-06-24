@@ -5,9 +5,11 @@
  */
 
 import { findByCodeLazy } from "@webpack";
-import { Channel, Message } from "discord-types/general";
+import { Channel } from "discord-types/general";
+
+import { FullMessage } from "../types";
 
 export const useFirstMessage: (channel: Channel) => {
     loaded: boolean;
-    firstMessage: Message | null;
+    firstMessage: FullMessage | null;
 } = findByCodeLazy("loaded:", "firstMessage:", "getChannel", "getMessage");

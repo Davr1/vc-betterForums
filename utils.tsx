@@ -5,8 +5,10 @@
  */
 
 import { DataStore } from "@api/index";
+import { getUserSettingLazy } from "@api/UserSettings";
 import { getIntlMessage } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
+import { parseUrl } from "@utils/misc";
 import { ModalAPI } from "@utils/modal";
 import { findByProps, findByPropsLazy, proxyLazyWebpack } from "@webpack";
 import { FluxDispatcher, IconUtils, React } from "@webpack/common";
@@ -15,7 +17,19 @@ import { Channel, Message } from "discord-types/general";
 import { ComponentType } from "react";
 
 import { Icons } from "./components/icons";
-import { CustomTag, ParsedContent, ThreadChannel } from "./types";
+import {
+    Attachment,
+    CustomTag,
+    FullEmbed,
+    FullMessage,
+    FullMessageAttachment,
+    MessageAttachmentFlag,
+    MessageComponent,
+    MessageComponentType,
+    ParsedContent,
+    ThreadChannel,
+    UnfurledMedia,
+} from "./types";
 
 export function indexedDBStorageFactory<T>() {
     return {
@@ -153,4 +167,223 @@ export function diffObjects<T extends object, TMerged extends boolean = false>(
 export function closeAllScreens(): void {
     ModalAPI.closeAllModals();
     FluxDispatcher.dispatch({ type: "LAYER_POP_ALL" });
+}
+
+export function hasFlag(value: number, flag: number): boolean {
+    return (value & flag) === flag;
+}
+
+const imageRegex = /\.(png|jpe?g|webp|gif|heic|heif|dng|avif)$/i;
+function isImage({ filename, height, width }: FullMessageAttachment): boolean {
+    return imageRegex.test(filename) && !!height && !!width;
+}
+
+const videoRegex = /\.(mp4|webm|mov)$/i;
+function isVideo({ filename, proxy_url }: FullMessageAttachment): boolean {
+    return videoRegex.test(filename) && !!proxy_url;
+}
+
+function isMedia(attachment: FullMessageAttachment | null) {
+    if (!attachment) return false;
+    return isImage(attachment) || isVideo(attachment);
+}
+
+const inlineAttachmentMedia = getUserSettingLazy<boolean>("textAndImages", "inlineAttachmentMedia");
+const inlineEmbedMedia = getUserSettingLazy<boolean>("textAndImages", "inlineEmbedMedia");
+const renderEmbeds = getUserSettingLazy<boolean>("textAndImages", "renderEmbeds");
+
+function parseMessageAttachment(
+    attachment: FullMessageAttachment,
+    mediaIndex: number = 0
+): Attachment | null {
+    const { proxy_url, url, description, flags, width, height, content_scan_version, ...rest } =
+        attachment;
+
+    if (!width || !height) return null;
+
+    const isMediaVideo = isVideo(attachment);
+    const isThumbnail = hasFlag(flags ?? 0, MessageAttachmentFlag.IS_THUMBNAIL);
+    const srcIsAnimated = hasFlag(flags ?? 0, MessageAttachmentFlag.IS_ANIMATED);
+
+    let src = proxy_url || url;
+
+    if (isMediaVideo) {
+        const videoUrl = parseUrl(proxy_url);
+        if (!videoUrl) return null;
+
+        videoUrl.searchParams.append("format", "webp");
+        src = videoUrl.toString();
+    }
+
+    return {
+        type: "attachment",
+        ...rest,
+        src,
+        width,
+        height,
+        flags,
+        contentScanVersion: content_scan_version,
+        alt: description,
+        isVideo: isMediaVideo,
+        isThumbnail,
+        attachmentId: attachment.id,
+        mediaIndex,
+        srcIsAnimated,
+    };
+}
+
+function getAttachments(message: FullMessage | null, inlineAttachmentMedia: boolean): Attachment[] {
+    if (!inlineAttachmentMedia || !message?.attachments) return [];
+
+    return message.attachments
+        .filter(isMedia)
+        .map(parseMessageAttachment)
+        .filter(Boolean) as Attachment[];
+}
+
+const matchesUrlSuffix = (url: string | null | undefined, regex: RegExp) => {
+    if (!url) return false;
+    const [cleanUrl] = url.split(/\?/, 1);
+    return regex.test(cleanUrl);
+};
+
+function parseEmbed(
+    embed: FullEmbed,
+    mediaIndex: number = 0,
+    spoiler?: boolean
+): Attachment | null {
+    const embedImage = embed.image ?? embed.thumbnail ?? embed.images?.[0];
+    if (!embedImage.url) return null;
+
+    const { proxyURL, url, flags, ...rest } = embedImage;
+    const src = proxyURL || url;
+    const isVideo = !!proxyURL && matchesUrlSuffix(proxyURL, videoRegex);
+    const srcIsAnimated = hasFlag(flags ?? 0, MessageAttachmentFlag.IS_ANIMATED);
+
+    return {
+        type: "embed",
+        ...rest,
+        src,
+        spoiler,
+        flags: embed.flags,
+        contentScanVersion: embed.contentScanVersion,
+        isVideo,
+        mediaIndex,
+        srcIsAnimated,
+    };
+}
+
+function getEmbeds(
+    message: FullMessage | null,
+    spoiler: boolean,
+    inlineEmbedMedia: boolean,
+    renderEmbeds: boolean
+): Attachment[] {
+    if (!renderEmbeds || !inlineEmbedMedia || !message?.embeds) return [];
+
+    return message.embeds
+        .map((embed, mediaIndex) => parseEmbed(embed, mediaIndex, spoiler))
+        .filter(Boolean) as Attachment[];
+}
+
+function getComponentMap(
+    components: MessageComponent[]
+): Map<MessageComponent["id"], MessageComponent> {
+    const map = new Map<MessageComponent["id"], MessageComponent>();
+    for (const item of components) flatten(map, item);
+    return map;
+}
+
+function flatten(map: Map<MessageComponent["id"], MessageComponent>, component: MessageComponent) {
+    map.set(component.id, component);
+
+    switch (component.type) {
+        case MessageComponentType.SECTION:
+            flatten(map, component.accessory!);
+        // eslint-disable-next-line no-fallthrough
+        case MessageComponentType.ACTION_ROW:
+        case MessageComponentType.CONTAINER:
+            component.components!.forEach(item => flatten(map, item));
+    }
+}
+
+function getComponentMedia(message: FullMessage, inlineEmbedMedia: boolean) {
+    if (!inlineEmbedMedia || !message?.components) return [];
+
+    const map = getComponentMap(message.components);
+
+    return Array.from(map.values())
+        .flatMap(({ type, media, spoiler, items }) => {
+            switch (type) {
+                case MessageComponentType.THUMBNAIL:
+                    return parseComponent(media!, 0, spoiler);
+                case MessageComponentType.MEDIA_GALLERY:
+                    return items!.map((item, index) =>
+                        parseComponent(item.media!, index, item.spoiler)
+                    );
+                default:
+                    return null;
+            }
+        })
+        .filter(Boolean);
+}
+
+const matchesMimeType = (url: string | null | undefined, type: string) => {
+    if (!url) return false;
+    const [parentType] = url.split("/");
+    return parentType === type;
+};
+
+function getEmbedMediaType(media: UnfurledMedia): "IMAGE" | "VIDEO" | "INVALID" {
+    return matchesMimeType(media.contentType, "image")
+        ? "IMAGE"
+        : matchesMimeType(media.contentType, "video") && media.proxyUrl && parseUrl(media.proxyUrl)
+        ? "VIDEO"
+        : "INVALID";
+}
+
+function parseComponent(
+    media: UnfurledMedia,
+    mediaIndex: number = 0,
+    spoiler?: boolean
+): Attachment | null {
+    const type = getEmbedMediaType(media);
+    if (type === "INVALID") return null;
+
+    const contentScanVersion = media.contentScanMetadata?.version;
+    const srcIsAnimated = hasFlag(media.flags ?? 0, MessageAttachmentFlag.IS_ANIMATED);
+    const isVideo = type === "VIDEO";
+
+    return {
+        type: "component",
+        src: media.proxyUrl,
+        height: media.height ?? 0,
+        width: media.width ?? 0,
+        spoiler: spoiler,
+        contentScanVersion,
+        srcIsAnimated,
+        isVideo,
+        mediaIndex: 0,
+        srcUnfurledMediaItem: media,
+    };
+}
+// function N(message, forumChannel, spoiler) {
+//     let allMedia = getAllMedia(message, spoiler);
+//     return r.useMemo(() => {
+//         if (!forumChannel) return [];
+//         if (!forumChannel.isMediaChannel()) return allMedia;
+//         let firstMedia = allMedia.find(e => e.isThumbnail);
+//         return firstMedia ? [firstMedia] : allMedia;
+//     }, [forumChannel, allMedia]);
+// }
+export function getAllMedia(message: FullMessage, spoiler: boolean = false) {
+    const inlineAttachmentMediaVisible = !!inlineAttachmentMedia?.getSetting();
+    const inlineEmbedMediaVisible = !!inlineEmbedMedia?.getSetting();
+    const shouldRenderEmbeds = !!renderEmbeds?.getSetting();
+
+    const attachments = getAttachments(message, inlineAttachmentMediaVisible);
+    const embeds = getEmbeds(message, spoiler, inlineEmbedMediaVisible, shouldRenderEmbeds);
+    const componentMedia = getComponentMedia(message, inlineEmbedMediaVisible);
+
+    return [...attachments, ...embeds, ...componentMedia];
 }

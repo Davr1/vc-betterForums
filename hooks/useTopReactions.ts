@@ -5,12 +5,11 @@
  */
 
 import { useMemo } from "@webpack/common";
-import { Message } from "discord-types/general";
 
-import { MessageReactionWithBurst, ReactionType } from "../types";
+import { FullMessage, MessageReactionWithBurst, ReactionType } from "../types";
 
 export function useTopReactions(
-    message: Message,
+    message: FullMessage,
     limit?: number
 ): { id: string; type: ReactionType; count: number; reaction: MessageReactionWithBurst }[] {
     const reactions = message.reactions as MessageReactionWithBurst[];

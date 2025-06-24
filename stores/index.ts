@@ -36,6 +36,7 @@ export const LurkingStore = f<S.LurkingStore>("LurkingStore");
 export const ThreadMembersStore = f<S.ThreadMembersStore>("ThreadMembersStore");
 export const ThreadMessageStore = f<S.ThreadMessageStore>("ThreadMessageStore");
 export const TypingStore = f<S.TypingStore>("TypingStore");
+export const UserSettingsProtoStore = f<S.UserSettingsProtoStore>("UserSettingsProtoStore");
 
 export const ChannelStore = f<S.ChannelStore>(() => _ChannelStore);
 export const GuildMemberStore = f<S.GuildMemberStore>(() => _GuildMemberStore);

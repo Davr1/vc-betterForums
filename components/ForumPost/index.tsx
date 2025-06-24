@@ -55,11 +55,7 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
     const { messageCountText } = useMessageCount(channel);
 
     const { ref: ringTarget, width, height } = useFocusRing<HTMLDivElement>();
-    const { handleLeftClick, handleRightClick } = useForumPostEvents({
-        goToThread,
-        channel,
-        facepileRef: () => {},
-    });
+    const { handleLeftClick, handleRightClick } = useForumPostEvents({ goToThread, channel });
 
     const setCardHeight = useForumPostComposerStore(store => store.setCardHeight);
     useEffect(() => {
