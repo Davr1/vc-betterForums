@@ -4,131 +4,104 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { useCallback, useMemo, useStateFromStores, WindowStore } from "@webpack/common";
-import { Message } from "discord-types/general";
-import { ComponentProps } from "react";
+import { findByCodeLazy, findByPropsLazy, proxyLazyWebpack } from "@webpack";
+import { React, useCallback, useMemo, useStateFromStores, WindowStore } from "@webpack/common";
 
-import { findByCodeLazy, findByPropsLazy } from "../../../../webpack";
-import { Attachment } from "../../types";
-import { _memo } from "../../utils";
-import { MediaMosaic } from "../MediaMosaic";
+import { useForumPostMetadata } from "../../hooks";
+import { FullMessage, UnfurledMediaItem } from "../../types";
+import { _memo, animatedMediaRegex, matchesUrlSuffix } from "../../utils";
 
-interface MediaProps extends Attachment {}
+const MediaContext = proxyLazyWebpack(() =>
+    React.createContext<{ message: FullMessage; media: UnfurledMediaItem[] } | null>(null)
+);
 
-const animatedMediaRegex = /\.(webp|gif|avif)$/i;
+interface MediaProps {
+    message: FullMessage | null;
+}
 
-export const Media = _memo<MediaProps>(function Media({ src, width, height, alt, srcIsAnimated }) {
-    const isFocused = useStateFromStores([WindowStore], () => WindowStore.isFocused());
-    const isAnimated = useMemo(() => !src || animatedMediaRegex.test(src.split(/\?/, 1)[0]), [src]);
+export const Media = _memo<MediaProps>(function Media({ message }) {
+    const { media } = useForumPostMetadata({ firstMessage: message });
+    if (!message || media.length === 0) return null;
 
     return (
-        <div onClick={e => e.stopPropagation()}>
-            <ImagePreview
-                src={src}
-                width={width}
-                height={height}
-                minWidth={72}
-                minHeight={72}
-                alt={alt}
-                animated={isAnimated && isFocused}
-                srcIsAnimated={srcIsAnimated}
-                containerClassName="vc-better-forums-thumbnail-container"
-                imageClassName="vc-better-forums-thumbnail-override"
-            />
-        </div>
+        <MediaContext.Provider value={{ media, message }}>
+            <div onClick={e => e.stopPropagation()}>
+                {media.map((_, index) => (
+                    <ImagePreview
+                        mediaIndex={index}
+                        key={index}
+                        containerClassName="vc-better-forums-thumbnail-container"
+                        imageClassName="vc-better-forums-thumbnail-override"
+                    />
+                ))}
+            </div>
+        </MediaContext.Provider>
     );
 });
 
 const Img = findByPropsLazy("preloadImage", "trackLoadingCompleted");
-const MediaViewer = findByCodeLazy("shouldHideMediaOptions", "LIGHTBOX");
+const openMediaViewer: (options: {
+    items: Partial<UnfurledMediaItem>[];
+    shouldHideMediaOptions?: boolean;
+    location?: string;
+    contextKey?: "default" | "popout";
+    startingIndex?: number;
+}) => void = findByCodeLazy("shouldHideMediaOptions", "LIGHTBOX");
 
-function ImagePreview(props: ComponentProps<typeof MediaMosaic>) {
+interface ImagePreviewProps {
+    mediaIndex: number;
+    containerClassName?: string;
+    imageClassName?: string;
+}
+
+function ImagePreview({ mediaIndex, containerClassName, imageClassName }: ImagePreviewProps) {
+    const value = React.useContext(MediaContext);
+    const image = value?.media[mediaIndex]!;
+
+    const { url, width, height } = image;
+
+    const isFocused = useStateFromStores([WindowStore], () => WindowStore.isFocused());
+    const isAnimated = useMemo(() => matchesUrlSuffix(url, animatedMediaRegex), [url]);
+
+    const animated = isAnimated && isFocused;
+
     const onMouseEnter = useCallback(() => {
         Img.preloadImage({
-            src: props.src,
+            src: url,
             dimensions: {
-                maxWidth: props.minWidth,
-                maxHeight: props.minHeight,
-                imageWidth: props.width,
-                imageHeight: props.height,
+                maxWidth: width,
+                maxHeight: height,
+                imageWidth: width,
+                imageHeight: height,
             },
-            options: props,
+            options: {},
         });
-    }, [props]);
+    }, [image]);
 
-    const onZoom = useCallback(e => {
-        e.currentTarget instanceof Element && e.currentTarget.blur();
+    const onZoom = useCallback(
+        e => {
+            e.currentTarget instanceof Element && e.currentTarget.blur();
 
-        MediaViewer({
-            items: [
-                {
-                    url: props.src,
-                    type: "IMAGE",
-                    original: props.original ?? props.src,
-                    ...props,
-                },
-            ],
-            shouldHideMediaOptions: false,
-            location: "LazyImageZoomable",
-            contextKey: "default",
-        });
-    }, []);
+            openMediaViewer({
+                items: value?.media ?? [],
+                shouldHideMediaOptions: false,
+                location: "LazyImageZoomable",
+                contextKey: "default",
+                startingIndex: mediaIndex,
+            });
+        },
+        [image, mediaIndex, value?.media]
+    );
 
     return (
         <Img
             onZoom={onZoom}
             onMouseEnter={onMouseEnter}
-            shouldAnimate={props.animated}
-            {...props}
+            shouldAnimate={animated}
+            src={url}
+            {...image}
+            containerClassName={containerClassName}
+            imageClassName={imageClassName}
         />
     );
-}
-
-interface MediaItem {
-    url: string;
-    proxyUrl: string;
-    height: number;
-    width: number;
-    contentType: string;
-    placeholder: string;
-    placeholderVersion: number;
-    loadingState: number;
-    contentScanMetadata: ContentScanMetadata;
-    flags: number;
-    type: string;
-    sourceMetadata: SourceMetadata;
-    original: string;
-    srcIsAnimated: boolean;
-}
-
-interface SourceMetadata {
-    message: Message;
-    identifier: Identifier;
-}
-
-interface Identifier {
-    type: string;
-    attachmentId: string;
-    filename: string;
-    size: number;
-}
-
-interface MessageAttachment extends Attachment {
-    id: string;
-    filename: string;
-    size: number;
-    url: string;
-    proxy_url: string;
-    width: number;
-    height: number;
-    content_type: string;
-    content_scan_version: number;
-    placeholder: string;
-    placeholder_version: number;
-    spoiler: boolean;
-}
-
-interface ContentScanMetadata {
-    version: number;
-    flags: number;
 }

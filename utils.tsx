@@ -5,7 +5,6 @@
  */
 
 import { DataStore } from "@api/index";
-import { getUserSettingLazy } from "@api/UserSettings";
 import { getIntlMessage } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
 import { parseUrl } from "@utils/misc";
@@ -28,7 +27,7 @@ import {
     MessageComponentType,
     ParsedContent,
     ThreadChannel,
-    UnfurledMedia,
+    UnfurledMediaItem,
 } from "./types";
 
 export function indexedDBStorageFactory<T>() {
@@ -173,13 +172,15 @@ export function hasFlag(value: number, flag: number): boolean {
     return (value & flag) === flag;
 }
 
-const imageRegex = /\.(png|jpe?g|webp|gif|heic|heif|dng|avif)$/i;
-function isImage({ filename, height, width }: FullMessageAttachment): boolean {
+export const imageRegex = /\.(png|jpe?g|webp|gif|heic|heif|dng|avif)$/i;
+export const videoRegex = /\.(mp4|webm|mov)$/i;
+export const animatedMediaRegex = /\.(webp|gif|avif)$/i;
+
+export function isImage({ filename, height, width }: FullMessageAttachment): boolean {
     return imageRegex.test(filename) && !!height && !!width;
 }
 
-const videoRegex = /\.(mp4|webm|mov)$/i;
-function isVideo({ filename, proxy_url }: FullMessageAttachment): boolean {
+export function isVideo({ filename, proxy_url }: FullMessageAttachment): boolean {
     return videoRegex.test(filename) && !!proxy_url;
 }
 
@@ -188,153 +189,7 @@ function isMedia(attachment: FullMessageAttachment | null) {
     return isImage(attachment) || isVideo(attachment);
 }
 
-const inlineAttachmentMedia = getUserSettingLazy<boolean>("textAndImages", "inlineAttachmentMedia");
-const inlineEmbedMedia = getUserSettingLazy<boolean>("textAndImages", "inlineEmbedMedia");
-const renderEmbeds = getUserSettingLazy<boolean>("textAndImages", "renderEmbeds");
-
-function parseMessageAttachment(
-    attachment: FullMessageAttachment,
-    mediaIndex: number = 0
-): Attachment | null {
-    const { proxy_url, url, description, flags, width, height, content_scan_version, ...rest } =
-        attachment;
-
-    if (!width || !height) return null;
-
-    const isMediaVideo = isVideo(attachment);
-    const isThumbnail = hasFlag(flags ?? 0, MessageAttachmentFlag.IS_THUMBNAIL);
-    const srcIsAnimated = hasFlag(flags ?? 0, MessageAttachmentFlag.IS_ANIMATED);
-
-    let src = proxy_url || url;
-
-    if (isMediaVideo) {
-        const videoUrl = parseUrl(proxy_url);
-        if (!videoUrl) return null;
-
-        videoUrl.searchParams.append("format", "webp");
-        src = videoUrl.toString();
-    }
-
-    return {
-        type: "attachment",
-        ...rest,
-        src,
-        width,
-        height,
-        flags,
-        contentScanVersion: content_scan_version,
-        alt: description,
-        isVideo: isMediaVideo,
-        isThumbnail,
-        attachmentId: attachment.id,
-        mediaIndex,
-        srcIsAnimated,
-    };
-}
-
-function getAttachments(message: FullMessage | null, inlineAttachmentMedia: boolean): Attachment[] {
-    if (!inlineAttachmentMedia || !message?.attachments) return [];
-
-    return message.attachments
-        .filter(isMedia)
-        .map(parseMessageAttachment)
-        .filter(Boolean) as Attachment[];
-}
-
-const matchesUrlSuffix = (url: string | null | undefined, regex: RegExp) => {
-    if (!url) return false;
-    const [cleanUrl] = url.split(/\?/, 1);
-    return regex.test(cleanUrl);
-};
-
-function parseEmbed(
-    embed: FullEmbed,
-    mediaIndex: number = 0,
-    spoiler?: boolean
-): Attachment | null {
-    const embedImage = embed.image ?? embed.thumbnail ?? embed.images?.[0];
-    if (!embedImage.url) return null;
-
-    const { proxyURL, url, flags, ...rest } = embedImage;
-    const src = proxyURL || url;
-    const isVideo = !!proxyURL && matchesUrlSuffix(proxyURL, videoRegex);
-    const srcIsAnimated = hasFlag(flags ?? 0, MessageAttachmentFlag.IS_ANIMATED);
-
-    return {
-        type: "embed",
-        ...rest,
-        src,
-        spoiler,
-        flags: embed.flags,
-        contentScanVersion: embed.contentScanVersion,
-        isVideo,
-        mediaIndex,
-        srcIsAnimated,
-    };
-}
-
-function getEmbeds(
-    message: FullMessage | null,
-    spoiler: boolean,
-    inlineEmbedMedia: boolean,
-    renderEmbeds: boolean
-): Attachment[] {
-    if (!renderEmbeds || !inlineEmbedMedia || !message?.embeds) return [];
-
-    return message.embeds
-        .map((embed, mediaIndex) => parseEmbed(embed, mediaIndex, spoiler))
-        .filter(Boolean) as Attachment[];
-}
-
-function getComponentMap(
-    components: MessageComponent[]
-): Map<MessageComponent["id"], MessageComponent> {
-    const map = new Map<MessageComponent["id"], MessageComponent>();
-    for (const item of components) flatten(map, item);
-    return map;
-}
-
-function flatten(map: Map<MessageComponent["id"], MessageComponent>, component: MessageComponent) {
-    map.set(component.id, component);
-
-    switch (component.type) {
-        case MessageComponentType.SECTION:
-            flatten(map, component.accessory!);
-        // eslint-disable-next-line no-fallthrough
-        case MessageComponentType.ACTION_ROW:
-        case MessageComponentType.CONTAINER:
-            component.components!.forEach(item => flatten(map, item));
-    }
-}
-
-function getComponentMedia(message: FullMessage, inlineEmbedMedia: boolean) {
-    if (!inlineEmbedMedia || !message?.components) return [];
-
-    const map = getComponentMap(message.components);
-
-    return Array.from(map.values())
-        .flatMap(({ type, media, spoiler, items }) => {
-            switch (type) {
-                case MessageComponentType.THUMBNAIL:
-                    return parseComponent(media!, 0, spoiler);
-                case MessageComponentType.MEDIA_GALLERY:
-                    return items!.map((item, index) =>
-                        parseComponent(item.media!, index, item.spoiler)
-                    );
-                default:
-                    return null;
-            }
-        })
-        .filter(Boolean);
-}
-
-const matchesMimeType = (url: string | null | undefined, type: string) => {
-    if (!url) return false;
-    const [parentType] = url.split("/");
-    return parentType === type;
-};
-
-function getEmbedMediaType(media: UnfurledMedia): "IMAGE" | "VIDEO" | "INVALID" {
+function getEmbedMediaType(media: UnfurledMediaItem): UnfurledMediaItem["type"] {
     return matchesMimeType(media.contentType, "image")
         ? "IMAGE"
         : matchesMimeType(media.contentType, "video") && media.proxyUrl && parseUrl(media.proxyUrl)
@@ -342,48 +197,195 @@ function getEmbedMediaType(media: UnfurledMedia): "IMAGE" | "VIDEO" | "INVALID" 
         : "INVALID";
 }
 
-function parseComponent(
-    media: UnfurledMedia,
-    mediaIndex: number = 0,
-    spoiler?: boolean
-): Attachment | null {
-    const type = getEmbedMediaType(media);
-    if (type === "INVALID") return null;
+export function matchesUrlSuffix(url: string | null | undefined, regex: RegExp) {
+    if (!url) return false;
+    const [cleanUrl] = url.split("?", 1);
+    return regex.test(cleanUrl);
+}
 
-    const contentScanVersion = media.contentScanMetadata?.version;
-    const srcIsAnimated = hasFlag(media.flags ?? 0, MessageAttachmentFlag.IS_ANIMATED);
-    const isVideo = type === "VIDEO";
+export function matchesMimeType(url: string | null | undefined, type: string) {
+    if (!url) return false;
+    const [parentType] = url.split("/");
+    return parentType === type;
+}
 
-    return {
-        type: "component",
-        src: media.proxyUrl,
-        height: media.height ?? 0,
-        width: media.width ?? 0,
-        spoiler: spoiler,
-        contentScanVersion,
-        srcIsAnimated,
-        isVideo,
-        mediaIndex: 0,
-        srcUnfurledMediaItem: media,
+function defineParser<T>(
+    type: Attachment["type"],
+    fn: (first: T) => Omit<Attachment, "type"> | null
+) {
+    return (first: T, mediaIndex = 0, spoiler = false) => {
+        const result = fn(first);
+        return result ? { ...result, mediaIndex, type, spoiler } : null;
     };
 }
-// function N(message, forumChannel, spoiler) {
-//     let allMedia = getAllMedia(message, spoiler);
-//     return r.useMemo(() => {
-//         if (!forumChannel) return [];
-//         if (!forumChannel.isMediaChannel()) return allMedia;
-//         let firstMedia = allMedia.find(e => e.isThumbnail);
-//         return firstMedia ? [firstMedia] : allMedia;
-//     }, [forumChannel, allMedia]);
-// }
-export function getAllMedia(message: FullMessage, spoiler: boolean = false) {
-    const inlineAttachmentMediaVisible = !!inlineAttachmentMedia?.getSetting();
-    const inlineEmbedMediaVisible = !!inlineEmbedMedia?.getSetting();
-    const shouldRenderEmbeds = !!renderEmbeds?.getSetting();
 
-    const attachments = getAttachments(message, inlineAttachmentMediaVisible);
-    const embeds = getEmbeds(message, spoiler, inlineEmbedMediaVisible, shouldRenderEmbeds);
-    const componentMedia = getComponentMedia(message, inlineEmbedMediaVisible);
+const AttachmentParser = {
+    fromMessageAttachment: defineParser<FullMessageAttachment>("attachment", attachment => {
+        const {
+            proxy_url,
+            url,
+            description,
+            flags,
+            width,
+            height,
+            content_scan_version,
+            content_type,
+            placeholder,
+            placeholder_version,
+            ...rest
+        } = attachment;
 
-    return [...attachments, ...embeds, ...componentMedia];
+        if (!width || !height) return null;
+
+        const isMediaVideo = isVideo(attachment);
+        const isThumbnail = hasFlag(flags ?? 0, MessageAttachmentFlag.IS_THUMBNAIL);
+
+        let src = proxy_url || url;
+
+        if (isMediaVideo) {
+            const videoUrl = parseUrl(proxy_url);
+            if (!videoUrl) return null;
+
+            videoUrl.searchParams.append("format", "webp");
+            src = videoUrl.toString();
+        }
+
+        return {
+            ...rest,
+            src,
+            width,
+            height,
+            flags,
+            contentScanVersion: content_scan_version,
+            alt: description,
+            isVideo: isMediaVideo,
+            isThumbnail,
+            attachmentId: attachment.id,
+            contentType: content_type,
+            srcUnfurledMediaItem: {
+                proxyUrl: proxy_url,
+                url,
+                contentScanMetadata: { version: content_scan_version, flags },
+                contentType: content_type,
+                width,
+                height,
+                flags,
+                original: url,
+                placeholder,
+                placeholderVersion: placeholder_version,
+            },
+        };
+    }),
+    fromEmbed: defineParser<FullEmbed>("embed", embed => {
+        const embedImage = embed.image ?? embed.thumbnail ?? embed.images?.[0];
+        if (!embedImage?.url) return null;
+
+        const { proxyURL, url, ...rest } = embedImage;
+
+        const src = proxyURL || url;
+        const isVideo = !!src && matchesUrlSuffix(src, videoRegex);
+
+        return {
+            ...rest,
+            src,
+            contentScanVersion: embed.contentScanVersion,
+            isVideo,
+        };
+    }),
+    fromMedia: defineParser<UnfurledMediaItem>("component", media => {
+        const type = getEmbedMediaType(media);
+        if (type === "INVALID") return null;
+
+        const contentScanVersion = media.contentScanMetadata?.version;
+        const isVideo = type === "VIDEO";
+
+        return {
+            src: media.proxyUrl,
+            height: media.height ?? 0,
+            width: media.width ?? 0,
+            flags: media.flags,
+            contentScanVersion,
+            isVideo,
+            srcUnfurledMediaItem: media,
+            contentType: media.contentType,
+        };
+    }),
+} as const;
+
+function getComponentMap(
+    components: MessageComponent[]
+): Map<MessageComponent["id"], MessageComponent> {
+    const map = new Map<MessageComponent["id"], MessageComponent>();
+    for (const item of components) flattenComponent(map, item);
+    return map;
+}
+
+function flattenComponent(
+    map: Map<MessageComponent["id"], MessageComponent>,
+    component: MessageComponent
+) {
+    map.set(component.id, component);
+
+    switch (component.type) {
+        case MessageComponentType.SECTION:
+            flattenComponent(map, component.accessory!);
+        // eslint-disable-next-line no-fallthrough
+        case MessageComponentType.ACTION_ROW:
+        case MessageComponentType.CONTAINER:
+            component.components!.forEach(item => flattenComponent(map, item));
+    }
+}
+
+export function getAttachments(attachments: FullMessage["attachments"]): Attachment[] {
+    return attachments
+        .filter(isMedia)
+        .map((item, index) => AttachmentParser.fromMessageAttachment(item, index))
+        .filter(Boolean) as Attachment[];
+}
+
+export function getEmbeds(embeds: FullMessage["embeds"], spoiler: boolean): Attachment[] {
+    return embeds
+        .map((embed, mediaIndex) => AttachmentParser.fromEmbed(embed, mediaIndex, spoiler))
+        .filter(Boolean) as Attachment[];
+}
+
+export function getComponentMedia(components: FullMessage["components"]): Attachment[] {
+    const map = getComponentMap(components);
+
+    return Array.from(map.values())
+        .flatMap(({ type, media, spoiler, items }) => {
+            switch (type) {
+                case MessageComponentType.THUMBNAIL:
+                    return AttachmentParser.fromMedia(media!, 0, spoiler);
+                case MessageComponentType.MEDIA_GALLERY:
+                    return items!.map((item, index) =>
+                        AttachmentParser.fromMedia(item.media!, index, item.spoiler)
+                    );
+                default:
+                    return null;
+            }
+        })
+        .filter(Boolean) as Attachment[];
+}
+
+export function unfurlAttachment(
+    attachment: Attachment,
+    message: FullMessage | null = null
+): UnfurledMediaItem {
+    const { flags, isVideo, attachmentId, src, srcUnfurledMediaItem, ...rest } = attachment;
+    const url = srcUnfurledMediaItem?.url || src;
+
+    return {
+        ...rest,
+        src: url,
+        url,
+        proxyUrl: srcUnfurledMediaItem?.proxyUrl || url,
+        original: srcUnfurledMediaItem?.original || url,
+        srcIsAnimated: hasFlag(flags ?? 0, MessageAttachmentFlag.IS_ANIMATED),
+        type: isVideo ? "VIDEO" : "IMAGE",
+        sourceMetadata: {
+            message,
+            identifier: attachmentId ? attachment : null,
+        },
+    };
 }

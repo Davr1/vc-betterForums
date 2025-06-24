@@ -18,10 +18,10 @@ import { FollowButton } from "./FollowButton";
 
 interface BodyProps {
     channel: ThreadChannel;
-    firstMessage: FullMessage | null;
+    message: FullMessage | null;
 }
 
-export const Body = _memo<BodyProps>(function Body({ channel, firstMessage }) {
+export const Body = _memo<BodyProps>(function Body({ channel, message }) {
     const { hasUnreads, isMuted, hasJoined } = useForumPostState(channel);
     const { messagePreviewLineCount, showFollowButton } = settings.use([
         "messagePreviewLineCount",
@@ -43,7 +43,7 @@ export const Body = _memo<BodyProps>(function Body({ channel, firstMessage }) {
     return (
         <Flex className="vc-better-forums-thread-body" direction={Flex.Direction.VERTICAL}>
             <Flex className="vc-better-forums-thread-header" align={Flex.Align.CENTER} grow={0}>
-                <Username channel={channel} user={owner ?? firstMessage?.author ?? null} />
+                <Username channel={channel} user={owner ?? message?.author ?? null} />
                 <Timestamp channel={channel} />
                 {showFollowButton && <FollowButton hasJoined={hasJoined} onClick={followAction} />}
             </Flex>
@@ -68,7 +68,7 @@ export const Body = _memo<BodyProps>(function Body({ channel, firstMessage }) {
             </Heading>
             <MessageContent
                 channel={channel}
-                message={firstMessage}
+                message={message}
                 color="text-secondary"
                 lineClamp={messagePreviewLineCount}
                 messageClassName={

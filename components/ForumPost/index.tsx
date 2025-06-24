@@ -16,7 +16,6 @@ import {
     useFocusRing,
     useForumPostComposerStore,
     useForumPostEvents,
-    useForumPostMetadata,
     useMessageCount,
 } from "../../hooks";
 import { ChannelSectionStore, ChannelStore } from "../../stores";
@@ -51,7 +50,6 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
     );
 
     const { firstMessage } = useFirstMessage(channel);
-    const { firstMedia } = useForumPostMetadata({ firstMessage });
     const { messageCountText } = useMessageCount(channel);
 
     const { ref: ringTarget, width, height } = useFocusRing<HTMLDivElement>();
@@ -82,12 +80,12 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
                     })}
                 >
                     <Flex className="vc-better-forums-thread-body-container">
-                        <ForumPost.Body channel={channel} firstMessage={firstMessage} />
-                        {firstMedia && width >= 500 && <ForumPost.Media {...firstMedia} />}
+                        <ForumPost.Body channel={channel} message={firstMessage} />
+                        {width >= 500 && <ForumPost.Media message={firstMessage} />}
                     </Flex>
                     <ForumPost.Footer
                         channel={channel}
-                        firstMessage={firstMessage}
+                        message={firstMessage}
                         containerWidth={width}
                     />
                 </Flex>

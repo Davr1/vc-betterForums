@@ -49,7 +49,7 @@ export function useMessageContent({
         [message]
     );
 
-    const { content, firstMedia } = useForumPostMetadata({ firstMessage: message });
+    const { content, media } = useForumPostMetadata({ firstMessage: message });
 
     const { contentPlaceholder, renderedContent, leadingIcon, trailingIcon } = useMemo(() => {
         return !message
@@ -72,7 +72,7 @@ export function useMessageContent({
     if (renderedContent)
         return { content: renderedContent, leadingIcon, trailingIcon, systemMessage: false };
 
-    if (!!firstMedia)
+    if (media.length === 0)
         return { content: getIntlMessage("REPLY_QUOTE_NO_TEXT_CONTENT"), ...systemMessage };
 
     if (!message)

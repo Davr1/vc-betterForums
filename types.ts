@@ -139,20 +139,20 @@ export interface Attachment {
     height: number;
     spoiler?: boolean;
     contentScanVersion?: number;
+    contentType?: string;
     isVideo?: boolean;
     isThumbnail?: boolean;
     attachmentId?: string;
     mediaIndex?: number;
-    srcIsAnimated?: boolean;
     alt?: string;
     flags?: MessageAttachmentFlag;
-    srcUnfurledMediaItem?: UnfurledMedia;
+    srcUnfurledMediaItem?: UnfurledMediaItem;
 }
 
 export interface FullMessage extends Omit<Message, "components"> {
     attachments: FullMessageAttachment[];
     embeds: FullEmbed[];
-    components?: MessageComponent[];
+    components: MessageComponent[];
 }
 
 export interface MessageComponent {
@@ -161,23 +161,24 @@ export interface MessageComponent {
     components?: MessageComponent[];
     accessory?: MessageComponent;
     spoiler?: boolean;
-    media?: UnfurledMedia;
+    media?: UnfurledMediaItem;
     description?: string;
     items?: Pick<MessageComponent, "media" | "description" | "spoiler">[];
 }
 
-export interface UnfurledMedia
-    extends Pick<FullMessageAttachment, "url" | "flags" | "width" | "height">,
-        Pick<Image, "srcIsAnimated"> {
+export interface UnfurledMediaItem
+    extends Pick<FullMessageAttachment, "url" | "flags" | "width" | "height"> {
     proxyUrl: FullMessageAttachment["proxy_url"];
-    contentType: FullMessageAttachment["content_type"];
+    contentType?: FullMessageAttachment["content_type"];
     contentScanMetadata?: ContentScanMetadata;
     placeholder?: string;
     placeholderVersion?: number;
     loadingState?: number;
     original?: string;
-    type?: string;
+    type?: "IMAGE" | "VIDEO" | "INVALID";
     sourceMetadata?: SourceMetadata;
+    srcIsAnimated?: boolean;
+    src?: string; // duplicate of url
 }
 
 export interface ContentScanMetadata {
@@ -186,13 +187,8 @@ export interface ContentScanMetadata {
 }
 
 export interface SourceMetadata {
-    message?: Message;
-    identifier?: Partial<{
-        type: string;
-        attachmentId: string;
-        filename: string;
-        size: number;
-    }>;
+    message?: Message | null;
+    identifier?: Partial<Attachment> | null;
 }
 
 export enum MessageAttachmentFlag {
@@ -215,11 +211,11 @@ export interface FullMessageAttachment extends MessageAttachment {
 
 export interface FullEmbed extends Embed, Pick<Attachment, "flags" | "contentScanVersion"> {
     url: string;
-    image: Image;
-    images: Image[];
+    image: EmbedImage;
+    images: EmbedImage[];
 }
 
-interface Image {
+interface EmbedImage {
     url: string;
     proxyURL: string;
     width: number;

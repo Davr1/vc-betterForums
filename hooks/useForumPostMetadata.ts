@@ -9,8 +9,9 @@ import { ReactNode } from "react";
 
 import { findByCodeLazy } from "../../../webpack";
 import { UserSettingsProtoStore } from "../stores";
-import { Attachment, FullMessage } from "../types";
-import { getAllMedia } from "../utils";
+import { FullMessage, UnfurledMediaItem } from "../types";
+import { unfurlAttachment } from "../utils";
+import { useMessageMedia } from "./";
 
 interface Options {
     firstMessage: FullMessage | null;
@@ -21,7 +22,7 @@ interface Options {
 interface ForumPostMetadata {
     hasSpoilerEmbeds?: boolean;
     content: ReactNode;
-    firstMedia: Attachment | null;
+    media: UnfurledMediaItem[];
 }
 
 const parseMessageContent: (
@@ -81,7 +82,11 @@ export function useForumPostMetadata({
         [firstMessage, formatInline, noStyleAndInteraction, shouldFilterKeywords]
     );
 
-    const firstMedia = firstMessage ? getAllMedia(firstMessage, hasSpoilerEmbeds)[0] ?? null : null;
+    const media = useMessageMedia(firstMessage, hasSpoilerEmbeds);
+    const unfurledMedia = useMemo(
+        () => media.map(item => unfurlAttachment(item, firstMessage)),
+        [firstMessage, media]
+    );
 
-    return { content, firstMedia, hasSpoilerEmbeds };
+    return { content, media: unfurledMedia, hasSpoilerEmbeds };
 }

@@ -23,6 +23,7 @@ export { useIsActiveChannelOrUnarchivableThread } from "./useIsActiveChannelOrUn
 export { useMember } from "./useMember";
 export { useMessageContent } from "./useMessageContent";
 export { useMessageCount } from "./useMessageCount";
+export { useMessageMedia } from "./useMessageMedia";
 export { usePreview } from "./usePreview";
 export { useRecentMessage } from "./useRecentMessage";
 export { useRichEditor } from "./useRichEditor";
