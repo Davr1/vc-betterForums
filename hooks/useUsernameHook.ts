@@ -19,5 +19,7 @@ export const useUsernameHook: (
         messageId: Message["id"];
         stopPropagation: boolean;
     }>
-) => (member: Member) => (username: string, channelId: Channel["id"]) => ReactNode =
-    findByCodeLazy("useUsernameHook");
+) => (member: Member) => (username: string, channelId: Channel["id"]) => ReactNode = findByCodeLazy(
+    ".USERNAME",
+    "stopPropagation:"
+);
