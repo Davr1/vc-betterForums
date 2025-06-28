@@ -383,18 +383,19 @@
     line-height: 0;
 }
 
-.vc-better-forums-thumbnail-override {
+.vc-better-forums-thumbnail {
     object-fit: cover;
-    max-height: var(--forum-post-thumbnail-size);
-    max-width: var(--forum-post-thumbnail-size);
     border-radius: var(--radius-sm);
 }
 
-.vc-better-forums-thumbnail-container {
+.vc-better-forums-thumbnail-container,
+.vc-better-forums-thumbnail {
     --forum-post-thumbnail-size: 72px;
 
-    max-height: var(--forum-post-thumbnail-size);
-    max-width: var(--forum-post-thumbnail-size);
+    max-height: var(--forum-post-thumbnail-size) !important;
+    max-width: var(--forum-post-thumbnail-size) !important;
+    min-width: var(--forum-post-thumbnail-size) !important;
+    min-height: var(--forum-post-thumbnail-size) !important;
     overflow: hidden;
 }
 

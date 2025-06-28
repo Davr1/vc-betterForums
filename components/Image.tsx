@@ -4,10 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findComponentByCodeLazy } from "@webpack";
+import { findByPropsLazy } from "@webpack";
 import { ComponentType, HTMLProps, MouseEvent } from "react";
 
 import { BoundingBox, UnfurledMediaItem } from "../types";
+
+export enum MediaLayoutType {
+    STATIC = "STATIC",
+    RESPONSIVE = "RESPONSIVE",
+    MOSAIC = "MOSAIC",
+}
 
 export interface ImageProps
     extends Pick<
@@ -30,7 +36,7 @@ export interface ImageProps
     limitResponsiveWidth?: boolean;
     useFullWidth?: boolean;
     dataSafeSrc?: string;
-    mediaLayoutType?: "STATIC" | "RESPONSIVE" | "MOSAIC";
+    mediaLayoutType?: MediaLayoutType;
     shouldRenderAccessory?: boolean;
     freeze?: boolean;
 }
@@ -46,7 +52,7 @@ interface ImageUtils {
     }) => void;
 }
 
-export const Image = findComponentByCodeLazy<ImageProps>(
+export const Image: ComponentType<ImageProps> & ImageUtils = findByPropsLazy(
     "preloadImage",
     "trackLoadingCompleted"
-) as ReturnType<typeof findComponentByCodeLazy<ImageProps>> & ImageUtils;
+);

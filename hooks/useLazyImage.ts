@@ -7,9 +7,9 @@
 import { findByCodeLazy } from "@webpack";
 import { useCallback, useMemo, useStateFromStores, WindowStore } from "@webpack/common";
 
-import { Image, ImageProps } from "../components/Image";
+import { Image, ImageProps, MediaLayoutType } from "../components/Image";
 import { UnfurledMediaItem } from "../types";
-import { animatedMediaRegex, getPreviewSize, matchesUrlSuffix } from "../utils";
+import { animatedMediaRegex, getPreviewSize, hasVolume, matchesUrlSuffix } from "../utils";
 
 const openMediaViewer: (options: {
     items: Partial<UnfurledMediaItem>[];
@@ -19,11 +19,20 @@ const openMediaViewer: (options: {
     startingIndex?: number;
 }) => void = findByCodeLazy("shouldHideMediaOptions", "LIGHTBOX");
 
-export function useLazyImage(items: UnfurledMediaItem[], mediaIndex: number = 0) {
-    const image = items[mediaIndex];
+interface LazyImageOptions {
+    items: UnfurledMediaItem[];
+    mediaIndex: number;
+    prefferedSize?: number;
+}
+
+export function useLazyImage({ items, prefferedSize, mediaIndex = 0 }: LazyImageOptions) {
+    const image: UnfurledMediaItem | undefined = items[mediaIndex];
 
     const isFocused = useStateFromStores([WindowStore], () => WindowStore.isFocused());
-    const isAnimated = useMemo(() => matchesUrlSuffix(image.url, animatedMediaRegex), [image.url]);
+    const isAnimated = useMemo(
+        () => !!image?.url && matchesUrlSuffix(image.url, animatedMediaRegex),
+        [image?.url]
+    );
 
     const animated = isAnimated && isFocused;
 
@@ -59,5 +68,19 @@ export function useLazyImage(items: UnfurledMediaItem[], mediaIndex: number = 0)
         [image, mediaIndex, items]
     );
 
-    return { ...image, onMouseEnter, onZoom } as const satisfies ImageProps;
+    const size = !prefferedSize
+        ? null
+        : !hasVolume(image)
+        ? { maxWidth: prefferedSize, maxHeight: prefferedSize }
+        : image.width > image.height
+        ? { maxHeight: prefferedSize }
+        : { maxWidth: prefferedSize };
+
+    return {
+        ...image,
+        ...size,
+        onMouseEnter,
+        onZoom,
+        mediaLayoutType: prefferedSize ? MediaLayoutType.RESPONSIVE : MediaLayoutType.STATIC,
+    } as const satisfies ImageProps;
 }

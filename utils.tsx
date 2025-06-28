@@ -392,8 +392,8 @@ export function unfurlAttachment(
     };
 }
 
-function hasVolume(size: Partial<Size>): size is Size {
-    return !!size.width && !!size.height;
+export function hasVolume(size?: Partial<Size>): size is Size {
+    return !!size && !!size.width && !!size.height;
 }
 
 function fitWithinBoundingBox({
