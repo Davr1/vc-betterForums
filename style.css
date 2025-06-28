@@ -602,7 +602,7 @@
     }
 
     .vc-better-forums-color-swatch-empty {
-        color: var(--text-normal);
+        color: var(--text-default);
     }
 
     &:has(input:not(:checked)) {
