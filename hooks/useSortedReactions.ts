@@ -8,9 +8,8 @@ import { useMemo } from "@webpack/common";
 
 import { FullMessage, MessageReactionWithBurst, ReactionType } from "../types";
 
-export function useTopReactions(
-    message: FullMessage,
-    limit?: number
+export function useSortedReactions(
+    message: FullMessage
 ): { id: string; type: ReactionType; count: number; reaction: MessageReactionWithBurst }[] {
     const reactions = message.reactions as MessageReactionWithBurst[];
 
@@ -23,7 +22,6 @@ export function useTopReactions(
                     ? { type: ReactionType.BURST, count: reaction.burst_count }
                     : { type: ReactionType.NORMAL, count: reaction.count }),
             }))
-            .sort((r1, r2) => r2.count - r1.count)
-            .slice(0, limit);
-    }, [reactions, limit]);
+            .sort((r1, r2) => r2.count - r1.count);
+    }, [reactions]);
 }

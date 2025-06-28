@@ -12,30 +12,36 @@ import { _memo } from "../../utils";
 import { DefaultReaction, Reactions } from "../Reaction";
 import { FooterSection } from "./FooterSection";
 
+const reactionsThreshold = 500;
+
 interface FooterProps {
     channel: ThreadChannel;
     message: FullMessage | null;
     containerWidth?: number;
 }
 
-export const Footer = _memo<FooterProps>(function Footer({ channel, message, containerWidth }) {
+export const Footer = _memo<FooterProps>(function Footer({ channel, message, containerWidth = 0 }) {
     const { maxReactionCount, showThreadMembers } = settings.use([
         "maxReactionCount",
         "showThreadMembers",
     ]);
-    const hasReactions = message?.reactions && message.reactions.length > 0;
+
+    const hasReactions =
+        message?.reactions &&
+        message.reactions.length > 0 &&
+        maxReactionCount !== MaxReactionCount.OFF;
 
     return (
         <Flex className="vc-better-forums-footer">
             {showThreadMembers && <FooterSection.Members channel={channel} />}
             <FooterSection.LatestMessage channel={channel} />
             {message &&
-                maxReactionCount !== MaxReactionCount.OFF &&
+                containerWidth >= reactionsThreshold &&
                 (hasReactions ? (
                     <Reactions
                         firstMessage={message}
                         channel={channel}
-                        maxWidth={containerWidth ? containerWidth - 500 : undefined}
+                        maxWidth={containerWidth - 500}
                         maxCount={
                             maxReactionCount !== MaxReactionCount.ALL ? maxReactionCount : undefined
                         }

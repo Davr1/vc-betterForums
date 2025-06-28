@@ -442,12 +442,6 @@
     display: contents;
 }
 
-.vc-better-forums-reactions {
-    display: flex;
-    flex-direction: row-reverse;
-    gap: var(--space-6);
-}
-
 .vc-better-forums-reaction {
     &,
     & > div {
@@ -455,7 +449,11 @@
     }
 }
 
-.vc-better-forums-reaction-hidden {
+.vc-better-forums-dynamic-item {
+    display: flex;
+}
+
+.vc-better-forums-dynamic-item-hidden {
     visibility: hidden;
     position: absolute;
     pointer-events: none;

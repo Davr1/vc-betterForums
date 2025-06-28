@@ -69,7 +69,7 @@ export const settings = definePluginSettings({
         type: OptionType.SLIDER,
         description:
             "Maximum number of media items (from attachments, embeds, or message components) to show",
-        default: 1,
+        default: 3,
         markers: [MaxMediaCount.OFF, ...makeRange(1, 5), MaxMediaCount.ALL],
         stickToMarkers: true,
         componentProps: {
