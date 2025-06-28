@@ -26,6 +26,8 @@ export const Footer = _memo<FooterProps>(function Footer({ channel, message, con
         "showThreadMembers",
     ]);
 
+    const maxCount = maxReactionCount !== MaxReactionCount.ALL ? maxReactionCount : undefined;
+
     const hasReactions =
         message?.reactions &&
         message.reactions.length > 0 &&
@@ -36,15 +38,12 @@ export const Footer = _memo<FooterProps>(function Footer({ channel, message, con
             {showThreadMembers && <FooterSection.Members channel={channel} />}
             <FooterSection.LatestMessage channel={channel} />
             {message &&
-                containerWidth >= reactionsThreshold &&
                 (hasReactions ? (
                     <Reactions
                         firstMessage={message}
                         channel={channel}
                         maxWidth={containerWidth - 500}
-                        maxCount={
-                            maxReactionCount !== MaxReactionCount.ALL ? maxReactionCount : undefined
-                        }
+                        maxCount={maxCount}
                     />
                 ) : (
                     <DefaultReaction firstMessage={message} channel={channel} />

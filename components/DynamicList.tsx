@@ -13,20 +13,22 @@ interface DynamicListProps<TItem, TChildElement extends HTMLElement> {
     items: TItem[];
     maxCount?: number;
     maxWidth?: number;
-    children: (item: TItem, ref: Ref<TChildElement>, index: number) => ReactNode;
+    children: (item: TItem, ref: Ref<TChildElement>, index: number, max: number) => ReactNode;
     predicate?: (item: TItem, index: number, max: number) => boolean;
+    renderFallback?: () => ReactNode;
     gap?: number;
     align?: string;
     direction?: string;
     className?: string;
 }
 
-export const DynamicList = function DynamicList<TItem, TChildElement extends HTMLElement>({
+export function DynamicList<TItem, TChildElement extends HTMLElement>({
     items,
     maxCount,
     maxWidth,
     children,
     predicate,
+    renderFallback,
     align,
     direction,
     gap,
@@ -35,7 +37,7 @@ export const DynamicList = function DynamicList<TItem, TChildElement extends HTM
     const itemCount =
         typeof maxCount === "number" ? Math.min(items.length, maxCount) : items.length;
 
-    const [visible, setVisible] = useState(itemCount);
+    const [max, setMax] = useState(itemCount);
     const refs = useRef<Array<TChildElement | null>>([]);
 
     if (itemCount !== refs.current.length) {
@@ -44,7 +46,7 @@ export const DynamicList = function DynamicList<TItem, TChildElement extends HTM
 
     useLayoutEffect(() => {
         if (!maxWidth) {
-            setVisible(itemCount);
+            setMax(itemCount);
             return;
         }
 
@@ -59,10 +61,35 @@ export const DynamicList = function DynamicList<TItem, TChildElement extends HTM
             count++;
         }
 
-        setVisible(count);
+        setMax(count);
     }, [maxWidth, items, itemCount, gap]);
 
-    if (itemCount === 0) return null;
+    let visibleCount = 0;
+
+    const renderedItems = items.slice(0, itemCount).map((item, i) => {
+        const isVisible = predicate ? predicate(item, i, max) : i < max;
+        if (isVisible) visibleCount++;
+
+        return (
+            <div
+                key={i}
+                className={cl("vc-better-forums-dynamic-item", {
+                    "vc-better-forums-dynamic-item-hidden": !isVisible,
+                })}
+            >
+                {children(
+                    item,
+                    ref => {
+                        refs.current[i] = ref;
+                    },
+                    i,
+                    max
+                )}
+            </div>
+        );
+    });
+
+    if (itemCount === 0) return renderFallback?.() ?? null;
 
     return (
         <Flex
@@ -73,24 +100,8 @@ export const DynamicList = function DynamicList<TItem, TChildElement extends HTM
             direction={direction}
             style={{ gap, margin: 0 }}
         >
-            {items.slice(0, itemCount).map((item, i) => (
-                <div
-                    key={i}
-                    className={cl("vc-better-forums-dynamic-item", {
-                        "vc-better-forums-dynamic-item-hidden": predicate
-                            ? !predicate(item, i, visible)
-                            : i >= visible,
-                    })}
-                >
-                    {children(
-                        item,
-                        ref => {
-                            refs.current[i] = ref;
-                        },
-                        i
-                    )}
-                </div>
-            ))}
+            {renderedItems}
+            {visibleCount === 0 && renderFallback?.()}
         </Flex>
     );
-};
+}

@@ -4,14 +4,17 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex } from "@webpack/common";
+import { Flex, Text, useCallback } from "@webpack/common";
+import { TextProps } from "@webpack/types";
 import { CSSProperties, Ref } from "react";
 
+import { cl } from "../..";
 import { useForumPostMetadata, useLazyImage } from "../../hooks";
 import { MaxMediaCount, settings } from "../../settings";
 import { FullMessage, UnfurledMediaItem } from "../../types";
 import { _memo } from "../../utils";
 import { DynamicList } from "../DynamicList";
+import { Icons } from "../icons";
 import { Image } from "../Image";
 
 interface MediaProps {
@@ -23,7 +26,9 @@ export const Media = _memo<MediaProps>(function Media({ message, maxWidth }) {
     const { media } = useForumPostMetadata({ firstMessage: message });
     const { maxMediaCount, mediaSize } = settings.use(["maxMediaCount", "mediaSize"]);
 
-    if (!message || media.length === 0 || maxMediaCount === MaxMediaCount.OFF) return null;
+    const renderFallback = useCallback(() => <MediaCount count={media.length} />, [media.length]);
+
+    if (!message || media.length === 0) return null;
 
     return (
         <DynamicList
@@ -32,9 +37,16 @@ export const Media = _memo<MediaProps>(function Media({ message, maxWidth }) {
             maxWidth={maxWidth}
             gap={6}
             direction={Flex.Direction.HORIZONTAL_REVERSE}
+            renderFallback={renderFallback}
         >
-            {(_, ref: Ref<HTMLDivElement>, index) => (
-                <MediaItem items={media} mediaIndex={index} prefferedSize={mediaSize} ref={ref} />
+            {(_, ref: Ref<HTMLDivElement>, index, max) => (
+                <MediaItem
+                    items={media}
+                    mediaIndex={index}
+                    prefferedSize={mediaSize}
+                    ref={ref}
+                    extraCount={index === 0 ? Math.max(media.length - max, 0) : 0}
+                />
             )}
         </DynamicList>
     );
@@ -43,7 +55,8 @@ export const Media = _memo<MediaProps>(function Media({ message, maxWidth }) {
 interface MediaItemProps {
     items: UnfurledMediaItem[];
     mediaIndex: number;
-    prefferedSize?: number;
+    prefferedSize?: number | null;
+    extraCount?: number | null;
     ref?: Ref<HTMLDivElement>;
 }
 
@@ -51,18 +64,21 @@ const MediaItem = _memo<MediaItemProps>(function MediaItem({
     items,
     mediaIndex = 0,
     prefferedSize,
+    extraCount = 0,
     ref,
 }) {
     const props = useLazyImage({ items, mediaIndex, prefferedSize });
+    const style = prefferedSize
+        ? ({
+              "--forum-post-thumbnail-size": `${prefferedSize}px`,
+          } as CSSProperties)
+        : {};
 
     return (
         <div
+            className="vc-better-forums-media-item"
             onClick={e => e.stopPropagation()}
-            style={
-                {
-                    "--forum-post-thumbnail-size": `${prefferedSize}px`,
-                } as CSSProperties
-            }
+            style={style}
             ref={ref}
         >
             <Image
@@ -70,6 +86,43 @@ const MediaItem = _memo<MediaItemProps>(function MediaItem({
                 className="vc-better-forums-thumbnail-container"
                 imageClassName="vc-better-forums-thumbnail"
             />
+            <MediaCount
+                count={extraCount}
+                className="vc-better-forums-thumbnail-decorator-overlay"
+                variant="text-sm/semibold"
+                color="text-primary"
+                isExtra
+                displayIcon={!prefferedSize || prefferedSize > 48}
+            />
         </div>
+    );
+});
+
+interface MediaCountProps extends TextProps {
+    count?: number | null;
+    isExtra?: boolean;
+    displayIcon?: boolean;
+}
+
+const MediaCount = _memo<MediaCountProps>(function MediaCount({
+    count,
+    className,
+    isExtra,
+    displayIcon = true,
+    ...props
+}) {
+    if (!count) return null;
+
+    return (
+        <Text
+            variant="text-sm/normal"
+            color="text-secondary"
+            className={cl("vc-better-forums-thumbnail-decorator", className)}
+            {...props}
+        >
+            {isExtra ? "+" : null}
+            {count}
+            {displayIcon && <Icons.Image size="1em" />}
+        </Text>
     );
 });

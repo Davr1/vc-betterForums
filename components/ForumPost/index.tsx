@@ -31,7 +31,7 @@ const ClickableWithRing: ComponentType<
     }
 > = Clickable;
 
-const mediaThreshold = 450;
+const mediaThreshold = 500;
 
 interface ForumPostProps {
     goToThread: (channel: Channel, shiftKey: boolean) => void;
@@ -83,12 +83,7 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
                 >
                     <Flex className="vc-better-forums-thread-body-container">
                         <ForumPost.Body channel={channel} message={firstMessage} />
-                        {width >= mediaThreshold && (
-                            <ForumPost.Media
-                                message={firstMessage}
-                                maxWidth={width - mediaThreshold}
-                            />
-                        )}
+                        <ForumPost.Media message={firstMessage} maxWidth={width - mediaThreshold} />
                     </Flex>
                     <ForumPost.Footer
                         channel={channel}

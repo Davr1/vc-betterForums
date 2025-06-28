@@ -22,7 +22,7 @@ const openMediaViewer: (options: {
 interface LazyImageOptions {
     items: UnfurledMediaItem[];
     mediaIndex: number;
-    prefferedSize?: number;
+    prefferedSize?: number | null;
 }
 
 export function useLazyImage({ items, prefferedSize, mediaIndex = 0 }: LazyImageOptions) {

@@ -25,6 +25,10 @@
     }
 }
 
+.vc-better-forums-thread-body-container {
+    position: relative;
+}
+
 .vc-better-forums-thread-body-container,
 .vc-better-forums-thread-body,
 .vc-better-forums-thread-header,
@@ -451,6 +455,7 @@
 
 .vc-better-forums-dynamic-item {
     display: flex;
+    width: max-content;
 }
 
 .vc-better-forums-dynamic-item-hidden {
@@ -659,4 +664,32 @@
 
 .vc-better-forums-channel-mention {
     white-space: nowrap;
+}
+
+.vc-better-forums-thumbnail-decorator {
+    position: absolute;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xxs);
+    white-space: nowrap;
+    transition: opacity 100ms ease;
+}
+
+.vc-better-forums-thumbnail-decorator-overlay {
+    right: 6px;
+    bottom: 6px;
+    background-color: #202225cc;
+    border-radius: 4px;
+    padding: 2px 4px;
+}
+
+.vc-better-forums-media-item {
+    position: relative;
+    display: flex;
+    height: max-content;
+
+    &:hover .vc-better-forums-thumbnail-decorator {
+        opacity: 0;
+    }
 }
