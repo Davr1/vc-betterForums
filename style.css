@@ -674,6 +674,7 @@
     gap: var(--space-xxs);
     white-space: nowrap;
     transition: opacity 100ms ease;
+    pointer-events: none;
 }
 
 .vc-better-forums-thumbnail-decorator-overlay {
