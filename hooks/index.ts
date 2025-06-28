@@ -20,6 +20,7 @@ export { useForumPostEvents } from "./useForumPostEvents";
 export { useForumPostMetadata } from "./useForumPostMetadata";
 export { useForumPostState } from "./useForumPostState";
 export { useIsActiveChannelOrUnarchivableThread } from "./useIsActiveChannelOrUnarchivableThread";
+export { useLazyImage } from "./useLazyImage";
 export { useMember } from "./useMember";
 export { useMessageContent } from "./useMessageContent";
 export { useMessageCount } from "./useMessageCount";

@@ -4,12 +4,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByCodeLazy, findByPropsLazy, proxyLazyWebpack } from "@webpack";
-import { React, useCallback, useMemo, useStateFromStores, WindowStore } from "@webpack/common";
+import { proxyLazyWebpack } from "@webpack";
+import { React } from "@webpack/common";
 
-import { useForumPostMetadata } from "../../hooks";
+import { useForumPostMetadata, useLazyImage } from "../../hooks";
 import { FullMessage, UnfurledMediaItem } from "../../types";
-import { _memo, animatedMediaRegex, matchesUrlSuffix } from "../../utils";
+import { _memo } from "../../utils";
+import { Image } from "../Image";
 
 const MediaContext = proxyLazyWebpack(() =>
     React.createContext<{ message: FullMessage; media: UnfurledMediaItem[] } | null>(null)
@@ -30,7 +31,6 @@ export const Media = _memo<MediaProps>(function Media({ message }) {
                     <ImagePreview
                         mediaIndex={index}
                         key={index}
-                        containerClassName="vc-better-forums-thumbnail-container"
                         imageClassName="vc-better-forums-thumbnail-override"
                     />
                 ))}
@@ -39,69 +39,15 @@ export const Media = _memo<MediaProps>(function Media({ message }) {
     );
 });
 
-const Img = findByPropsLazy("preloadImage", "trackLoadingCompleted");
-const openMediaViewer: (options: {
-    items: Partial<UnfurledMediaItem>[];
-    shouldHideMediaOptions?: boolean;
-    location?: string;
-    contextKey?: "default" | "popout";
-    startingIndex?: number;
-}) => void = findByCodeLazy("shouldHideMediaOptions", "LIGHTBOX");
-
 interface ImagePreviewProps {
     mediaIndex: number;
-    containerClassName?: string;
     imageClassName?: string;
 }
 
-function ImagePreview({ mediaIndex, containerClassName, imageClassName }: ImagePreviewProps) {
+function ImagePreview({ mediaIndex, imageClassName }: ImagePreviewProps) {
     const value = React.useContext(MediaContext);
-    const image = value?.media[mediaIndex]!;
 
-    const { url, width, height } = image;
+    const props = useLazyImage(value?.media ?? [], mediaIndex);
 
-    const isFocused = useStateFromStores([WindowStore], () => WindowStore.isFocused());
-    const isAnimated = useMemo(() => matchesUrlSuffix(url, animatedMediaRegex), [url]);
-
-    const animated = isAnimated && isFocused;
-
-    const onMouseEnter = useCallback(() => {
-        Img.preloadImage({
-            src: url,
-            dimensions: {
-                maxWidth: width,
-                maxHeight: height,
-                imageWidth: width,
-                imageHeight: height,
-            },
-            options: {},
-        });
-    }, [image]);
-
-    const onZoom = useCallback(
-        e => {
-            e.currentTarget instanceof Element && e.currentTarget.blur();
-
-            openMediaViewer({
-                items: value?.media ?? [],
-                shouldHideMediaOptions: false,
-                location: "LazyImageZoomable",
-                contextKey: "default",
-                startingIndex: mediaIndex,
-            });
-        },
-        [image, mediaIndex, value?.media]
-    );
-
-    return (
-        <Img
-            onZoom={onZoom}
-            onMouseEnter={onMouseEnter}
-            shouldAnimate={animated}
-            src={url}
-            {...image}
-            containerClassName={containerClassName}
-            imageClassName={imageClassName}
-        />
-    );
+    return <Image {...props} imageClassName={imageClassName} />;
 }

@@ -18,6 +18,7 @@ import { ComponentType } from "react";
 import { Icons } from "./components/icons";
 import {
     Attachment,
+    BoundingBox,
     CustomTag,
     FullEmbed,
     FullMessage,
@@ -26,6 +27,7 @@ import {
     MessageComponent,
     MessageComponentType,
     ParsedContent,
+    Size,
     ThreadChannel,
     UnfurledMediaItem,
 } from "./types";
@@ -168,8 +170,8 @@ export function closeAllScreens(): void {
     FluxDispatcher.dispatch({ type: "LAYER_POP_ALL" });
 }
 
-export function hasFlag(value: number, flag: number): boolean {
-    return (value & flag) === flag;
+export function hasFlag(value: number | undefined | null, flag: number): boolean {
+    return !!value && (value & flag) === flag;
 }
 
 export const imageRegex = /\.(png|jpe?g|webp|gif|heic|heif|dng|avif)$/i;
@@ -225,7 +227,7 @@ const AttachmentParser = {
             proxy_url,
             url,
             description,
-            flags,
+            flags = 0,
             width,
             height,
             content_scan_version,
@@ -238,7 +240,7 @@ const AttachmentParser = {
         if (!width || !height) return null;
 
         const isMediaVideo = isVideo(attachment);
-        const isThumbnail = hasFlag(flags ?? 0, MessageAttachmentFlag.IS_THUMBNAIL);
+        const isThumbnail = hasFlag(flags, MessageAttachmentFlag.IS_THUMBNAIL);
 
         let src = proxy_url || url;
 
@@ -296,18 +298,18 @@ const AttachmentParser = {
         const type = getEmbedMediaType(media);
         if (type === "INVALID") return null;
 
+        const { proxyUrl, width, height, contentScanMetadata, ...rest } = media;
         const contentScanVersion = media.contentScanMetadata?.version;
         const isVideo = type === "VIDEO";
 
         return {
-            src: media.proxyUrl,
-            height: media.height ?? 0,
-            width: media.width ?? 0,
-            flags: media.flags,
+            ...rest,
+            src: proxyUrl,
+            height: height ?? 0,
+            width: width ?? 0,
             contentScanVersion,
             isVideo,
             srcUnfurledMediaItem: media,
-            contentType: media.contentType,
         };
     }),
 } as const;
@@ -372,20 +374,72 @@ export function unfurlAttachment(
     attachment: Attachment,
     message: FullMessage | null = null
 ): UnfurledMediaItem {
-    const { flags, isVideo, attachmentId, src, srcUnfurledMediaItem, ...rest } = attachment;
-    const url = srcUnfurledMediaItem?.url || src;
+    const { flags = 0, isVideo, attachmentId, src, srcUnfurledMediaItem, ...rest } = attachment;
 
     return {
         ...rest,
-        src: url,
-        url,
-        proxyUrl: srcUnfurledMediaItem?.proxyUrl || url,
-        original: srcUnfurledMediaItem?.original || url,
-        srcIsAnimated: hasFlag(flags ?? 0, MessageAttachmentFlag.IS_ANIMATED),
+        flags,
+        src,
+        url: src,
+        proxyUrl: srcUnfurledMediaItem?.proxyUrl || src,
+        original: srcUnfurledMediaItem?.original || src,
+        srcIsAnimated: hasFlag(flags, MessageAttachmentFlag.IS_ANIMATED),
         type: isVideo ? "VIDEO" : "IMAGE",
         sourceMetadata: {
             message,
             identifier: attachmentId ? attachment : null,
         },
     };
+}
+
+function hasVolume(size: Partial<Size>): size is Size {
+    return !!size.width && !!size.height;
+}
+
+function fitWithinBoundingBox({
+    width,
+    height,
+    maxWidth = window.innerWidth,
+    maxHeight = window.innerHeight,
+    minWidth = 0,
+    minHeight = 0,
+}: BoundingBox): Size {
+    if (width !== maxWidth || height !== maxHeight) {
+        const wRatio = width > maxWidth ? maxWidth / width : 1;
+        width = Math.max(Math.round(width * wRatio), minWidth);
+        height = Math.max(Math.round(height * wRatio), minHeight);
+
+        const hRatio = height > maxHeight ? maxHeight / height : 1;
+        width = Math.max(Math.round(width * hRatio), minWidth);
+        height = Math.max(Math.round(height * hRatio), minHeight);
+    }
+
+    return { width, height };
+}
+
+const buttonSize = 40;
+const toolbar = Object.freeze({ width: 236, height: buttonSize });
+const safezone = Object.freeze({ inline: 24, block: 36 });
+const gap = 12;
+
+export function getPreviewSize(hasMultiple: boolean, size: Partial<Size>): Size {
+    const { innerWidth, innerHeight } = window;
+    const widestPreview = {
+        maxWidth: innerWidth - 2 * (safezone.inline + (hasMultiple ? buttonSize + gap : 0)),
+        maxHeight: innerHeight - 2 * (safezone.block + toolbar.height + gap),
+    };
+
+    if (!hasVolume(size)) {
+        return { width: widestPreview.maxWidth, height: widestPreview.maxHeight };
+    }
+
+    const tallestPreview = {
+        maxWidth: innerWidth - 2 * (safezone.inline + toolbar.width + gap),
+        maxHeight: innerHeight - 2 * (safezone.block + (hasMultiple ? toolbar.height + gap : 0)),
+    };
+
+    const widestFit = fitWithinBoundingBox({ ...size, ...widestPreview });
+    const tallestFit = fitWithinBoundingBox({ ...size, ...tallestPreview });
+
+    return widestFit.width >= tallestFit.width ? widestFit : tallestFit;
 }

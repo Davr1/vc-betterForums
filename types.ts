@@ -179,6 +179,7 @@ export interface UnfurledMediaItem
     sourceMetadata?: SourceMetadata;
     srcIsAnimated?: boolean;
     src?: string; // duplicate of url
+    alt?: string;
 }
 
 export interface ContentScanMetadata {
@@ -192,6 +193,7 @@ export interface SourceMetadata {
 }
 
 export enum MessageAttachmentFlag {
+    NONE = 0,
     IS_CLIP = 1 << 0,
     IS_THUMBNAIL = 1 << 1,
     IS_REMIX = 1 << 2,
@@ -259,3 +261,6 @@ export enum MessageComponentType {
     CONTENT_INVENTORY_ENTRY = 16,
     CONTAINER = 17,
 }
+
+export type Size = Record<"width" | "height", number>;
+export type BoundingBox = Size & Partial<Record<`${"max" | "min"}${"Width" | "Height"}`, number>>;
