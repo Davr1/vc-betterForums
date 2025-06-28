@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { GuildStore, useEffect, useStateFromStores } from "@webpack/common";
+import { GuildRoleStore, GuildStore, useEffect, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
 import { GuildMemberRequesterStore, GuildMemberStore, RelationshipStore } from "../stores";
@@ -28,10 +28,10 @@ export function useMember(user: FullUser | null, channel: Channel): Member {
     );
 
     const { guild, guildRoles } = useStateFromStores(
-        [GuildStore],
+        [GuildStore, GuildRoleStore],
         () => {
             const guild = GuildStore.getGuild(guildId);
-            const guildRoles = guild ? GuildStore.getRoles(guild.id) : undefined;
+            const guildRoles = guild ? GuildRoleStore.getRoles(guild.id) : undefined;
             return { guild, guildRoles };
         },
         [guildId]
