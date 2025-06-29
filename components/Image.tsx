@@ -25,7 +25,7 @@ export interface ImageProps
     zoomThumbnailPlaceholder?: string;
     onZoom: (
         event: MouseEvent<HTMLDivElement>,
-        context: { trigger: "CLICK" } & Pick<ImageProps, "zoomThumbnailPlaceholder">
+        context?: { trigger: "CLICK" } & Pick<ImageProps, "zoomThumbnailPlaceholder">
     ) => void;
     shouldLink?: boolean;
     autoPlay?: boolean;

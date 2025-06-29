@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex, Text, useCallback } from "@webpack/common";
+import { Flex, Text, Tooltip, useCallback } from "@webpack/common";
 import { TextProps } from "@webpack/types";
 import { CSSProperties, Ref } from "react";
 
@@ -26,7 +26,25 @@ export const Media = _memo<MediaProps>(function Media({ message, maxWidth }) {
     const { media } = useForumPostMetadata({ firstMessage: message });
     const { maxMediaCount, mediaSize } = settings.use(["maxMediaCount", "mediaSize"]);
 
-    const renderFallback = useCallback(() => <MediaCount count={media.length} />, [media.length]);
+    const { onMouseEnter, onZoom } = useLazyImage({ items: media });
+    const renderFallback = useCallback(
+        () => (
+            <Tooltip text="View media">
+                {props => (
+                    <MediaCount
+                        count={media.length}
+                        {...props}
+                        onMouseEnter={e => {
+                            onMouseEnter(e);
+                            props.onMouseEnter();
+                        }}
+                        onClick={onZoom}
+                    />
+                )}
+            </Tooltip>
+        ),
+        [media, onMouseEnter, onZoom]
+    );
 
     if (!message || media.length === 0) return null;
 
@@ -116,7 +134,6 @@ const MediaCount = _memo<MediaCountProps>(function MediaCount({
     return (
         <Text
             variant="text-sm/normal"
-            color="text-secondary"
             className={cl("vc-better-forums-thumbnail-decorator", className)}
             {...props}
         >

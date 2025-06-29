@@ -9,7 +9,7 @@ import { getIntlMessage } from "@utils/discord";
 import { LazyComponent } from "@utils/lazyReact";
 import { parseUrl } from "@utils/misc";
 import { ModalAPI } from "@utils/modal";
-import { findByProps, findByPropsLazy, proxyLazyWebpack } from "@webpack";
+import { findByCodeLazy, findByProps, findByPropsLazy, proxyLazyWebpack } from "@webpack";
 import { FluxDispatcher, IconUtils, React } from "@webpack/common";
 import { CustomEmoji, UnicodeEmoji } from "@webpack/types";
 import { Channel, Message } from "discord-types/general";
@@ -443,3 +443,11 @@ export function getPreviewSize(hasMultiple: boolean, size: Partial<Size>): Size 
 
     return widestFit.width >= tallestFit.width ? widestFit : tallestFit;
 }
+
+export const openMediaViewer: (options: {
+    items: Partial<UnfurledMediaItem>[];
+    shouldHideMediaOptions?: boolean;
+    location?: string;
+    contextKey?: "default" | "popout";
+    startingIndex?: number;
+}) => void = findByCodeLazy("shouldHideMediaOptions", "LIGHTBOX");

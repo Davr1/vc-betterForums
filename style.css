@@ -667,14 +667,18 @@
 }
 
 .vc-better-forums-thumbnail-decorator {
+    color: var(--interactive-normal);
     position: absolute;
     right: 0;
     display: flex;
     align-items: center;
     gap: var(--space-xxs);
     white-space: nowrap;
-    transition: opacity 100ms ease;
-    pointer-events: none;
+    transition: color 150ms ease, opacity 100ms ease;
+
+    &:hover {
+        color: var(--interactive-active);
+    }
 }
 
 .vc-better-forums-thumbnail-decorator-overlay {
@@ -683,6 +687,7 @@
     background-color: #202225cc;
     border-radius: 4px;
     padding: 2px 4px;
+    pointer-events: none;
 }
 
 .vc-better-forums-media-item {

@@ -4,24 +4,21 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByCodeLazy } from "@webpack";
 import { useCallback, useMemo, useStateFromStores, WindowStore } from "@webpack/common";
 
 import { Image, ImageProps, MediaLayoutType } from "../components/Image";
 import { UnfurledMediaItem } from "../types";
-import { animatedMediaRegex, getPreviewSize, hasVolume, matchesUrlSuffix } from "../utils";
-
-const openMediaViewer: (options: {
-    items: Partial<UnfurledMediaItem>[];
-    shouldHideMediaOptions?: boolean;
-    location?: string;
-    contextKey?: "default" | "popout";
-    startingIndex?: number;
-}) => void = findByCodeLazy("shouldHideMediaOptions", "LIGHTBOX");
+import {
+    animatedMediaRegex,
+    getPreviewSize,
+    hasVolume,
+    matchesUrlSuffix,
+    openMediaViewer,
+} from "../utils";
 
 interface LazyImageOptions {
     items: UnfurledMediaItem[];
-    mediaIndex: number;
+    mediaIndex?: number;
     prefferedSize?: number | null;
 }
 
