@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { lodash, useStateFromStores } from "@webpack/common";
+import { lodash } from "@webpack/common";
 
 import { ThreadMembersStore } from "../../../stores";
 import { ThreadChannel } from "../../../types";
@@ -18,11 +18,10 @@ interface MembersSectionProps {
 }
 
 export const MembersSection = _memo<MembersSectionProps>(function MembersSection({ channel }) {
-    const { count, memberIds } = useStateFromStores(
-        [ThreadMembersStore],
-        () => ({
-            count: ThreadMembersStore.getMemberCount(channel.id) ?? 0,
-            memberIds: ThreadMembersStore.getMemberIdsPreview(channel.id) ?? [],
+    const { count, memberIds } = ThreadMembersStore.use(
+        $ => ({
+            count: $.getMemberCount(channel.id) ?? 0,
+            memberIds: $.getMemberIdsPreview(channel.id) ?? [],
         }),
         [channel.id],
         lodash.isEqual

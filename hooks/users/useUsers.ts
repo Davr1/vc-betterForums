@@ -4,15 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { useEffect, UserStore, useStateFromStores } from "@webpack/common";
+import { useEffect } from "@webpack/common";
 import { Guild, User } from "discord-types/general";
 
-import { MissingGuildMemberStore } from "../../stores";
+import { MissingGuildMemberStore, UserStore } from "../../stores";
 
 export function useUsers(guildId: Guild["id"], userIds: User["id"][], limit?: number) {
-    const users = useStateFromStores(
-        [UserStore],
-        () => userIds.map(UserStore.getUser).filter(Boolean).slice(0, limit),
+    const users = UserStore.use(
+        $ => userIds.map($.getUser).filter(Boolean).slice(0, limit),
         [userIds, limit]
     );
 

@@ -4,17 +4,18 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { MessageStore, useStateFromStores } from "@webpack/common";
+import { MessageStore } from "@webpack/common";
 
 import { ForumPostMessagesStore, ThreadMessageStore } from "../../stores";
 import { FullMessage, ThreadChannel } from "../../types";
+import { useStores } from "../misc/useStores";
 
 export function useRecentMessage(channel: ThreadChannel): FullMessage | null {
-    return useStateFromStores(
+    return useStores(
         [ThreadMessageStore, ForumPostMessagesStore, MessageStore],
-        () => {
-            const recentMessage = ThreadMessageStore.getMostRecentMessage(channel.id);
-            const { firstMessage } = ForumPostMessagesStore.getMessage(channel.id);
+        (threadMessageStore, forumPostMessagesStore, messageStore) => {
+            const recentMessage = threadMessageStore.getMostRecentMessage(channel.id);
+            const { firstMessage } = forumPostMessagesStore.getMessage(channel.id);
 
             if (recentMessage && recentMessage.id !== firstMessage?.id) return recentMessage;
 
@@ -22,7 +23,7 @@ export function useRecentMessage(channel: ThreadChannel): FullMessage | null {
             if (channel.lastMessageId === firstMessage?.id) return null;
 
             return (
-                (MessageStore.getMessage(channel.id, channel.lastMessageId) as FullMessage) ?? null
+                (messageStore.getMessage(channel.id, channel.lastMessageId) as FullMessage) ?? null
             );
         },
         [channel.id, channel.lastMessageId]

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { PermissionsBits, useStateFromStores } from "@webpack/common";
+import { PermissionsBits } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
 import {
@@ -23,27 +23,26 @@ export function useCheckPermissions(
     boolean
 > {
     const guildId = channel?.getGuildId();
-    const canChat = useStateFromStores(
-        [GuildVerificationStore],
-        () => !guildId || GuildVerificationStore.canChatInGuild(guildId),
+
+    const canChat = GuildVerificationStore.use(
+        $ => !guildId || $.canChatInGuild(guildId),
         [guildId]
     );
-    const isLurking = useStateFromStores(
-        [LurkingStore],
-        () => !!guildId && LurkingStore.isLurking(guildId),
+
+    const isLurking = LurkingStore.use($ => !!guildId && $.isLurking(guildId), [guildId]);
+
+    const isGuest = GuildMemberStore.use(
+        $ => !!guildId && $.isCurrentUserGuest(guildId),
         [guildId]
     );
-    const isGuest = useStateFromStores(
-        [GuildMemberStore],
-        () => !!guildId && GuildMemberStore.isCurrentUserGuest(guildId),
-        [guildId]
-    );
-    const canAddNewReactions = useStateFromStores(
-        [PermissionStore],
-        () => canChat && PermissionStore.can(PermissionsBits.ADD_REACTIONS, channel),
+
+    const canAddNewReactions = PermissionStore.use(
+        $ => canChat && $.can(PermissionsBits.ADD_REACTIONS, channel),
         [canChat, channel]
     );
+
     const isActiveChannelOrUnarchivableThread = useIsActiveChannelOrUnarchivableThread(channel);
+
     if (!channel)
         return {
             disableReactionReads: true,

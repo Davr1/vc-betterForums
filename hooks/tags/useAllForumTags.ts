@@ -4,27 +4,19 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { useStateFromStores } from "@webpack/common";
-
 import { ChannelStore } from "../../stores";
 import { CustomTag } from "../../types";
 
 export function useAllForumTags(): Map<CustomTag["id"], CustomTag> {
-    return useStateFromStores(
-        [ChannelStore],
-        () => {
-            const forumChannels = Object.values(
-                ChannelStore.loadAllGuildAndPrivateChannelsFromDisk()
-            )
-                .filter(channel => channel.isForumLikeChannel())
-                .filter(channel => channel.availableTags.length > 0);
+    return ChannelStore.use($ => {
+        const forumChannels = Object.values($.loadAllGuildAndPrivateChannelsFromDisk())
+            .filter(channel => channel.isForumLikeChannel())
+            .filter(channel => channel.availableTags.length > 0);
 
-            const tags = forumChannels.flatMap(channel =>
-                channel.availableTags.map(tag => ({ ...tag, channelId: channel.id }))
-            );
+        const tags = forumChannels.flatMap(channel =>
+            channel.availableTags.map(tag => ({ ...tag, channelId: channel.id }))
+        );
 
-            return new Map(tags.map(tag => [tag.id, tag]));
-        },
-        []
-    );
+        return new Map(tags.map(tag => [tag.id, tag]));
+    });
 }

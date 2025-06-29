@@ -6,12 +6,12 @@
 
 import { getIntlMessage } from "@utils/discord";
 import { findByCodeLazy } from "@webpack";
-import { useMemo, useStateFromStores } from "@webpack/common";
+import { lodash, useMemo } from "@webpack/common";
 import { ReactNode } from "react";
 
 import { ChannelStore, ForumPostMessagesStore, RelationshipStore } from "../../stores";
 import { FullMessage, MessageFormatterOptions } from "../../types";
-import { useMessage } from "../index";
+import { useMessage, useStores } from "../index";
 
 const getReplyPreview: (
     message: FullMessage | null,
@@ -33,15 +33,15 @@ export function useFormattedMessage({
 } {
     const channelId = message?.getChannelId();
 
-    const isLoading = useStateFromStores(
+    const isLoading = useStores(
         [ForumPostMessagesStore, ChannelStore],
-        () => {
+        (forumPostMessagesStore, channelStore) => {
             if (!channelId || !message?.id) return false;
 
-            const channel = ChannelStore.getChannel(channelId);
+            const channel = channelStore.getChannel(channelId);
             if (!channel?.isThread()) return false;
 
-            const { firstMessage, loaded } = ForumPostMessagesStore.getMessage(channel.id);
+            const { firstMessage, loaded } = forumPostMessagesStore.getMessage(channel.id);
             if (firstMessage?.id !== message.id) return false;
 
             return loaded;
@@ -49,49 +49,43 @@ export function useFormattedMessage({
         [channelId, message?.id]
     );
 
-    const isAuthorBlocked = useStateFromStores(
-        [RelationshipStore],
-        () => !!message && RelationshipStore.isBlockedForMessage(message),
-        [message]
-    );
-
-    const isAuthorIgnored = useStateFromStores(
-        [RelationshipStore],
-        () => !!message && RelationshipStore.isIgnoredForMessage(message),
-        [message]
+    const { isAuthorBlocked, isAuthorIgnored } = RelationshipStore.use(
+        $ => ({
+            isAuthorBlocked: !!message && $.isBlockedForMessage(message),
+            isAuthorIgnored: !!message && $.isIgnoredForMessage(message),
+        }),
+        [message],
+        lodash.isEqual
     );
 
     const { content, media } = useMessage({ message });
 
     const { contentPlaceholder, renderedContent, leadingIcon, trailingIcon } = useMemo(() => {
-        return !message
-            ? ({} as Record<keyof ReturnType<typeof getReplyPreview>, undefined>)
-            : getReplyPreview(message, content, isAuthorBlocked, isAuthorIgnored, className, {
-                  iconSize,
-                  leadingIconClass: iconClassName,
-                  trailingIconClass: iconClassName,
-              });
-    }, [message, content, isAuthorBlocked, isAuthorIgnored, className]);
+        if (!message) return {} as Record<keyof ReturnType<typeof getReplyPreview>, undefined>;
 
-    const systemMessage = { systemMessage: true, leadingIcon, trailingIcon } as const;
+        return getReplyPreview(message, content, isAuthorBlocked, isAuthorIgnored, className, {
+            iconSize,
+            leadingIconClass: iconClassName,
+            trailingIconClass: iconClassName,
+        });
+    }, [message, content, isAuthorBlocked, isAuthorIgnored, className, iconSize, iconClassName]);
 
-    if (isAuthorBlocked)
-        return { content: getIntlMessage("FORUM_POST_BLOCKED_FIRST_MESSAGE"), ...systemMessage };
+    switch (true) {
+        case isAuthorBlocked:
+            return systemMessage(getIntlMessage("FORUM_POST_BLOCKED_FIRST_MESSAGE"));
+        case isAuthorIgnored:
+            return systemMessage(getIntlMessage("FORUM_POST_IGNORED_FIRST_MESSAGE"));
+        case !!renderedContent:
+            return { content: renderedContent, leadingIcon, trailingIcon, systemMessage: false };
+        case media.length > 0:
+            return systemMessage(getIntlMessage("REPLY_QUOTE_NO_TEXT_CONTENT"));
+        case !message:
+            return systemMessage(isLoading ? "..." : getIntlMessage("REPLY_QUOTE_MESSAGE_DELETED"));
+        default:
+            return systemMessage(contentPlaceholder);
+    }
 
-    if (isAuthorIgnored)
-        return { content: getIntlMessage("FORUM_POST_IGNORED_FIRST_MESSAGE"), ...systemMessage };
-
-    if (renderedContent)
-        return { content: renderedContent, leadingIcon, trailingIcon, systemMessage: false };
-
-    if (media.length === 0)
-        return { content: getIntlMessage("REPLY_QUOTE_NO_TEXT_CONTENT"), ...systemMessage };
-
-    if (!message)
-        return {
-            content: isLoading ? "..." : getIntlMessage("REPLY_QUOTE_MESSAGE_DELETED"),
-            ...systemMessage,
-        };
-
-    return { content: contentPlaceholder, ...systemMessage };
+    function systemMessage(content: ReactNode) {
+        return { content, systemMessage: true, leadingIcon, trailingIcon };
+    }
 }

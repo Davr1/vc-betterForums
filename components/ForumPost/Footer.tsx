@@ -12,8 +12,6 @@ import { _memo } from "../../utils";
 import { DefaultReaction, Reactions } from "../Reaction";
 import { FooterSection } from "./FooterSection";
 
-const reactionsThreshold = 500;
-
 interface FooterProps {
     channel: ThreadChannel;
     message: FullMessage | null;

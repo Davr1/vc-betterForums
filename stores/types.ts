@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { FluxEvents, FluxStore } from "@webpack/types";
+import { FluxEvents, FluxStore, RelationshipStore as _RelationshipStore } from "@webpack/types";
 import { Channel, Guild, User } from "discord-types/general";
 import * as Stores from "discord-types/stores";
 
-import { DiscordTag, FullChannel, FullMessage } from "../types";
+import { DiscordTag, FullChannel, FullMessage, FullUser } from "../types";
 
 export type FluxEventHandlers<T extends Partial<Record<FluxEvents, unknown>>> = {
     [K in keyof T]?: (data: T[K]) => void;
@@ -62,7 +62,7 @@ export namespace ExtendedStores {
         getOldestUnreadMessageId(channelId: Channel["id"]): FullMessage["id"] | null;
     }
 
-    export interface RelationshipStore extends FluxStore, Stores.RelationshipStore {
+    export interface RelationshipStore extends _RelationshipStore {
         isBlockedOrIgnored(userId: User["id"]): boolean;
         isBlockedForMessage(message: FullMessage): boolean;
         isIgnoredForMessage(message: FullMessage): boolean;
@@ -108,6 +108,17 @@ export namespace ExtendedStores {
                 >;
             };
         };
+    }
+
+    export interface UserStore extends FluxStore, Omit<Stores.UserStore, "getUser"> {
+        getUser(userId: User["id"]): FullUser | undefined;
+        getCurrentUser(): FullUser;
+    }
+
+    export interface MissingGuildMemberStore extends FluxStore {
+        reset(): void;
+        isMember(guildId: Guild["id"], userId: User["id"]): boolean;
+        requestMembersBulk(guildId: Guild["id"], userIds: User["id"][]): void;
     }
 }
 

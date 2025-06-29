@@ -4,15 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { PermissionsBits, useStateFromStores } from "@webpack/common";
+import { PermissionsBits } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
 import { PermissionStore } from "../../stores";
 
 export function useIsActiveChannelOrUnarchivableThread(channel: Channel | null): boolean {
-    const canSendMessagesInThreads = useStateFromStores(
-        [PermissionStore],
-        () => !!channel && PermissionStore.can(PermissionsBits.SEND_MESSAGES_IN_THREADS, channel),
+    const canSendMessagesInThreads = PermissionStore.use(
+        $ => !!channel && $.can(PermissionsBits.SEND_MESSAGES_IN_THREADS, channel),
         [channel]
     );
 

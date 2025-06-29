@@ -7,7 +7,7 @@
 import { getIntlMessage } from "@utils/discord";
 import { runtimeHashMessageKey } from "@utils/intlHash";
 import { findByCodeLazy } from "@webpack";
-import { i18n, SnowflakeUtils, useMemo, useStateFromStores } from "@webpack/common";
+import { i18n, SnowflakeUtils, useMemo } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
 import { Duration, ReadStateStore, SortOrder } from "../../stores";
@@ -31,11 +31,7 @@ export function useFormatTimestamp(
 ): string {
     const timestamp = useMemo(() => SnowflakeUtils.extractTimestamp(channel.id), [channel.id]);
 
-    const lastMessage = useStateFromStores(
-        [ReadStateStore],
-        () => ReadStateStore.lastMessageId(channel.id),
-        [channel.id]
-    );
+    const lastMessage = ReadStateStore.use($ => $.lastMessageId(channel.id), [channel.id]);
 
     const lastMessageTimestamp = useMemo(
         () => (lastMessage ? SnowflakeUtils.extractTimestamp(lastMessage) : timestamp),
@@ -47,13 +43,10 @@ export function useFormatTimestamp(
         [lastMessageTimestamp, sortOrder, timestamp]
     );
 
-    const format = useMemo(
-        () =>
-            sortOrder === SortOrder.CREATION_DATE && duration === Duration.POSTED_DURATION_AGO
-                ? timeFormat
-                : undefined,
-        [sortOrder, duration]
-    );
+    const format = useMemo(() => {
+        if (sortOrder === SortOrder.CREATION_DATE && duration === Duration.POSTED_DURATION_AGO)
+            return timeFormat;
+    }, [sortOrder, duration]);
 
     return useMemo(() => timeFormatter(targetTimestamp, format), [targetTimestamp, format]);
 }

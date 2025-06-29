@@ -4,16 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { GuildStore, lodash, SnowflakeUtils, useStateFromStores } from "@webpack/common";
+import { GuildStore, lodash, SnowflakeUtils } from "@webpack/common";
 import { Channel, Guild } from "discord-types/general";
 
-import {
-    GuildMemberStore,
-    JoinedThreadsStore,
-    MissingGuildMemberStore,
-    ReadStateStore,
-} from "../../stores";
+import { JoinedThreadsStore, MissingGuildMemberStore, ReadStateStore } from "../../stores";
 import { ForumPostState } from "../../types";
+import { useStores } from "../misc/useStores";
 
 function getJoinedAtTime(guild: Guild): number {
     return +guild.joinedAt || +new Date(guild.joinedAt) || Date.now();
@@ -25,21 +21,21 @@ export function useForumPostState(channel: Channel): ForumPostState {
     const isLocked = channel.threadMetadata?.locked === true;
     const isPinned = channel.hasFlag(2);
 
-    return useStateFromStores(
-        [GuildStore, ReadStateStore, JoinedThreadsStore, GuildMemberStore, MissingGuildMemberStore],
-        () => {
-            const guild: Guild | null = GuildStore.getGuild(guild_id);
+    return useStores(
+        [GuildStore, ReadStateStore, JoinedThreadsStore, MissingGuildMemberStore],
+        (guildStore, readStateStore, joinedThreadsStore, missingGuildMemberStore) => {
+            const guild: Guild | null = guildStore.getGuild(guild_id);
             const joinedAt = guild ? getJoinedAtTime(guild) : Date.now();
 
             const isActive = !!guild && !isArchived;
-            const hasUnreads = isActive && ReadStateStore.isForumPostUnread(id);
-            const isMuted = JoinedThreadsStore.isMuted(id);
-            const hasJoined = JoinedThreadsStore.hasJoined(id);
-            const hasOpened = ReadStateStore.hasOpenedThread(id);
-            const isAbandoned = !MissingGuildMemberStore.isMember(guild_id, ownerId);
+            const hasUnreads = isActive && readStateStore.isForumPostUnread(id);
+            const isMuted = joinedThreadsStore.isMuted(id);
+            const hasJoined = joinedThreadsStore.hasJoined(id);
+            const hasOpened = readStateStore.hasOpenedThread(id);
+            const isAbandoned = !missingGuildMemberStore.isMember(guild_id, ownerId);
 
             const createdAfterJoin = SnowflakeUtils.extractTimestamp(id) > joinedAt;
-            const isNewThread = ReadStateStore.isNewForumThread(id, parent_id, guild);
+            const isNewThread = readStateStore.isNewForumThread(id, parent_id, guild);
             const isNew = isActive && !hasOpened && createdAfterJoin && (isNewThread || hasUnreads);
 
             return {

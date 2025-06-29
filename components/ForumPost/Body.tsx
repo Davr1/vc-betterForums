@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex, Heading, Text, useCallback, UserStore, useStateFromStores } from "@webpack/common";
+import { Flex, Heading, Text, useCallback } from "@webpack/common";
 
 import { useForumPostName, useForumPostState } from "../../hooks";
 import { settings } from "../../settings";
+import { UserStore } from "../../stores";
 import { FullMessage, ThreadChannel } from "../../types";
 import { _memo, ThreadUtils } from "../../utils";
 import { MessageContent } from "../MessageContent";
@@ -29,9 +30,8 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
     ]);
     const threadName = useForumPostName(channel);
 
-    const owner = useStateFromStores(
-        [UserStore],
-        () => (channel?.ownerId ? UserStore.getUser(channel.ownerId) : null),
+    const owner = UserStore.use(
+        $ => (channel?.ownerId ? $.getUser(channel.ownerId) : null),
         [channel?.ownerId]
     );
 

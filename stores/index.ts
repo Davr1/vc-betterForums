@@ -7,43 +7,67 @@
 import { findStoreLazy, proxyLazyWebpack } from "@webpack";
 import {
     ChannelStore as _ChannelStore,
+    Flux,
     GuildMemberStore as _GuildMemberStore,
     PermissionStore as _PermissionStore,
     ReadStateStore as _ReadStateStore,
     RelationshipStore as _RelationshipStore,
+    UserStore as _UserStore,
 } from "@webpack/common";
 import { FluxStore } from "@webpack/types";
 
+import { useStores } from "../hooks";
 import { ExtendedStores as S } from "./types";
 export * from "./types";
 
-function f<T extends FluxStore>(store: string | (() => Partial<T>)): T {
-    return typeof store === "string" ? findStoreLazy(store) : (proxyLazyWebpack(store) as T);
+export const BaseStore = proxyLazyWebpack(
+    () =>
+        class BaseStore extends Flux.Store {
+            use<TReturn>(
+                mapper: (store: this) => TReturn,
+                deps?: unknown[],
+                isEqual?: (old: TReturn, newer: TReturn) => boolean
+            ): TReturn {
+                return useStores([this], mapper, deps, isEqual);
+            }
+        }
+);
+
+export type CustomStore<TStore extends FluxStore> = TStore & InstanceType<typeof BaseStore>;
+
+function $<T extends FluxStore>(store: string | (() => unknown)): CustomStore<T> {
+    const lazyStore: T = typeof store === "string" ? findStoreLazy(store) : proxyLazyWebpack(store);
+
+    return new Proxy(lazyStore, {
+        get(target, prop) {
+            if (prop === "use") return BaseStore.prototype.use.bind(target);
+            return target[prop];
+        },
+    }) as CustomStore<T>;
 }
 
-export const ChannelSectionStore = f<S.ChannelSectionStore>("ChannelSectionStore");
-export const ForumPostMessagesStore = f<S.ForumPostMessagesStore>("ForumPostMessagesStore");
-export const ForumPostUnreadCountStore = f<S.ForumPostUnreadCountStore>(
+export const ChannelSectionStore = $<S.ChannelSectionStore>("ChannelSectionStore");
+export const ForumPostMessagesStore = $<S.ForumPostMessagesStore>("ForumPostMessagesStore");
+export const ForumPostUnreadCountStore = $<S.ForumPostUnreadCountStore>(
     "ForumPostUnreadCountStore"
 );
-export const ForumSearchStore = f<S.ForumSearchStore>("ForumSearchStore");
-export const GuildMemberRequesterStore = f<S.GuildMemberRequesterStore>(
+export const ForumSearchStore = $<S.ForumSearchStore>("ForumSearchStore");
+export const GuildMemberRequesterStore = $<S.GuildMemberRequesterStore>(
     "GuildMemberRequesterStore"
 );
-export const GuildVerificationStore = f<S.GuildVerificationStore>("GuildVerificationStore");
-export const JoinedThreadsStore = f<S.JoinedThreadsStore>("JoinedThreadsStore");
-export const LurkingStore = f<S.LurkingStore>("LurkingStore");
-export const ThreadMembersStore = f<S.ThreadMembersStore>("ThreadMembersStore");
-export const ThreadMessageStore = f<S.ThreadMessageStore>("ThreadMessageStore");
-export const TypingStore = f<S.TypingStore>("TypingStore");
-export const UserSettingsProtoStore = f<S.UserSettingsProtoStore>("UserSettingsProtoStore");
+export const GuildVerificationStore = $<S.GuildVerificationStore>("GuildVerificationStore");
+export const JoinedThreadsStore = $<S.JoinedThreadsStore>("JoinedThreadsStore");
+export const LurkingStore = $<S.LurkingStore>("LurkingStore");
+export const ThreadMembersStore = $<S.ThreadMembersStore>("ThreadMembersStore");
+export const ThreadMessageStore = $<S.ThreadMessageStore>("ThreadMessageStore");
+export const TypingStore = $<S.TypingStore>("TypingStore");
+export const UserSettingsProtoStore = $<S.UserSettingsProtoStore>("UserSettingsProtoStore");
 
-export const ChannelStore = f<S.ChannelStore>(() => _ChannelStore as S.ChannelStore);
-export const GuildMemberStore = f<S.GuildMemberStore>(() => _GuildMemberStore);
-export const PermissionStore = f<S.PermissionStore>(() => _PermissionStore);
-export const ReadStateStore = f<S.ReadStateStore>(() => _ReadStateStore);
-export const RelationshipStore = f<S.RelationshipStore & typeof RelationshipStore>(
-    () => _RelationshipStore
-);
+export const ChannelStore = $<S.ChannelStore>(() => _ChannelStore);
+export const GuildMemberStore = $<S.GuildMemberStore>(() => _GuildMemberStore);
+export const PermissionStore = $<S.PermissionStore>(() => _PermissionStore);
+export const ReadStateStore = $<S.ReadStateStore>(() => _ReadStateStore);
+export const RelationshipStore = $<S.RelationshipStore>(() => _RelationshipStore);
+export const UserStore = $<S.UserStore>(() => _UserStore);
 
 export { MissingGuildMemberStore } from "./MissingGuildMemberStore";

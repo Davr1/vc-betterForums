@@ -25,6 +25,7 @@ export { useFormattedMessage } from "./messages/useFormattedMessage";
 export { useMessage } from "./messages/useMessage";
 export { useMessageMedia } from "./messages/useMessageMedia";
 export { useSortedReactions } from "./messages/useSortedReactions";
+export { useStores } from "./misc/useStores";
 export { useAllCustomTags } from "./tags/useAllCustomTags";
 export { useAllForumTags } from "./tags/useAllForumTags";
 export { useAppliedTags } from "./tags/useAppliedTags";

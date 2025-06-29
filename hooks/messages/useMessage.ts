@@ -5,7 +5,7 @@
  */
 
 import { findByCodeLazy } from "@webpack";
-import { lodash, useMemo, useStateFromStores } from "@webpack/common";
+import { lodash, useMemo } from "@webpack/common";
 
 import { UserSettingsProtoStore } from "../../stores";
 import { ForumPostMetadata, FullMessage, MessageParserOptions } from "../../types";
@@ -34,10 +34,9 @@ export function useMessage({
     formatInline = true,
     noStyleAndInteraction = true,
 }: MessageParserOptions): ForumPostMetadata {
-    const keywordFilterSettings = useStateFromStores(
-        [UserSettingsProtoStore],
-        () =>
-            UserSettingsProtoStore.settings.textAndImages?.keywordFilterSettings ?? {
+    const keywordFilterSettings = UserSettingsProtoStore.use(
+        $ =>
+            $.settings.textAndImages?.keywordFilterSettings ?? {
                 profanity: false,
                 sexualContent: false,
                 slurs: false,

@@ -4,17 +4,18 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { EmojiStore, useStateFromStores } from "@webpack/common";
+import { EmojiStore } from "@webpack/common";
 import { ReactionEmoji } from "discord-types/general";
 
 import { ForumChannel } from "../../types";
+import { useStores } from "../misc/useStores";
 
 export function useDefaultEmoji(channel: ForumChannel): ReactionEmoji | null {
     const emoji = channel.defaultReactionEmoji;
 
-    const customEmoji = useStateFromStores(
+    const customEmoji = useStores(
         [EmojiStore],
-        () => emoji?.emojiId && EmojiStore.getUsableCustomEmojiById(emoji.emojiId),
+        $ => emoji?.emojiId && $.getUsableCustomEmojiById(emoji.emojiId),
         [emoji?.emojiId]
     );
 

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { useCallback, useMemo, useStateFromStores, WindowStore } from "@webpack/common";
+import { useCallback, useMemo, WindowStore } from "@webpack/common";
 
 import { Image, ImageProps, MediaLayoutType } from "../../components/Image";
 import { LazyImageOptions, UnfurledMediaItem } from "../../types";
@@ -15,11 +15,12 @@ import {
     matchesUrlSuffix,
     openMediaViewer,
 } from "../../utils";
+import { useStores } from "../misc/useStores";
 
 export function useLazyImage({ items, prefferedSize, mediaIndex = 0 }: LazyImageOptions) {
     const image: UnfurledMediaItem | undefined = items[mediaIndex];
 
-    const isFocused = useStateFromStores([WindowStore], () => WindowStore.isFocused());
+    const isFocused = useStores([WindowStore], $ => $.isFocused());
     const isAnimated = useMemo(
         () => !!image?.url && matchesUrlSuffix(image.url, animatedMediaRegex),
         [image?.url]

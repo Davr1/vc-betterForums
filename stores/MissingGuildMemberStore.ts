@@ -5,17 +5,16 @@
  */
 
 import { proxyLazyWebpack } from "@webpack";
-import { Flux, FluxDispatcher, lodash } from "@webpack/common";
-import { FluxStore } from "@webpack/types";
+import { FluxDispatcher, lodash } from "@webpack/common";
 import { Guild, User } from "discord-types/general";
 
-import { FluxEventHandlers, GuildMemberRequesterStore } from "./";
-
-interface _MissingGuildMemberStore extends FluxStore {
-    reset(): void;
-    isMember(guildId: Guild["id"], userId: User["id"]): boolean;
-    requestMembersBulk(guildId: Guild["id"], userIds: User["id"][]): void;
-}
+import {
+    BaseStore,
+    CustomStore,
+    ExtendedStores,
+    FluxEventHandlers,
+    GuildMemberRequesterStore,
+} from "./";
 
 interface Member {
     user: Pick<User, "id">;
@@ -44,8 +43,14 @@ interface FluxEvents {
 }
 
 export const MissingGuildMemberStore = proxyLazyWebpack(() => {
-    class MissingGuildMemberStore extends Flux.Store implements _MissingGuildMemberStore {
+    type Store = CustomStore<ExtendedStores.MissingGuildMemberStore>;
+
+    class MissingGuildMemberStore extends BaseStore implements Store {
         private missingMembers: Map<Guild["id"], Set<User["id"]>> = new Map();
+
+        __getLocalVars() {
+            return lodash.pick(this, ["missingMembers"]);
+        }
 
         _modify(guildId: Guild["id"], fn: (set: Set<User["id"]>) => void) {
             const set = this.missingMembers.get(guildId) ?? new Set();
@@ -106,5 +111,5 @@ export const MissingGuildMemberStore = proxyLazyWebpack(() => {
 
     const store = new MissingGuildMemberStore(FluxDispatcher, eventHandlers);
 
-    return store as _MissingGuildMemberStore;
+    return store as Store;
 });

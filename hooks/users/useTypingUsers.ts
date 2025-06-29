@@ -4,20 +4,21 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { UserStore, useStateFromStores } from "@webpack/common";
+import { UserStore } from "@webpack/common";
 import { Channel, User } from "discord-types/general";
 
 import { RelationshipStore, TypingStore } from "../../stores";
+import { useStores } from "../misc/useStores";
 
 export function useTypingUsers(
     channelId: Channel["id"],
     limit: number = Number.MAX_SAFE_INTEGER
 ): User["id"][] {
-    return useStateFromStores(
+    return useStores(
         [UserStore, TypingStore, RelationshipStore],
-        () => {
-            const currentUserId = UserStore.getCurrentUser()?.id;
-            const typingUsers = TypingStore.getTypingUsers(channelId);
+        (userStore, typingStore, relationshipStore) => {
+            const currentUserId = userStore.getCurrentUser()?.id;
+            const typingUsers = typingStore.getTypingUsers(channelId);
             const users: User["id"][] = [];
 
             for (const userId in typingUsers) {
@@ -25,7 +26,7 @@ export function useTypingUsers(
                 const user = UserStore.getUser(userId);
                 if (!user || user.id === currentUserId) continue;
 
-                if (!RelationshipStore.isBlockedOrIgnored(user.id)) {
+                if (!relationshipStore.isBlockedOrIgnored(user.id)) {
                     users.push(user.id);
                 }
             }

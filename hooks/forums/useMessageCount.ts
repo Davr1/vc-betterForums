@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { useMemo, useStateFromStores } from "@webpack/common";
+import { useMemo } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
 import { settings } from "../../settings";
@@ -31,21 +31,18 @@ export function useMessageCount(channel: Channel): MessageCount {
     const { useExactCounts } = settings.use(["useExactCounts"]);
     const { hasUnreads } = useForumPostState(channel);
 
-    const messageCount = useStateFromStores(
-        [ThreadMessageStore],
-        () => ThreadMessageStore.getCount(channel.id) ?? 0,
-        [channel.id]
-    );
+    const messageCount = ThreadMessageStore.use($ => $.getCount(channel.id) ?? 0, [channel.id]);
+
     const messageCountText = useMemo(
         () => (useExactCounts ? `${messageCount}` : formatMessageCount(messageCount)),
         [messageCount, useExactCounts]
     );
 
-    const unreadCount = useStateFromStores(
-        [ForumPostUnreadCountStore],
-        () => (hasUnreads ? ForumPostUnreadCountStore.getCount(channel.id) ?? null : null),
+    const unreadCount = ForumPostUnreadCountStore.use(
+        $ => (hasUnreads ? $.getCount(channel.id) ?? null : null),
         [hasUnreads, channel.id]
     );
+
     const unreadCountText = useMemo(() => {
         if (unreadCount === null) return null;
         return useExactCounts

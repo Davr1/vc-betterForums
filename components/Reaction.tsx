@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex, useStateFromStores } from "@webpack/common";
+import { Flex } from "@webpack/common";
 import { Ref } from "react";
 
 import { useCheckPermissions, useDefaultEmoji, useSortedReactions } from "../hooks";
@@ -60,11 +60,11 @@ export const DefaultReaction = _memo<ReactionProps>(function DefaultReaction({
     firstMessage,
     channel,
 }) {
-    const forumChannel = useStateFromStores(
-        [ChannelStore],
-        () => ChannelStore.getChannel(channel.parent_id) as ForumChannel,
+    const forumChannel = ChannelStore.use(
+        $ => $.getChannel(channel.parent_id) as ForumChannel,
         [channel.parent_id]
     );
+
     const defaultEmoji = useDefaultEmoji(forumChannel);
     const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
 

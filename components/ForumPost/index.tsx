@@ -6,7 +6,7 @@
 
 import { ErrorBoundary } from "@components/index";
 import { getIntlMessage } from "@utils/discord";
-import { Clickable, Flex, useEffect, useStateFromStores } from "@webpack/common";
+import { Clickable, Flex, useEffect } from "@webpack/common";
 import { Channel } from "discord-types/general";
 import { ComponentProps, ComponentType, Ref } from "react";
 
@@ -39,15 +39,10 @@ interface ForumPostProps {
 }
 
 export function ForumPost({ goToThread, threadId }: ForumPostProps) {
-    const channel = useStateFromStores(
-        [ChannelStore],
-        () => ChannelStore.getChannel(threadId) as ThreadChannel,
-        [threadId]
-    );
+    const channel = ChannelStore.use($ => $.getChannel(threadId) as ThreadChannel, [threadId]);
 
-    const isOpen = useStateFromStores(
-        [ChannelSectionStore],
-        () => ChannelSectionStore.getCurrentSidebarChannelId(channel.parent_id) === channel.id,
+    const isOpen = ChannelSectionStore.use(
+        $ => $.getCurrentSidebarChannelId(channel.parent_id) === channel.id,
         [channel.parent_id, channel.id]
     );
 

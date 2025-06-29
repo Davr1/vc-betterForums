@@ -5,7 +5,7 @@
  */
 
 import { findByCodeLazy } from "@webpack";
-import { useMemo, useStateFromStores } from "@webpack/common";
+import { useMemo } from "@webpack/common";
 import { Channel } from "discord-types/general";
 import { ReactNode } from "react";
 
@@ -23,15 +23,13 @@ const textHightlightParser: (
 } = findByCodeLazy("hideSimpleEmbedContent:", "1!==");
 
 export function useForumPostName(channel: Channel): ReactNode {
-    const hasSearchResults = useStateFromStores(
-        [ForumSearchStore],
-        () => ForumSearchStore.getHasSearchResults(channel.parent_id),
+    const hasSearchResults = ForumSearchStore.use(
+        $ => $.getHasSearchResults(channel.parent_id),
         [channel.parent_id]
     );
 
-    const searchQuery = useStateFromStores(
-        [ForumSearchStore],
-        () => ForumSearchStore.getSearchQuery(channel.parent_id),
+    const searchQuery = ForumSearchStore.use(
+        $ => $.getSearchQuery(channel.parent_id),
         [channel.parent_id]
     );
 
