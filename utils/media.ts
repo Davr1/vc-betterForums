@@ -49,25 +49,26 @@ export function hasVolume(size?: Partial<Size>): size is Size {
     return !!size && !!size.width && !!size.height;
 }
 
-export function fitWithinBoundingBox({
-    width,
-    height,
-    maxWidth = window.innerWidth,
-    maxHeight = window.innerHeight,
-    minWidth = 0,
-    minHeight = 0,
-}: BoundingBox): Size {
-    if (width !== maxWidth || height !== maxHeight) {
-        const wRatio = width > maxWidth ? maxWidth / width : 1;
-        width = Math.max(Math.round(width * wRatio), minWidth);
-        height = Math.max(Math.round(height * wRatio), minHeight);
+export function adjustSize(
+    {
+        width,
+        height,
+        maxWidth = window.innerWidth,
+        maxHeight = window.innerHeight,
+    }: Partial<Omit<BoundingBox, "minWidth" | "minHeight">>,
+    mode: "fill" | "contain" | "cover" = "contain"
+): Size {
+    if (mode === "fill" || !hasVolume({ width, height }))
+        return { width: maxWidth, height: maxHeight };
 
-        const hRatio = height > maxHeight ? maxHeight / height : 1;
-        width = Math.max(Math.round(width * hRatio), minWidth);
-        height = Math.max(Math.round(height * hRatio), minHeight);
-    }
+    const wRatio = maxWidth / width!;
+    const hRatio = maxHeight / height!;
+    const ratio = mode === "contain" ? Math.min(1, wRatio, hRatio) : Math.max(wRatio, hRatio);
 
-    return { width, height };
+    return {
+        width: Math.round(width! * ratio),
+        height: Math.round(height! * ratio),
+    };
 }
 
 const buttonSize = 40;
@@ -91,8 +92,8 @@ export function getPreviewSize(hasMultiple: boolean, size: Partial<Size>): Size 
         maxHeight: innerHeight - 2 * (safezone.block + (hasMultiple ? toolbar.height + gap : 0)),
     };
 
-    const widestFit = fitWithinBoundingBox({ ...size, ...widestPreview });
-    const tallestFit = fitWithinBoundingBox({ ...size, ...tallestPreview });
+    const widestFit = adjustSize({ ...size, ...widestPreview }, "contain");
+    const tallestFit = adjustSize({ ...size, ...tallestPreview }, "contain");
 
     return widestFit.width >= tallestFit.width ? widestFit : tallestFit;
 }

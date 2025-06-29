@@ -14,7 +14,9 @@ import {
     MessageReaction,
     User,
 } from "discord-types/general";
-import { ReactNode } from "react";
+import { ReactNode, Ref } from "react";
+
+import { RichEditorType } from "./components/RichEditor";
 
 export interface FullChannel extends Channel {
     isForumLikeChannel(): this is ForumChannel;
@@ -128,7 +130,7 @@ export enum ReactionType {
     VOTE = 2,
 }
 
-export interface MessageFormattingOptions {
+export interface MessageFormatterOptions {
     message: FullMessage | null;
     className?: string;
     iconSize?: number;
@@ -267,3 +269,49 @@ export enum MessageComponentType {
 
 export type Size = Record<"width" | "height", number>;
 export type BoundingBox = Size & Partial<Record<`${"max" | "min"}${"Width" | "Height"}`, number>>;
+
+export type TimeFormatterOptions = Record<
+    "minutes" | "hours" | "days" | "month",
+    string | (() => unknown)
+>;
+
+export interface LazyImageOptions {
+    items: UnfurledMediaItem[];
+    mediaIndex?: number;
+    prefferedSize?: number | null;
+}
+
+export type RichEditorSubmit = Partial<{ shouldClear: boolean; shouldRefocus: boolean }> | void;
+
+export interface RichEditorOptions {
+    defaultValue?: string | null;
+    handleChange?: (value: ParsedContent) => void;
+    handleSubmit?: (value: ParsedContent) => RichEditorSubmit | Promise<RichEditorSubmit>;
+    type?: Partial<RichEditorType>;
+}
+
+export interface ForumPostEventOptions {
+    facepileRef?: Ref<HTMLElement>;
+    goToThread: (channel: Channel, shiftKey: boolean) => void;
+    channel: Channel;
+}
+
+export type TitleMatch = {
+    type: "text" | "highlight";
+    content: string | TitleMatch;
+    originalMatch: RegExpExecArray;
+};
+
+export type TitlePostProcessor = (match: TitleMatch[], filters: Set<string>) => TitleMatch[];
+
+export interface MessageParserOptions {
+    message: FullMessage | null;
+    formatInline?: boolean;
+    noStyleAndInteraction?: boolean;
+}
+
+export interface ForumPostMetadata {
+    hasSpoilerEmbeds?: boolean;
+    content: ReactNode;
+    media: UnfurledMediaItem[];
+}

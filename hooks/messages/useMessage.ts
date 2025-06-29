@@ -6,24 +6,11 @@
 
 import { findByCodeLazy } from "@webpack";
 import { lodash, useMemo, useStateFromStores } from "@webpack/common";
-import { ReactNode } from "react";
 
 import { UserSettingsProtoStore } from "../../stores";
-import { FullMessage, UnfurledMediaItem } from "../../types";
+import { ForumPostMetadata, FullMessage, MessageParserOptions } from "../../types";
 import { unfurlAttachment } from "../../utils";
 import { useMessageMedia } from "../index";
-
-interface Options {
-    message: FullMessage | null;
-    formatInline?: boolean;
-    noStyleAndInteraction?: boolean;
-}
-
-interface ForumPostMetadata {
-    hasSpoilerEmbeds?: boolean;
-    content: ReactNode;
-    media: UnfurledMediaItem[];
-}
 
 const parseMessageContent: (
     message: FullMessage,
@@ -46,7 +33,7 @@ export function useMessage({
     message,
     formatInline = true,
     noStyleAndInteraction = true,
-}: Options): ForumPostMetadata {
+}: MessageParserOptions): ForumPostMetadata {
     const keywordFilterSettings = useStateFromStores(
         [UserSettingsProtoStore],
         () =>

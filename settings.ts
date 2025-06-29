@@ -85,7 +85,7 @@ export const settings = definePluginSettings({
         type: OptionType.SLIDER,
         description: "Media preview size in pixels",
         default: 72,
-        markers: [48, 64, 72, 96, 128],
+        markers: [48, 56, 64, 72, 80, 96, 128],
         stickToMarkers: true,
     },
     messagePreviewLineCount: {

@@ -7,20 +7,14 @@
 import { useCallback, useMemo, useStateFromStores, WindowStore } from "@webpack/common";
 
 import { Image, ImageProps, MediaLayoutType } from "../../components/Image";
-import { UnfurledMediaItem } from "../../types";
+import { LazyImageOptions, UnfurledMediaItem } from "../../types";
 import {
+    adjustSize,
     animatedMediaRegex,
     getPreviewSize,
-    hasVolume,
     matchesUrlSuffix,
     openMediaViewer,
 } from "../../utils";
-
-interface LazyImageOptions {
-    items: UnfurledMediaItem[];
-    mediaIndex?: number;
-    prefferedSize?: number | null;
-}
 
 export function useLazyImage({ items, prefferedSize, mediaIndex = 0 }: LazyImageOptions) {
     const image: UnfurledMediaItem | undefined = items[mediaIndex];
@@ -65,13 +59,21 @@ export function useLazyImage({ items, prefferedSize, mediaIndex = 0 }: LazyImage
         [image, mediaIndex, items]
     );
 
-    const size = !prefferedSize
-        ? null
-        : !hasVolume(image)
-        ? { maxWidth: prefferedSize, maxHeight: prefferedSize }
-        : image.width > image.height
-        ? { maxHeight: prefferedSize }
-        : { maxWidth: prefferedSize };
+    const size = useMemo(() => {
+        if (!prefferedSize) return null;
+
+        const { width, height } = adjustSize(
+            {
+                width: image?.width,
+                height: image?.height,
+                maxWidth: prefferedSize,
+                maxHeight: prefferedSize,
+            },
+            "cover"
+        );
+
+        return { maxWidth: width, maxHeight: height };
+    }, [prefferedSize, image?.width, image?.height]);
 
     return {
         ...image,

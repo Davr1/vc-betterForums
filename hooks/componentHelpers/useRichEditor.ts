@@ -6,18 +6,9 @@
 
 import { useCallback, useMemo, useRef, useState } from "@webpack/common";
 
-import { DraftType, RichEditorProps, RichEditorType, SlateNode } from "../../components/RichEditor";
-import { ParsedContent } from "../../types";
+import { DraftType, RichEditorProps, SlateNode } from "../../components/RichEditor";
+import { ParsedContent, RichEditorOptions } from "../../types";
 import { dummyChannel, MessageParserUtils } from "../../utils";
-
-type Submit = Partial<{ shouldClear: boolean; shouldRefocus: boolean }> | void;
-
-interface Options {
-    defaultValue?: string | null;
-    handleChange?: (value: ParsedContent) => void;
-    handleSubmit?: (value: ParsedContent) => Submit | Promise<Submit>;
-    type?: Partial<RichEditorType>;
-}
 
 function parse(value: string): ParsedContent {
     return MessageParserUtils.parse(dummyChannel, value.trim());
@@ -27,7 +18,12 @@ function toRichValue(value: string): SlateNode[] {
     return value.split("\n").map(line => ({ type: "line", children: [{ text: line }] }));
 }
 
-export function useRichEditor({ defaultValue, handleChange, handleSubmit, type }: Options) {
+export function useRichEditor({
+    defaultValue,
+    handleChange,
+    handleSubmit,
+    type,
+}: RichEditorOptions) {
     // this isn't really required, but it prevents flashing during typing
     const focused = useRef<boolean>(false);
 

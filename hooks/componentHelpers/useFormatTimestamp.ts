@@ -11,11 +11,7 @@ import { i18n, SnowflakeUtils, useMemo, useStateFromStores } from "@webpack/comm
 import { Channel } from "discord-types/general";
 
 import { Duration, ReadStateStore, SortOrder } from "../../stores";
-
-type TimeFormatterOptions = Record<
-    "minutes" | "hours" | "days" | "month",
-    string | (() => unknown)
->;
+import { TimeFormatterOptions } from "../../types";
 
 const timeFormatter: (timestamp: number | null, options?: () => TimeFormatterOptions) => string =
     findByCodeLazy('"minutes",1');

@@ -10,19 +10,13 @@ import { Channel } from "discord-types/general";
 import { ReactNode } from "react";
 
 import { ForumSearchStore } from "../../stores";
+import { TitlePostProcessor } from "../../types";
 
-type Match = {
-    type: "text" | "highlight";
-    content: string | Match;
-    originalMatch: RegExpExecArray;
-};
-
-type PostProcessor = (match: Match[], filters: Set<string>) => Match[];
-
-const getTitlePostprocessor: (query: string) => PostProcessor = findByCodeLazy('type:"highlight"');
+const getTitlePostprocessor: (query: string) => TitlePostProcessor =
+    findByCodeLazy('type:"highlight"');
 const textHightlightParser: (
     data: { content: string; embeds: [] },
-    options: { postProcessor: PostProcessor }
+    options: { postProcessor: TitlePostProcessor }
 ) => {
     content: React.ReactNode;
     hasSpoilerEmbeds: boolean;

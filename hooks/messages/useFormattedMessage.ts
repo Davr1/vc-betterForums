@@ -10,7 +10,7 @@ import { useMemo, useStateFromStores } from "@webpack/common";
 import { ReactNode } from "react";
 
 import { ChannelStore, ForumPostMessagesStore, RelationshipStore } from "../../stores";
-import { FullMessage, MessageFormattingOptions } from "../../types";
+import { FullMessage, MessageFormatterOptions } from "../../types";
 import { useMessage } from "../index";
 
 const getReplyPreview: (
@@ -28,7 +28,7 @@ export function useFormattedMessage({
     className,
     iconSize,
     iconClassName,
-}: MessageFormattingOptions): Record<"content" | "leadingIcon" | "trailingIcon", ReactNode> & {
+}: MessageFormatterOptions): Record<"content" | "leadingIcon" | "trailingIcon", ReactNode> & {
     systemMessage: boolean;
 } {
     const channelId = message?.getChannelId();

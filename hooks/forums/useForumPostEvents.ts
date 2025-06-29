@@ -6,22 +6,20 @@
 
 import { findByCodeLazy } from "@webpack";
 import { useMemo } from "@webpack/common";
-import { Channel } from "discord-types/general";
-import { MouseEventHandler, Ref } from "react";
+import { MouseEventHandler } from "react";
 
-interface Options {
-    facepileRef?: Ref<HTMLElement>;
-    goToThread: (channel: Channel, shiftKey: boolean) => void;
-    channel: Channel;
-}
+import { ForumPostEventOptions } from "../../types";
 
-export const getForumPostEvents: (options: Options) => {
+export const getForumPostEvents: (options: ForumPostEventOptions) => {
     handleLeftClick: MouseEventHandler<unknown>;
     handleRightClick: MouseEventHandler<unknown>;
 } = findByCodeLazy("facepileRef:", "handleLeftClick");
 
-const facepileRef: Options["facepileRef"] = () => {};
-export function useForumPostEvents({ channel, goToThread }: Omit<Options, "facepileRef">) {
+const facepileRef: ForumPostEventOptions["facepileRef"] = () => {};
+export function useForumPostEvents({
+    channel,
+    goToThread,
+}: Omit<ForumPostEventOptions, "facepileRef">) {
     return useMemo(
         () => getForumPostEvents({ channel, goToThread, facepileRef }),
         [channel, goToThread]
