@@ -28,16 +28,14 @@ export const Footer = _memo<FooterProps>(function Footer({ channel, message, con
 
     const maxCount = maxReactionCount !== MaxReactionCount.ALL ? maxReactionCount : undefined;
 
-    const hasReactions =
-        message?.reactions &&
-        message.reactions.length > 0 &&
-        maxReactionCount !== MaxReactionCount.OFF;
+    const hasReactions = message?.reactions && message.reactions.length > 0;
 
     return (
         <Flex className="vc-better-forums-footer">
             {showThreadMembers && <FooterSection.Members channel={channel} />}
             <FooterSection.LatestMessage channel={channel} />
             {message &&
+                maxReactionCount !== MaxReactionCount.OFF &&
                 (hasReactions ? (
                     <Reactions
                         firstMessage={message}
