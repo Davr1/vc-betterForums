@@ -56,7 +56,6 @@ export const Media = _memo<MediaProps>(function Media({ message, maxWidth }) {
             items={media}
             maxCount={maxMediaCount === MaxMediaCount.ALL ? undefined : maxMediaCount}
             maxWidth={maxWidth}
-            gap={6}
             direction={Flex.Direction.HORIZONTAL_REVERSE}
             renderFallback={renderFallback}
         >

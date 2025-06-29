@@ -27,14 +27,15 @@
 
 .vc-better-forums-thread-body-container {
     position: relative;
+    min-width: 0;
 }
 
-.vc-better-forums-thread-body-container,
 .vc-better-forums-thread-body,
 .vc-better-forums-thread-header,
 .vc-better-forums-footer {
     gap: var(--space-6);
     min-width: 0;
+    margin: 0 !important;
 }
 
 .vc-better-forums-thread-title-container {
@@ -533,6 +534,7 @@
     position: relative;
     display: flex;
     height: max-content;
+    padding-left: var(--space-xs);
 
     &:hover .vc-better-forums-thumbnail-decorator {
         opacity: 0;
