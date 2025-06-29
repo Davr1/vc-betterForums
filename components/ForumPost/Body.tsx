@@ -9,7 +9,7 @@ import { Flex, Heading, Text, useCallback, UserStore, useStateFromStores } from 
 import { useChannelName, useForumPostState } from "../../hooks";
 import { settings } from "../../settings";
 import { FullMessage, ThreadChannel } from "../../types";
-import { _memo, threadUtils } from "../../utils";
+import { _memo, ThreadUtils } from "../../utils";
 import { MessageContent } from "../MessageContent";
 import { Timestamp } from "../Timestamp";
 import { Username } from "../Username";
@@ -36,7 +36,7 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
     );
 
     const followAction = useCallback(
-        () => (hasJoined ? threadUtils.leaveThread(channel) : threadUtils.joinThread(channel)),
+        () => (hasJoined ? ThreadUtils.leaveThread(channel) : ThreadUtils.joinThread(channel)),
         [hasJoined, channel]
     );
 
