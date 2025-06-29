@@ -68,7 +68,7 @@ export const settings = definePluginSettings({
     maxMediaCount: {
         type: OptionType.SLIDER,
         description:
-            "Maximum number of media items (from attachments, embeds, or message components) to show",
+            "Maximum number of media items (from attachments, embeds, or message components) to show at once",
         default: 3,
         markers: [MaxMediaCount.OFF, ...makeRange(1, 5), MaxMediaCount.ALL],
         stickToMarkers: true,
@@ -83,10 +83,13 @@ export const settings = definePluginSettings({
     },
     mediaSize: {
         type: OptionType.SLIDER,
-        description: "Media preview size in pixels",
+        description: "Media preview size. Has no effect when Max Media Count is set to OFF.",
         default: 72,
         markers: [48, 56, 64, 72, 80, 96, 128],
         stickToMarkers: true,
+        componentProps: {
+            onMarkerRender: (value: number) => `${value}px`,
+        },
     },
     messagePreviewLineCount: {
         type: OptionType.SLIDER,

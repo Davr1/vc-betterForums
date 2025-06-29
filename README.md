@@ -11,6 +11,11 @@ This plugin completely replaces the forum list item component and introduces new
   - **Tag overrides** - allows full customization of *custom* and *forum* tags - change the name, color, or icon
   - **Quick filter** - click on a tag to add it to the filters - click again to disable
 - **Message preview** - message preview can show as many lines as you want - two, three, or more
+- **Media preview** - you can now customize the count and size of media previews
+  - **Improved thumbnail fetching** - thumbnails are fetched at the smallest possible size to reduce network traffic
+- **Media gallery** - click on a thumbnail to open the gallery, which now correctly displays all message media
+  - **Video support** - video files are now playable
+  - **Message and attachment context** - contextual metadata like message timestamp, message author, file name or file size are displayed
 - **Reply preview** - view the latest reply/typing indicator directly in the thread footer
   - **Jump to message** - clicking on the preview brings you to the original message
   - **Improved usernames** - usernames are now fully interactive

@@ -698,4 +698,5 @@
 
 .vc-better-forums-channel-mention {
     white-space: nowrap;
+    user-select: none;
 }
