@@ -5,12 +5,11 @@
  */
 
 import { Flex, Heading, Text, useCallback, UserStore, useStateFromStores } from "@webpack/common";
-import { Message } from "discord-types/general";
 
-import { useChannelName, useForumPostState } from "../../hooks";
+import { useForumPostName, useForumPostState } from "../../hooks";
 import { settings } from "../../settings";
-import { ThreadChannel } from "../../types";
-import { _memo, threadUtils } from "../../utils";
+import { FullMessage, ThreadChannel } from "../../types";
+import { _memo, ThreadUtils } from "../../utils";
 import { MessageContent } from "../MessageContent";
 import { Timestamp } from "../Timestamp";
 import { Username } from "../Username";
@@ -19,16 +18,16 @@ import { FollowButton } from "./FollowButton";
 
 interface BodyProps {
     channel: ThreadChannel;
-    firstMessage: Message | null;
+    message: FullMessage | null;
 }
 
-export const Body = _memo<BodyProps>(function Body({ channel, firstMessage }) {
+export const Body = _memo<BodyProps>(function Body({ channel, message }) {
     const { hasUnreads, isMuted, hasJoined } = useForumPostState(channel);
     const { messagePreviewLineCount, showFollowButton } = settings.use([
         "messagePreviewLineCount",
         "showFollowButton",
     ]);
-    const channelName = useChannelName(channel);
+    const threadName = useForumPostName(channel);
 
     const owner = useStateFromStores(
         [UserStore],
@@ -37,14 +36,14 @@ export const Body = _memo<BodyProps>(function Body({ channel, firstMessage }) {
     );
 
     const followAction = useCallback(
-        () => (hasJoined ? threadUtils.leaveThread(channel) : threadUtils.joinThread(channel)),
+        () => (hasJoined ? ThreadUtils.leaveThread(channel) : ThreadUtils.joinThread(channel)),
         [hasJoined, channel]
     );
 
     return (
         <Flex className="vc-better-forums-thread-body" direction={Flex.Direction.VERTICAL}>
             <Flex className="vc-better-forums-thread-header" align={Flex.Align.CENTER} grow={0}>
-                <Username channel={channel} user={owner ?? firstMessage?.author ?? null} />
+                <Username channel={channel} user={owner ?? message?.author ?? null} />
                 <Timestamp channel={channel} />
                 {showFollowButton && <FollowButton hasJoined={hasJoined} onClick={followAction} />}
             </Flex>
@@ -63,13 +62,13 @@ export const Body = _memo<BodyProps>(function Body({ channel, firstMessage }) {
                     }
                     className="vc-better-forums-thread-title"
                 >
-                    {channelName}
+                    {threadName}
                 </Text>
                 <ForumPost.Tags channel={channel} />
             </Heading>
             <MessageContent
                 channel={channel}
-                message={firstMessage}
+                message={message}
                 color="text-secondary"
                 lineClamp={messagePreviewLineCount}
                 messageClassName={

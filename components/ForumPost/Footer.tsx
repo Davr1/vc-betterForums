@@ -5,48 +5,48 @@
  */
 
 import { Flex } from "@webpack/common";
-import { Message } from "discord-types/general";
 
 import { MaxReactionCount, settings } from "../../settings";
-import { ThreadChannel } from "../../types";
+import { FullMessage, ThreadChannel } from "../../types";
 import { _memo } from "../../utils";
 import { DefaultReaction, Reactions } from "../Reaction";
 import { FooterSection } from "./FooterSection";
 
+const reactionsThreshold = 500;
+
 interface FooterProps {
     channel: ThreadChannel;
-    firstMessage: Message | null;
+    message: FullMessage | null;
     containerWidth?: number;
 }
 
-export const Footer = _memo<FooterProps>(function Footer({
-    channel,
-    firstMessage,
-    containerWidth,
-}) {
+export const Footer = _memo<FooterProps>(function Footer({ channel, message, containerWidth = 0 }) {
     const { maxReactionCount, showThreadMembers } = settings.use([
         "maxReactionCount",
         "showThreadMembers",
     ]);
-    const hasReactions = firstMessage?.reactions && firstMessage.reactions.length > 0;
+
+    const maxCount = maxReactionCount !== MaxReactionCount.ALL ? maxReactionCount : undefined;
+
+    const hasReactions =
+        message?.reactions &&
+        message.reactions.length > 0 &&
+        maxReactionCount !== MaxReactionCount.OFF;
 
     return (
         <Flex className="vc-better-forums-footer">
             {showThreadMembers && <FooterSection.Members channel={channel} />}
             <FooterSection.LatestMessage channel={channel} />
-            {firstMessage &&
-                maxReactionCount !== MaxReactionCount.OFF &&
+            {message &&
                 (hasReactions ? (
                     <Reactions
-                        firstMessage={firstMessage}
+                        firstMessage={message}
                         channel={channel}
-                        maxWidth={containerWidth ? containerWidth - 500 : undefined}
-                        maxCount={
-                            maxReactionCount !== MaxReactionCount.ALL ? maxReactionCount : undefined
-                        }
+                        maxWidth={containerWidth - 500}
+                        maxCount={maxCount}
                     />
                 ) : (
-                    <DefaultReaction firstMessage={firstMessage} channel={channel} />
+                    <DefaultReaction firstMessage={message} channel={channel} />
                 ))}
         </Flex>
     );

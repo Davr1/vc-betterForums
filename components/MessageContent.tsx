@@ -6,15 +6,16 @@
 
 import { Text } from "@webpack/common";
 import { TextProps } from "@webpack/types";
-import { Channel, Message } from "discord-types/general";
+import { Channel } from "discord-types/general";
 
 import { cl } from "..";
-import { useMessageContent } from "../hooks";
+import { useFormattedMessage } from "../hooks";
+import { FullMessage } from "../types";
 import { _memo } from "../utils";
 
 interface MessageContentProps extends Omit<TextProps, "children"> {
     channel: Channel;
-    message: Message | null;
+    message: FullMessage | null;
     messageClassName?: string;
     visibleIcons?: boolean;
 }
@@ -32,7 +33,7 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
         systemMessage,
         leadingIcon,
         trailingIcon,
-    } = useMessageContent({
+    } = useFormattedMessage({
         message,
         className: messageClassName,
         iconSize: 16,

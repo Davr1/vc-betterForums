@@ -26,6 +26,11 @@ export enum MaxTagCount {
     ALL = 6,
 }
 
+export enum MaxMediaCount {
+    OFF = 0,
+    ALL = 6,
+}
+
 export enum ShowReplyPreview {
     NEVER,
     UNREADS_ONLY,
@@ -49,8 +54,6 @@ export const settings = definePluginSettings({
         type: OptionType.SLIDER,
         description: "Maximum number of tags to show in the thread header",
         default: 3,
-        min: 1,
-        max: 6,
         markers: [MaxTagCount.OFF, ...makeRange(1, 5), MaxTagCount.ALL],
         stickToMarkers: true,
         componentProps: {
@@ -62,12 +65,36 @@ export const settings = definePluginSettings({
                     : value,
         },
     },
+    maxMediaCount: {
+        type: OptionType.SLIDER,
+        description:
+            "Maximum number of media items (from attachments, embeds, or message components) to show at once",
+        default: 3,
+        markers: [MaxMediaCount.OFF, ...makeRange(1, 5), MaxMediaCount.ALL],
+        stickToMarkers: true,
+        componentProps: {
+            onMarkerRender: (value: number) =>
+                value === MaxMediaCount.OFF
+                    ? getIntlMessage("FORM_LABEL_OFF")
+                    : value === MaxMediaCount.ALL
+                    ? getIntlMessage("FORM_LABEL_ALL")
+                    : value,
+        },
+    },
+    mediaSize: {
+        type: OptionType.SLIDER,
+        description: "Media preview size. Has no effect when Max Media Count is set to OFF.",
+        default: 72,
+        markers: [48, 56, 64, 72, 80, 96, 128],
+        stickToMarkers: true,
+        componentProps: {
+            onMarkerRender: (value: number) => `${value}px`,
+        },
+    },
     messagePreviewLineCount: {
         type: OptionType.SLIDER,
         description: "Number of lines to show in the message preview",
         default: 3,
-        min: 1,
-        max: 6,
         markers: [...makeRange(1, 5), MessagePreviewLineCount.ALL],
         stickToMarkers: true,
         componentProps: {
@@ -112,8 +139,6 @@ export const settings = definePluginSettings({
         type: OptionType.SLIDER,
         description: "Maximum number of reactions to show in the thread footer",
         default: 3,
-        min: MaxReactionCount.OFF,
-        max: MaxReactionCount.ALL,
         markers: [MaxReactionCount.OFF, ...makeRange(1, 9), MaxReactionCount.ALL],
         stickToMarkers: true,
         componentProps: {

@@ -5,10 +5,10 @@
  */
 
 import { FluxEvents, FluxStore } from "@webpack/types";
-import { Channel, Guild, Message, User } from "discord-types/general";
+import { Channel, Guild, User } from "discord-types/general";
 import * as Stores from "discord-types/stores";
 
-import { DiscordTag, FullChannel } from "../types";
+import { DiscordTag, FullChannel, FullMessage } from "../types";
 
 export type FluxEventHandlers<T extends Partial<Record<FluxEvents, unknown>>> = {
     [K in keyof T]?: (data: T[K]) => void;
@@ -23,12 +23,12 @@ export namespace ExtendedStores {
 
     export interface ForumPostMessagesStore extends FluxStore {
         isLoading(channelId: Channel["id"]): boolean;
-        getMessage(channelId: Channel["id"]): { firstMessage: Message | null };
+        getMessage(channelId: Channel["id"]): { firstMessage: FullMessage | null; loaded: boolean };
     }
 
     export interface ThreadMessageStore extends FluxStore {
         getCount(channelId: Channel["id"]): number | null;
-        getMostRecentMessage(channelId: Channel["id"]): Message | null;
+        getMostRecentMessage(channelId: Channel["id"]): FullMessage | null;
     }
 
     export interface ForumPostUnreadCountStore extends FluxStore {
@@ -51,21 +51,21 @@ export namespace ExtendedStores {
     export interface ReadStateStore extends FluxStore {
         hasTrackedUnread(channelId: Channel["id"]): boolean;
         hasOpenedThread(channelId: Channel["id"]): boolean;
-        getTrackedAckMessageId(channelId: Channel["id"]): Message["id"] | null;
+        getTrackedAckMessageId(channelId: Channel["id"]): FullMessage["id"] | null;
         isNewForumThread(
             channelId: Channel["id"],
             parentChannelId: Channel["id"],
             guild: Guild
         ): boolean;
         isForumPostUnread(channelId: Channel["id"]): boolean;
-        lastMessageId(channelId: Channel["id"]): Message["id"] | null;
-        getOldestUnreadMessageId(channelId: Channel["id"]): Message["id"] | null;
+        lastMessageId(channelId: Channel["id"]): FullMessage["id"] | null;
+        getOldestUnreadMessageId(channelId: Channel["id"]): FullMessage["id"] | null;
     }
 
     export interface RelationshipStore extends FluxStore, Stores.RelationshipStore {
         isBlockedOrIgnored(userId: User["id"]): boolean;
-        isBlockedForMessage(message: Message): boolean;
-        isIgnoredForMessage(message: Message): boolean;
+        isBlockedForMessage(message: FullMessage): boolean;
+        isIgnoredForMessage(message: FullMessage): boolean;
     }
 
     export interface GuildMemberStore extends FluxStore, Stores.GuildMemberStore {
@@ -84,7 +84,8 @@ export namespace ExtendedStores {
         canChatInGuild(guildId: Guild["id"]): boolean;
     }
 
-    export interface ChannelStore extends FluxStore, Stores.ChannelStore {
+    export interface ChannelStore extends FluxStore, Omit<Stores.ChannelStore, "getChannel"> {
+        getChannel(channelId: Channel["id"]): FullChannel | undefined;
         loadAllGuildAndPrivateChannelsFromDisk(): Record<Channel["id"], FullChannel>;
     }
 
@@ -96,6 +97,17 @@ export namespace ExtendedStores {
     export interface ThreadMembersStore extends FluxStore {
         getMemberCount(threadId: Channel["id"]): number | null;
         getMemberIdsPreview(threadId: Channel["id"]): User["id"][] | null;
+    }
+
+    export interface UserSettingsProtoStore extends FluxStore {
+        settings: {
+            textAndImages: {
+                keywordFilterSettings?: Record<
+                    "profanity" | "sexualContent" | "slurs",
+                    { value: boolean }
+                >;
+            };
+        };
     }
 }
 

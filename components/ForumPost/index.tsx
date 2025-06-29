@@ -16,7 +16,6 @@ import {
     useFocusRing,
     useForumPostComposerStore,
     useForumPostEvents,
-    useForumPostMetadata,
     useMessageCount,
 } from "../../hooks";
 import { ChannelSectionStore, ChannelStore } from "../../stores";
@@ -31,6 +30,8 @@ const ClickableWithRing: ComponentType<
         focusProps: { ringTarget: Ref<HTMLElement> };
     }
 > = Clickable;
+
+const mediaThreshold = 500;
 
 interface ForumPostProps {
     goToThread: (channel: Channel, shiftKey: boolean) => void;
@@ -51,15 +52,10 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
     );
 
     const { firstMessage } = useFirstMessage(channel);
-    const { firstMedia } = useForumPostMetadata({ firstMessage });
     const { messageCountText } = useMessageCount(channel);
 
     const { ref: ringTarget, width, height } = useFocusRing<HTMLDivElement>();
-    const { handleLeftClick, handleRightClick } = useForumPostEvents({
-        goToThread,
-        channel,
-        facepileRef: () => {},
-    });
+    const { handleLeftClick, handleRightClick } = useForumPostEvents({ goToThread, channel });
 
     const setCardHeight = useForumPostComposerStore(store => store.setCardHeight);
     useEffect(() => {
@@ -86,12 +82,12 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
                     })}
                 >
                     <Flex className="vc-better-forums-thread-body-container">
-                        <ForumPost.Body channel={channel} firstMessage={firstMessage} />
-                        {firstMedia && width >= 500 && <ForumPost.Media {...firstMedia} />}
+                        <ForumPost.Body channel={channel} message={firstMessage} />
+                        <ForumPost.Media message={firstMessage} maxWidth={width - mediaThreshold} />
                     </Flex>
                     <ForumPost.Footer
                         channel={channel}
-                        firstMessage={firstMessage}
+                        message={firstMessage}
                         containerWidth={width}
                     />
                 </Flex>

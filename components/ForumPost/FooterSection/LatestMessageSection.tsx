@@ -17,7 +17,7 @@ import {
 } from "../../../hooks";
 import { settings } from "../../../settings";
 import { ThreadChannel } from "../../../types";
-import { _memo, Kangaroo } from "../../../utils";
+import { _memo, MessageUtils } from "../../../utils";
 import { Icons } from "../../icons";
 import { MessageContent } from "../../MessageContent";
 import { Typing } from "../../Typing";
@@ -53,7 +53,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
     const clickHandler = useCallback(() => {
         // wait until router navigation
         setImmediate(() =>
-            Kangaroo.jumpToMessage({ channelId: channel.id, messageId, flash: true })
+            MessageUtils.jumpToMessage({ channelId: channel.id, messageId, flash: true })
         );
     }, [channel.id, messageId]);
 
@@ -81,7 +81,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
                     />
                     <MessageContent
                         channel={channel}
-                        message={mostRecentMessage}
+                        message={mostRecentMessage!}
                         messageClassName="vc-better-forums-message-content-inline"
                         variant={unreadCount ? "text-sm/semibold" : "text-sm/normal"}
                         lineClamp={1}

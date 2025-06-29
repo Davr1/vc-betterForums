@@ -12,7 +12,7 @@ import definePlugin from "@utils/types";
 import { zustandCreate, zustandPersist } from "@webpack/common";
 
 import { ForumPost } from "./components/ForumPost";
-import { setForumChannelStore } from "./hooks/useForumChannelStore";
+import { setForumChannelStore } from "./hooks/forums/useForumChannelStore";
 import { settings } from "./settings";
 import { ForumChannelStore, ForumChannelStoreState, MissingGuildMemberStore } from "./stores";
 import { indexedDBStorageFactory } from "./utils";

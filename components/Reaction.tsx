@@ -4,26 +4,23 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { useLayoutEffect, useRef, useState, useStateFromStores } from "@webpack/common";
-import { Message } from "discord-types/general";
+import { Flex, useStateFromStores } from "@webpack/common";
 import { Ref } from "react";
 
-import { cl } from "..";
-import { useCheckPermissions, useDefaultEmoji, useTopReactions } from "../hooks";
+import { useCheckPermissions, useDefaultEmoji, useSortedReactions } from "../hooks";
 import { ChannelStore } from "../stores";
-import { ForumChannel, ReactionType, ThreadChannel } from "../types";
+import { ForumChannel, FullMessage, ReactionType, ThreadChannel } from "../types";
 import { _memo } from "../utils";
+import { DynamicList } from "./DynamicList";
 import { ReactionButton, ReactionButtonProps } from "./ReactionButton";
 
 type PartiallyOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 interface ReactionContainerProps
     extends PartiallyOptional<ReactionButtonProps, "me" | "me_burst" | "count" | "burst_count"> {
-    visible?: boolean;
     ref?: Ref<HTMLDivElement>;
 }
 
 function ReactionContainer({
-    visible = true,
     count = 0,
     burst_count = 0,
     me = false,
@@ -36,12 +33,7 @@ function ReactionContainer({
     ...props
 }: ReactionContainerProps) {
     return (
-        <div
-            ref={ref}
-            className={cl("vc-better-forums-reaction", {
-                "vc-better-forums-reaction-hidden": !visible,
-            })}
-        >
+        <div className="vc-better-forums-reaction" ref={ref}>
             <ReactionButton
                 count={count}
                 burst_count={burst_count}
@@ -58,7 +50,7 @@ function ReactionContainer({
 }
 
 interface ReactionProps {
-    firstMessage: Message;
+    firstMessage: FullMessage;
     channel: ThreadChannel;
     maxWidth?: number;
     maxCount?: number;
@@ -91,6 +83,8 @@ export const DefaultReaction = _memo<ReactionProps>(function DefaultReaction({
     );
 });
 
+const visibilityPredicate = (_: unknown, i: number, max: number) => i < max || i === 0;
+
 export const Reactions = _memo<ReactionProps>(function Reactions({
     firstMessage,
     channel,
@@ -98,50 +92,34 @@ export const Reactions = _memo<ReactionProps>(function Reactions({
     maxCount,
 }) {
     const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
-    const reactions = useTopReactions(firstMessage, maxCount);
+    const readonly = disableReactionCreates || channel.isArchivedLockedThread();
 
-    const [visibleReactions, setVisibleReactions] = useState(reactions.length);
-    const refs = useRef<Array<HTMLDivElement | null>>([]);
-
-    if (reactions.length !== refs.current.length) {
-        refs.current = Array.from({ length: reactions.length }, (_, i) => refs.current[i] ?? null);
-    }
-
-    useLayoutEffect(() => {
-        if (!maxWidth || reactions.length === 0) return;
-
-        let count = 0;
-        let width = 0;
-
-        for (const ref of refs.current) {
-            if (!ref) break;
-            width += ref.offsetWidth + 6 /* (gap) */;
-            if (width >= maxWidth) break;
-            count++;
-        }
-
-        setVisibleReactions(count);
-    }, [maxWidth, reactions]);
+    const reactions = useSortedReactions(firstMessage);
 
     if (reactions.length === 0) return null;
 
     return (
-        <div className="vc-better-forums-reactions">
-            {reactions.map((reaction, i) => (
+        <DynamicList
+            items={reactions}
+            maxWidth={maxWidth}
+            maxCount={maxCount}
+            direction={Flex.Direction.HORIZONTAL_REVERSE}
+            align={Flex.Align.STRETCH}
+            gap={6}
+            predicate={visibilityPredicate}
+            className="vc-better-forums-reactions"
+        >
+            {(reaction, ref: Ref<HTMLDivElement>) => (
                 <ReactionContainer
                     message={firstMessage}
-                    readOnly={disableReactionCreates || channel.isArchivedLockedThread()}
+                    readOnly={readonly}
                     isLurking={isLurking}
                     isPendingMember={isPendingMember}
                     type={reaction.type}
-                    key={reaction.id}
-                    visible={i < visibleReactions || i === 0}
-                    ref={ref => {
-                        refs.current[i] = ref;
-                    }}
+                    ref={ref}
                     {...reaction.reaction}
                 />
-            ))}
-        </div>
+            )}
+        </DynamicList>
     );
 });
