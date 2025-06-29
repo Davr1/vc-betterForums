@@ -6,15 +6,15 @@
 
 import { useCallback, useMemo, useStateFromStores, WindowStore } from "@webpack/common";
 
-import { Image, ImageProps, MediaLayoutType } from "../components/Image";
-import { UnfurledMediaItem } from "../types";
+import { Image, ImageProps, MediaLayoutType } from "../../components/Image";
+import { UnfurledMediaItem } from "../../types";
 import {
     animatedMediaRegex,
     getPreviewSize,
     hasVolume,
     matchesUrlSuffix,
     openMediaViewer,
-} from "../utils";
+} from "../../utils";
 
 interface LazyImageOptions {
     items: UnfurledMediaItem[];
@@ -34,7 +34,7 @@ export function useLazyImage({ items, prefferedSize, mediaIndex = 0 }: LazyImage
     const animated = isAnimated && isFocused;
 
     const onMouseEnter: ImageProps["onMouseEnter"] = useCallback(() => {
-        if (!image) return;
+        if (image?.type !== "IMAGE") return;
         const previewSize = getPreviewSize(items.length > 1, image);
 
         Image.preloadImage({

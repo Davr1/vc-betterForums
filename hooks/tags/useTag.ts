@@ -6,7 +6,7 @@
 
 import { useMemo } from "@webpack/common";
 
-import { CustomTag } from "../types";
+import { CustomTag } from "../../types";
 import { useAllCustomTags } from "./useAllCustomTags";
 import { useAllForumTags } from "./useAllForumTags";
 

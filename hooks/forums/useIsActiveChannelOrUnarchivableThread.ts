@@ -7,7 +7,7 @@
 import { PermissionsBits, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
-import { PermissionStore } from "../stores";
+import { PermissionStore } from "../../stores";
 
 export function useIsActiveChannelOrUnarchivableThread(channel: Channel | null): boolean {
     const canSendMessagesInThreads = useStateFromStores(

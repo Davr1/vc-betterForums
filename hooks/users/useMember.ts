@@ -7,8 +7,8 @@
 import { GuildRoleStore, GuildStore, useEffect, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
-import { GuildMemberRequesterStore, GuildMemberStore, RelationshipStore } from "../stores";
-import { FullGuildMember, FullUser, Member } from "../types";
+import { GuildMemberRequesterStore, GuildMemberStore, RelationshipStore } from "../../stores";
+import { FullGuildMember, FullUser, Member } from "../../types";
 
 export function useMember(user: FullUser | null, channel: Channel): Member {
     const userId = user?.id;

@@ -9,7 +9,7 @@ import { TextProps } from "@webpack/types";
 import { Channel } from "discord-types/general";
 
 import { cl } from "..";
-import { useMessageContent } from "../hooks";
+import { useFormattedMessage } from "../hooks";
 import { FullMessage } from "../types";
 import { _memo } from "../utils";
 
@@ -33,7 +33,7 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
         systemMessage,
         leadingIcon,
         trailingIcon,
-    } = useMessageContent({
+    } = useFormattedMessage({
         message,
         className: messageClassName,
         iconSize: 16,

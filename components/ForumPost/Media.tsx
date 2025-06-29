@@ -9,7 +9,7 @@ import { TextProps } from "@webpack/types";
 import { CSSProperties, Ref } from "react";
 
 import { cl } from "../..";
-import { useForumPostMetadata, useLazyImage } from "../../hooks";
+import { useLazyImage, useMessage } from "../../hooks";
 import { MaxMediaCount, settings } from "../../settings";
 import { FullMessage, UnfurledMediaItem } from "../../types";
 import { _memo } from "../../utils";
@@ -23,7 +23,7 @@ interface MediaProps {
 }
 
 export const Media = _memo<MediaProps>(function Media({ message, maxWidth }) {
-    const { media } = useForumPostMetadata({ firstMessage: message });
+    const { media } = useMessage({ message });
     const { maxMediaCount, mediaSize } = settings.use(["maxMediaCount", "mediaSize"]);
 
     const { onMouseEnter, onZoom } = useLazyImage({ items: media });
@@ -38,7 +38,10 @@ export const Media = _memo<MediaProps>(function Media({ message, maxWidth }) {
                             onMouseEnter(e);
                             props.onMouseEnter();
                         }}
-                        onClick={onZoom}
+                        onClick={e => {
+                            e.stopPropagation();
+                            onZoom(e);
+                        }}
                     />
                 )}
             </Tooltip>

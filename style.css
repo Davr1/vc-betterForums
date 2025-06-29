@@ -479,9 +479,8 @@
     flex-shrink: 0;
 }
 
-.vc-better-forums-follow-button {
-    appearance: none;
-    background: unset;
+.vc-better-forums-follow-button,
+.vc-better-forums-thumbnail-decorator {
     font: inherit;
     display: flex;
     align-items: center;
@@ -490,6 +489,31 @@
     padding: 0.3rem 0.2rem;
     margin: -0.3rem -0.2rem;
     transition: color 150ms ease, opacity 150ms ease;
+    white-space: nowrap;
+}
+
+.vc-better-forums-thumbnail-decorator {
+    position: absolute;
+    right: 0;
+
+    &:hover {
+        color: var(--interactive-active);
+    }
+}
+
+.vc-better-forums-thumbnail-decorator-overlay {
+    right: 6px;
+    bottom: 6px;
+    background-color: #202225cc;
+    border-radius: 4px;
+    margin: 0;
+    padding: 3px 4px;
+    pointer-events: none;
+}
+
+.vc-better-forums-follow-button {
+    appearance: none;
+    background: unset;
 
     &:hover {
         color: var(--interactive-active);
@@ -498,9 +522,19 @@
     &.vc-better-forums-follow-button-active {
         color: var(--text-brand);
     }
+}
 
-    .vc-better-forums-thread:not(.vc-better-forums-thread-open, :hover)
-        &:not(.vc-better-forums-follow-button-active) {
+.vc-better-forums-thread:not(.vc-better-forums-thread-open, :hover)
+    .vc-better-forums-follow-button:not(.vc-better-forums-follow-button-active) {
+    opacity: 0;
+}
+
+.vc-better-forums-media-item {
+    position: relative;
+    display: flex;
+    height: max-content;
+
+    &:hover .vc-better-forums-thumbnail-decorator {
         opacity: 0;
     }
 }
@@ -664,38 +698,4 @@
 
 .vc-better-forums-channel-mention {
     white-space: nowrap;
-}
-
-.vc-better-forums-thumbnail-decorator {
-    color: var(--interactive-normal);
-    position: absolute;
-    right: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--space-xxs);
-    white-space: nowrap;
-    transition: color 150ms ease, opacity 100ms ease;
-
-    &:hover {
-        color: var(--interactive-active);
-    }
-}
-
-.vc-better-forums-thumbnail-decorator-overlay {
-    right: 6px;
-    bottom: 6px;
-    background-color: #202225cc;
-    border-radius: 4px;
-    padding: 2px 4px;
-    pointer-events: none;
-}
-
-.vc-better-forums-media-item {
-    position: relative;
-    display: flex;
-    height: max-content;
-
-    &:hover .vc-better-forums-thumbnail-decorator {
-        opacity: 0;
-    }
 }

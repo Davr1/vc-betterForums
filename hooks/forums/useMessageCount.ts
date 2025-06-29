@@ -7,9 +7,9 @@
 import { useMemo, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
-import { settings } from "../settings";
-import { ForumPostUnreadCountStore, ThreadMessageStore } from "../stores";
-import { MessageCount } from "../types";
+import { settings } from "../../settings";
+import { ForumPostUnreadCountStore, ThreadMessageStore } from "../../stores";
+import { MessageCount } from "../../types";
 import { useForumPostState } from "./useForumPostState";
 
 function roundNumber(n: number): number {

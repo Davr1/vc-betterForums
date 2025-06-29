@@ -9,12 +9,12 @@ import { findByCodeLazy } from "@webpack";
 import { useMemo, useStateFromStores } from "@webpack/common";
 import { ReactNode } from "react";
 
-import { ForumPostMessagesStore, RelationshipStore } from "../stores";
-import { FullMessage, MessageFormattingOptions } from "../types";
-import { useForumPostMetadata } from "./";
+import { ChannelStore, ForumPostMessagesStore, RelationshipStore } from "../../stores";
+import { FullMessage, MessageFormattingOptions } from "../../types";
+import { useMessage } from "../index";
 
 const getReplyPreview: (
-    message: FullMessage,
+    message: FullMessage | null,
     content: ReactNode,
     isBlocked: boolean | undefined,
     isIgnored: boolean | undefined,
@@ -23,7 +23,7 @@ const getReplyPreview: (
 ) => Record<"contentPlaceholder" | "renderedContent" | "trailingIcon" | "leadingIcon", ReactNode> =
     findByCodeLazy("#{intl::MESSAGE_PINNED}");
 
-export function useMessageContent({
+export function useFormattedMessage({
     message,
     className,
     iconSize,
@@ -31,10 +31,22 @@ export function useMessageContent({
 }: MessageFormattingOptions): Record<"content" | "leadingIcon" | "trailingIcon", ReactNode> & {
     systemMessage: boolean;
 } {
+    const channelId = message?.getChannelId();
+
     const isLoading = useStateFromStores(
-        [ForumPostMessagesStore],
-        () => !!message?.channel_id && ForumPostMessagesStore.isLoading(message.channel_id),
-        [message?.channel_id]
+        [ForumPostMessagesStore, ChannelStore],
+        () => {
+            if (!channelId || !message?.id) return false;
+
+            const channel = ChannelStore.getChannel(channelId);
+            if (!channel?.isThread()) return false;
+
+            const { firstMessage, loaded } = ForumPostMessagesStore.getMessage(channel.id);
+            if (firstMessage?.id !== message.id) return false;
+
+            return loaded;
+        },
+        [channelId, message?.id]
     );
 
     const isAuthorBlocked = useStateFromStores(
@@ -49,7 +61,7 @@ export function useMessageContent({
         [message]
     );
 
-    const { content, media } = useForumPostMetadata({ firstMessage: message });
+    const { content, media } = useMessage({ message });
 
     const { contentPlaceholder, renderedContent, leadingIcon, trailingIcon } = useMemo(() => {
         return !message

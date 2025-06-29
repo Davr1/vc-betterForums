@@ -6,8 +6,8 @@
 
 import { useMemo } from "@webpack/common";
 
-import { CustomTag } from "../types";
-import { tagDefinitions } from "../utils";
+import { CustomTag } from "../../types";
+import { tagDefinitions } from "../../utils";
 
 export function useAllCustomTags(): Map<CustomTag["id"], CustomTag> {
     return useMemo(() => new Map(tagDefinitions.map(tag => [tag.id, tag])), []);

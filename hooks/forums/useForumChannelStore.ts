@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ForumChannelStore } from "../stores";
+import { ForumChannelStore } from "../../stores";
 
 let store: () => ForumChannelStore | null = () => null;
 

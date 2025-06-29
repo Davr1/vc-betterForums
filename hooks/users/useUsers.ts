@@ -7,7 +7,7 @@
 import { useEffect, UserStore, useStateFromStores } from "@webpack/common";
 import { Guild, User } from "discord-types/general";
 
-import { MissingGuildMemberStore } from "../stores";
+import { MissingGuildMemberStore } from "../../stores";
 
 export function useUsers(guildId: Guild["id"], userIds: User["id"][], limit?: number) {
     const users = useStateFromStores(

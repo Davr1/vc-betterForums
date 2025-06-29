@@ -7,7 +7,12 @@
 import { PermissionsBits, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
-import { GuildMemberStore, GuildVerificationStore, LurkingStore, PermissionStore } from "../stores";
+import {
+    GuildMemberStore,
+    GuildVerificationStore,
+    LurkingStore,
+    PermissionStore,
+} from "../../stores";
 import { useIsActiveChannelOrUnarchivableThread } from "./useIsActiveChannelOrUnarchivableThread";
 
 export function useCheckPermissions(

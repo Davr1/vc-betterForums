@@ -7,7 +7,7 @@
 import { findByCodeLazy } from "@webpack";
 import { Channel } from "discord-types/general";
 
-import { FullMessage } from "../types";
+import { FullMessage } from "../../types";
 
 export const useFirstMessage: (channel: Channel) => {
     loaded: boolean;

@@ -6,8 +6,8 @@
 
 import { MessageStore, useStateFromStores } from "@webpack/common";
 
-import { ForumPostMessagesStore, ThreadMessageStore } from "../stores";
-import { FullMessage, ThreadChannel } from "../types";
+import { ForumPostMessagesStore, ThreadMessageStore } from "../../stores";
+import { FullMessage, ThreadChannel } from "../../types";
 
 export function useRecentMessage(channel: ThreadChannel): FullMessage | null {
     return useStateFromStores(

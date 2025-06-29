@@ -7,7 +7,7 @@
 import { EmojiStore, useStateFromStores } from "@webpack/common";
 import { ReactionEmoji } from "discord-types/general";
 
-import { ForumChannel } from "../types";
+import { ForumChannel } from "../../types";
 
 export function useDefaultEmoji(channel: ForumChannel): ReactionEmoji | null {
     const emoji = channel.defaultReactionEmoji;

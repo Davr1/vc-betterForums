@@ -7,8 +7,8 @@
 import { getUserSettingLazy } from "@api/UserSettings";
 import { useMemo } from "@webpack/common";
 
-import { Attachment, FullMessage } from "../types";
-import { getAttachments, getComponentMedia, getEmbeds } from "../utils";
+import { Attachment, FullMessage } from "../../types";
+import { getAttachments, getComponentMedia, getEmbeds } from "../../utils";
 
 const inlineAttachmentMedia = getUserSettingLazy<boolean>("textAndImages", "inlineAttachmentMedia");
 const inlineEmbedMedia = getUserSettingLazy<boolean>("textAndImages", "inlineEmbedMedia");

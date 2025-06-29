@@ -6,7 +6,7 @@
 
 import { Flex, Heading, Text, useCallback, UserStore, useStateFromStores } from "@webpack/common";
 
-import { useChannelName, useForumPostState } from "../../hooks";
+import { useForumPostName, useForumPostState } from "../../hooks";
 import { settings } from "../../settings";
 import { FullMessage, ThreadChannel } from "../../types";
 import { _memo, ThreadUtils } from "../../utils";
@@ -27,7 +27,7 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
         "messagePreviewLineCount",
         "showFollowButton",
     ]);
-    const channelName = useChannelName(channel);
+    const threadName = useForumPostName(channel);
 
     const owner = useStateFromStores(
         [UserStore],
@@ -62,7 +62,7 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
                     }
                     className="vc-better-forums-thread-title"
                 >
-                    {channelName}
+                    {threadName}
                 </Text>
                 <ForumPost.Tags channel={channel} />
             </Heading>

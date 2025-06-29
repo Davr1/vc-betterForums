@@ -19,6 +19,9 @@ import { ReactNode } from "react";
 export interface FullChannel extends Channel {
     isForumLikeChannel(): this is ForumChannel;
     isForumChannel(): this is ForumChannel;
+    isActiveThread(): this is ThreadChannel;
+    isArchivedThread(): this is ThreadChannel;
+    isThread(): this is ThreadChannel;
 }
 
 export interface ForumChannel extends FullChannel {
@@ -35,7 +38,7 @@ export interface ThreadMetadata {
     invitable: boolean;
 }
 
-export interface ThreadChannel extends Channel {
+export interface ThreadChannel extends FullChannel {
     appliedTags: DiscordTag["id"][] | null;
     memberIdsPreview: User["id"][];
     memberCount: number;

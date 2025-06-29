@@ -8,8 +8,8 @@ import { parseUrl } from "@utils/misc";
 import { useMemo } from "@webpack/common";
 import { ReactNode } from "react";
 
-import { CustomTag } from "../types";
-import { getEmojiURL } from "../utils";
+import { CustomTag } from "../../types";
+import { getEmojiURL } from "../../utils";
 
 export function useTagIcon(tag: CustomTag): string | ReactNode | null {
     return useMemo(() => {

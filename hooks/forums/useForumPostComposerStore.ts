@@ -6,7 +6,7 @@
 
 import { findByCodeLazy } from "@webpack";
 
-import { ForumPostComposerStore } from "../stores";
+import { ForumPostComposerStore } from "../../stores";
 
 export const useForumPostComposerStore: <T>(
     selector: (store: ForumPostComposerStore) => T,

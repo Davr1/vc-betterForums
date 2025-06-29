@@ -23,7 +23,7 @@ export namespace ExtendedStores {
 
     export interface ForumPostMessagesStore extends FluxStore {
         isLoading(channelId: Channel["id"]): boolean;
-        getMessage(channelId: Channel["id"]): { firstMessage: FullMessage | null };
+        getMessage(channelId: Channel["id"]): { firstMessage: FullMessage | null; loaded: boolean };
     }
 
     export interface ThreadMessageStore extends FluxStore {
@@ -84,7 +84,8 @@ export namespace ExtendedStores {
         canChatInGuild(guildId: Guild["id"]): boolean;
     }
 
-    export interface ChannelStore extends FluxStore, Stores.ChannelStore {
+    export interface ChannelStore extends FluxStore, Omit<Stores.ChannelStore, "getChannel"> {
+        getChannel(channelId: Channel["id"]): FullChannel | undefined;
         loadAllGuildAndPrivateChannelsFromDisk(): Record<Channel["id"], FullChannel>;
     }
 

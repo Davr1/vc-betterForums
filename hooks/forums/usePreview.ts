@@ -6,8 +6,8 @@
 
 import { useMemo } from "@webpack/common";
 
-import { settings, ShowReplyPreview } from "../settings";
-import { ForumPostState } from "../types";
+import { settings, ShowReplyPreview } from "../../settings";
+import { ForumPostState } from "../../types";
 
 function canShowTypingIndicator(forumState: ForumPostState, showReplyPreview: ShowReplyPreview) {
     if (forumState.isMuted) return false;

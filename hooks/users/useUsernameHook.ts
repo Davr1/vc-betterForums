@@ -5,11 +5,10 @@
  */
 
 import { findByCodeLazy } from "@webpack";
-import { Channel, Guild, User } from "discord-types/general";
-import { Message } from "esbuild";
+import { Channel, Guild, Message, User } from "discord-types/general";
 import { ReactNode } from "react";
 
-import { Member } from "../types";
+import { Member } from "../../types";
 
 export const useUsernameHook: (
     options: Partial<{

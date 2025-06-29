@@ -7,7 +7,7 @@
 import { UserStore, useStateFromStores } from "@webpack/common";
 import { Channel, User } from "discord-types/general";
 
-import { RelationshipStore, TypingStore } from "../stores";
+import { RelationshipStore, TypingStore } from "../../stores";
 
 export function useTypingUsers(
     channelId: Channel["id"],

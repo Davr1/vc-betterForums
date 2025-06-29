@@ -4,17 +4,17 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { findByCodeLazy } from "@webpack";
 import { lodash, useMemo, useStateFromStores } from "@webpack/common";
 import { ReactNode } from "react";
 
-import { findByCodeLazy } from "../../../webpack";
-import { UserSettingsProtoStore } from "../stores";
-import { FullMessage, UnfurledMediaItem } from "../types";
-import { unfurlAttachment } from "../utils";
-import { useMessageMedia } from "./";
+import { UserSettingsProtoStore } from "../../stores";
+import { FullMessage, UnfurledMediaItem } from "../../types";
+import { unfurlAttachment } from "../../utils";
+import { useMessageMedia } from "../index";
 
 interface Options {
-    firstMessage: FullMessage | null;
+    message: FullMessage | null;
     formatInline?: boolean;
     noStyleAndInteraction?: boolean;
 }
@@ -42,8 +42,8 @@ const parseMessageContent: (
     "escapeReplacement"
 );
 
-export function useForumPostMetadata({
-    firstMessage,
+export function useMessage({
+    message,
     formatInline = true,
     noStyleAndInteraction = true,
 }: Options): ForumPostMetadata {
@@ -67,8 +67,8 @@ export function useForumPostMetadata({
 
     const { hasSpoilerEmbeds, content } = useMemo(
         () =>
-            firstMessage?.content
-                ? parseMessageContent(firstMessage, {
+            message?.content
+                ? parseMessageContent(message, {
                       formatInline,
                       noStyleAndInteraction,
                       shouldFilterKeywords,
@@ -79,13 +79,13 @@ export function useForumPostMetadata({
                       hasSpoilerEmbeds: false,
                       content: null,
                   },
-        [firstMessage, formatInline, noStyleAndInteraction, shouldFilterKeywords]
+        [message, formatInline, noStyleAndInteraction, shouldFilterKeywords]
     );
 
-    const media = useMessageMedia(firstMessage, hasSpoilerEmbeds);
+    const media = useMessageMedia(message, hasSpoilerEmbeds);
     const unfurledMedia = useMemo(
-        () => media.map(item => unfurlAttachment(item, firstMessage)),
-        [firstMessage, media]
+        () => media.map(item => unfurlAttachment(item, message)),
+        [message, media]
     );
 
     return { content, media: unfurledMedia, hasSpoilerEmbeds };

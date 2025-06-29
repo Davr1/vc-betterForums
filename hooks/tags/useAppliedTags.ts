@@ -6,11 +6,11 @@
 
 import { useMemo, useStateFromStores } from "@webpack/common";
 
-import { settings } from "../settings";
-import { ChannelStore } from "../stores";
-import { CustomTag, DiscordTag, ForumChannel, ThreadChannel } from "../types";
-import { tagDefinitions } from "../utils";
-import { useForumPostState } from "./";
+import { settings } from "../../settings";
+import { ChannelStore } from "../../stores";
+import { CustomTag, DiscordTag, ForumChannel, ThreadChannel } from "../../types";
+import { tagDefinitions } from "../../utils";
+import { useForumPostState } from "../index";
 
 export function useAppliedTags(channel: ThreadChannel): CustomTag[] {
     const { tagOverrides } = settings.use(["tagOverrides"]);

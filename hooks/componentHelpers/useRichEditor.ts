@@ -6,9 +6,9 @@
 
 import { useCallback, useMemo, useRef, useState } from "@webpack/common";
 
-import { DraftType, RichEditorProps, RichEditorType, SlateNode } from "../components/RichEditor";
-import { ParsedContent } from "../types";
-import { dummyChannel, MessageParserUtils } from "../utils";
+import { DraftType, RichEditorProps, RichEditorType, SlateNode } from "../../components/RichEditor";
+import { ParsedContent } from "../../types";
+import { dummyChannel, MessageParserUtils } from "../../utils";
 
 type Submit = Partial<{ shouldClear: boolean; shouldRefocus: boolean }> | void;
 

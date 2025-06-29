@@ -12,8 +12,8 @@ import {
     JoinedThreadsStore,
     MissingGuildMemberStore,
     ReadStateStore,
-} from "../stores";
-import { ForumPostState } from "../types";
+} from "../../stores";
+import { ForumPostState } from "../../types";
 
 function getJoinedAtTime(guild: Guild): number {
     return +guild.joinedAt || +new Date(guild.joinedAt) || Date.now();

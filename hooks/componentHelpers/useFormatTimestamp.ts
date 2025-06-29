@@ -10,7 +10,7 @@ import { findByCodeLazy } from "@webpack";
 import { i18n, SnowflakeUtils, useMemo, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
-import { Duration, ReadStateStore, SortOrder } from "../stores";
+import { Duration, ReadStateStore, SortOrder } from "../../stores";
 
 type TimeFormatterOptions = Record<
     "minutes" | "hours" | "days" | "month",

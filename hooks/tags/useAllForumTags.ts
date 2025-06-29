@@ -6,8 +6,8 @@
 
 import { useStateFromStores } from "@webpack/common";
 
-import { ChannelStore } from "../stores";
-import { CustomTag } from "../types";
+import { ChannelStore } from "../../stores";
+import { CustomTag } from "../../types";
 
 export function useAllForumTags(): Map<CustomTag["id"], CustomTag> {
     return useStateFromStores(

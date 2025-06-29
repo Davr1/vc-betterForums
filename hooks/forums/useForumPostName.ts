@@ -9,7 +9,7 @@ import { useMemo, useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 import { ReactNode } from "react";
 
-import { ForumSearchStore } from "../stores";
+import { ForumSearchStore } from "../../stores";
 
 type Match = {
     type: "text" | "highlight";
@@ -28,7 +28,7 @@ const textHightlightParser: (
     hasSpoilerEmbeds: boolean;
 } = findByCodeLazy("hideSimpleEmbedContent:", "1!==");
 
-export function useChannelName(channel: Channel): ReactNode {
+export function useForumPostName(channel: Channel): ReactNode {
     const hasSearchResults = useStateFromStores(
         [ForumSearchStore],
         () => ForumSearchStore.getHasSearchResults(channel.parent_id),

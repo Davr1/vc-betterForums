@@ -7,8 +7,8 @@
 import { useStateFromStores } from "@webpack/common";
 import { Channel } from "discord-types/general";
 
-import { ChannelState, ChannelStore, LayoutType, SortOrder, TagSetting } from "../stores";
-import { useForumChannelStore } from "./";
+import { ChannelState, ChannelStore, LayoutType, SortOrder, TagSetting } from "../../stores";
+import { useForumChannelStore } from "../index";
 
 function getDefaultChannelState(): ChannelState {
     return {
