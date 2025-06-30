@@ -82,7 +82,6 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
                     <MessageContent
                         channel={channel}
                         message={mostRecentMessage!}
-                        messageClassName="vc-better-forums-message-content-inline"
                         variant={unreadCount ? "text-sm/semibold" : "text-sm/normal"}
                         lineClamp={1}
                         visibleIcons

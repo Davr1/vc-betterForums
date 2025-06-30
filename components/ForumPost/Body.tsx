@@ -71,11 +71,6 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
                 message={message}
                 color="text-secondary"
                 lineClamp={messagePreviewLineCount}
-                messageClassName={
-                    messagePreviewLineCount === 1
-                        ? "vc-better-forums-message-content-inline"
-                        : "vc-better-forums-message-content"
-                }
             />
         </Flex>
     );

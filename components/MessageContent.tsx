@@ -24,18 +24,20 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
     channel,
     message,
     className,
-    messageClassName = "vc-better-forums-message-content",
+    messageClassName,
     visibleIcons,
+    lineClamp,
     ...props
 }) {
-    const {
-        content: messageContent,
-        systemMessage,
-        leadingIcon,
-        trailingIcon,
-    } = useFormattedMessage({
+    const { content, systemMessage, leadingIcon, trailingIcon } = useFormattedMessage({
         message,
-        className: messageClassName,
+        channelId: channel.id,
+        className: cl(
+            lineClamp === 1
+                ? "vc-better-forums-message-content-inline"
+                : "vc-better-forums-message-content",
+            messageClassName
+        ),
         iconSize: 16,
         iconClassName: "vc-better-forums-message-icon",
     });
@@ -49,9 +51,10 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
             color="currentColor"
             variant="text-sm/normal"
             className={cl(className, "vc-better-forums-latest-message-content-wrapper")}
+            lineClamp={lineClamp}
             {...props}
         >
-            {messageContent}
+            {content}
         </Text>
     );
 

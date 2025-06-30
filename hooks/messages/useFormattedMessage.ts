@@ -25,26 +25,25 @@ const getReplyPreview: (
 
 export function useFormattedMessage({
     message,
+    channelId,
     className,
     iconSize,
     iconClassName,
 }: MessageFormatterOptions): Record<"content" | "leadingIcon" | "trailingIcon", ReactNode> & {
     systemMessage: boolean;
 } {
-    const channelId = message?.getChannelId();
-
     const isLoading = useStores(
         [ForumPostMessagesStore, ChannelStore],
         (forumPostMessagesStore, channelStore) => {
-            if (!channelId || !message?.id) return false;
+            if (!channelId) return false;
 
             const channel = channelStore.getChannel(channelId);
-            if (!channel?.isThread()) return false;
+            if (!channel?.isActiveThread()) return false;
 
-            const { firstMessage, loaded } = forumPostMessagesStore.getMessage(channel.id);
-            if (firstMessage?.id !== message.id) return false;
+            const { firstMessage, loaded } = forumPostMessagesStore.getMessage(channelId);
+            if (firstMessage?.id !== message?.id) return false;
 
-            return loaded;
+            return !loaded;
         },
         [channelId, message?.id]
     );

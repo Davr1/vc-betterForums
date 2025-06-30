@@ -132,6 +132,7 @@ export enum ReactionType {
 
 export interface MessageFormatterOptions {
     message: FullMessage | null;
+    channelId: Channel["id"];
     className?: string;
     iconSize?: number;
     iconClassName?: string;
