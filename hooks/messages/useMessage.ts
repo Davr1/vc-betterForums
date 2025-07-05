@@ -9,7 +9,7 @@ import { lodash, useMemo } from "@webpack/common";
 import { UserSettingsProtoStore } from "../../stores";
 import { ForumPostMetadata, MessageParserOptions } from "../../types";
 import { unfurlAttachment } from "../../utils";
-import { parseInlineContent } from "../../utils/messageParsers";
+import { parseInlineContent } from "../../utils/messageParser";
 import { useMessageMedia } from "../index";
 
 export function useMessage({

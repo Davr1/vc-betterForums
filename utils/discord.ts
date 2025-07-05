@@ -10,7 +10,9 @@ import { FluxDispatcher, IconUtils } from "@webpack/common";
 import { CustomEmoji, UnicodeEmoji } from "@webpack/types";
 import { Channel, Message } from "discord-types/general";
 
+import { KeywordFilterStore } from "../stores";
 import { ParsedContent, ThreadChannel, UnfurledMediaItem } from "../types";
+import { normalize } from "./text";
 
 export const MessageUtils: {
     jumpToMessage: (options: {
@@ -57,4 +59,30 @@ export function getEmojiURL(
     if (id) return IconUtils.getEmojiURL({ id, animated: false, size });
     if (name) return EmojiUtils.getURL(name);
     return null;
+}
+
+export function replaceKeywords(text: string, options: { escapeReplacement?: boolean }): string {
+    const normalized = normalize(text);
+    if (!normalized) return text;
+
+    const replacement = options?.escapeReplacement ? "\\*" : "*";
+
+    const keywordTrie = KeywordFilterStore.getKeywordTrie();
+    const keywords = Object.values(keywordTrie?.search(normalized) ?? {});
+
+    return keywords
+        .sort((a, b) => b.start - a.start)
+        .reduce((content, { start, end }) => {
+            const from = Math.max(start, 0);
+            const to = Math.min(end, content.length - 1);
+
+            const before = content.substring(0, from);
+            const after = content.substring(to + 1);
+
+            const maskedKeyword = [...content.substring(from, to + 1)]
+                .map(char => (char === " " ? " " : replacement))
+                .join("");
+
+            return `${before}${maskedKeyword}${after}`;
+        }, text);
 }

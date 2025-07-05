@@ -66,3 +66,23 @@ export const dummyChannel: Channel = proxyLazyWebpack(() => {
 
     return Object.freeze(new DmChannel({ id: "0" }));
 });
+
+const BASE_URL = "discord.com";
+
+export const Host = Object.freeze({
+    get WEBAPP() {
+        return window.GLOBAL_ENV.WEBAPP_ENDPOINT ?? `//canary.${BASE_URL}`;
+    },
+    get CANARY() {
+        return `//canary.${BASE_URL}`;
+    },
+    get PTB() {
+        return `//ptb.${BASE_URL}`;
+    },
+    get LEGACY() {
+        return "discordapp.com";
+    },
+    get DISCORD() {
+        return BASE_URL;
+    },
+});

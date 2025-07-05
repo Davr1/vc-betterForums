@@ -24,7 +24,7 @@ export const BaseStore = proxyLazyWebpack(
     () =>
         class BaseStore extends Flux.Store {
             use<TReturn>(
-                mapper: (store: this) => TReturn,
+                mapper: (store: Omit<this, "use">) => TReturn,
                 deps?: unknown[],
                 isEqual?: (old: TReturn, newer: TReturn) => boolean
             ): TReturn {

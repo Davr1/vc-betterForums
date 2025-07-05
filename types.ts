@@ -124,7 +124,7 @@ export interface FullUser extends User {
 
 export type MessageReactionWithBurst = MessageReaction & { burst_count: number; me_burst: boolean };
 
-export enum ReactionType {
+export const enum ReactionType {
     NORMAL = 0,
     BURST = 1,
     VOTE = 2,
@@ -199,7 +199,7 @@ export interface SourceMetadata {
     identifier?: Partial<Attachment> | null;
 }
 
-export enum MessageAttachmentFlag {
+export const enum MessageAttachmentFlag {
     NONE = 0,
     IS_CLIP = 1 << 0,
     IS_THUMBNAIL = 1 << 1,
@@ -218,7 +218,7 @@ export interface FullMessageAttachment extends MessageAttachment {
     placeholder_version?: number;
 }
 
-export enum EmbedType {
+export const enum EmbedType {
     IMAGE = "image",
     VIDEO = "video",
     LINK = "link",
@@ -273,7 +273,7 @@ export interface ParsedContent {
     tts: boolean;
 }
 
-export enum MessageComponentType {
+export const enum MessageComponentType {
     ACTION_ROW = 1,
     BUTTON = 2,
     STRING_SELECT = 3,
@@ -321,7 +321,7 @@ export interface ForumPostEventOptions {
     channel: Channel;
 }
 
-export enum ASTNodeType {
+export const enum ASTNodeType {
     TEXT = "text",
     STRIKETHROUGH = "s",
     UNDERLINE = "u",
