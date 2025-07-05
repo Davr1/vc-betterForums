@@ -159,6 +159,7 @@ export interface FullMessage extends Omit<Message, "components"> {
     attachments: FullMessageAttachment[];
     embeds: FullEmbed[];
     components: MessageComponent[];
+    soundboardSounds?: string[];
 }
 
 export interface MessageComponent {
@@ -217,10 +218,33 @@ export interface FullMessageAttachment extends MessageAttachment {
     placeholder_version?: number;
 }
 
+export enum EmbedType {
+    IMAGE = "image",
+    VIDEO = "video",
+    LINK = "link",
+    ARTICLE = "article",
+    TWEET = "tweet",
+    RICH = "rich",
+    GIFV = "gifv",
+    APPLICATION_NEWS = "application_news",
+    AUTO_MODERATION_MESSAGE = "auto_moderation_message",
+    AUTO_MODERATION_NOTIFICATION = "auto_moderation_notification",
+    TEXT = "text",
+    POST_PREVIEW = "post_preview",
+    GIFT = "gift",
+    SAFETY_POLICY_NOTICE = "safety_policy_notice",
+    SAFETY_SYSTEM_NOTIFICATION = "safety_system_notification",
+    AGE_VERIFICATION_SYSTEM_NOTIFICATION = "age_verification_system_notification",
+    VOICE_CHANNEL = "voice_channel",
+    GAMING_PROFILE = "gaming_profile",
+    POLL_RESULT = "poll_result",
+}
+
 export interface FullEmbed extends Embed, Pick<Attachment, "flags" | "contentScanVersion"> {
     url: string;
     image: EmbedImage;
     images: EmbedImage[];
+    type: EmbedType;
 }
 
 interface EmbedImage {
@@ -297,13 +321,82 @@ export interface ForumPostEventOptions {
     channel: Channel;
 }
 
-export type TitleMatch = {
-    type: "text" | "highlight";
-    content: string | TitleMatch;
-    originalMatch: RegExpExecArray;
-};
+export enum ASTNodeType {
+    TEXT = "text",
+    STRIKETHROUGH = "s",
+    UNDERLINE = "u",
+    STRONG = "strong",
+    ITALICS = "em",
+    IMAGE = "image",
+    EMOJI = "emoji",
+    CUSTOM_EMOJI = "customEmoji",
+    LINK = "link",
+    URL = "url",
+    AUTOLINK = "autolink",
+    HIGHLIGHT = "highlight",
+    PARAGRAPH = "paragraph",
+    LINE_BREAK = "br",
+    NEWLINE = "newline",
+    ESCAPE = "escape",
+    SPOILER = "spoiler",
+    BLOCK_QUOTE = "blockQuote",
+    INLINE_CODE = "inlineCode",
+    CODE_BLOCK = "codeBlock",
+    MENTION = "mention",
+    CHANNEL_MENTION = "channelMention",
+    CHANNEL = "channel",
+    GUILD = "guild",
+    ATTACHMENT_LINK = "attachmentLink",
+    SHOP_LINK = "shopLink",
+    SOUNDBOARD = "soundboard",
+    STATIC_ROUTE_LINK = "staticRouteLink",
+    ROLE_MENTION = "roleMention",
+    COMMAND_MENTION = "commandMention",
+    TIMESTAMP = "timestamp",
+    LIST = "list",
+    HEADING = "heading",
+    SUBTEXT = "subtext",
+    SILENT_PREFIX = "silentPrefix",
+}
 
-export type TitlePostProcessor = (match: TitleMatch[], filters: Set<string>) => TitleMatch[];
+type ASTSpec<T extends Partial<Record<ASTNodeType, unknown>>> = {
+    [K in ASTNodeType]: BaseASTNode<K> & (K extends keyof T ? T[K] : {});
+}[ASTNodeType];
+
+export interface BaseASTNode<T extends ASTNodeType> {
+    type: T;
+    content: string | ASTNode | ASTNode[];
+    originalMatch: RegExpExecArray;
+}
+
+export interface EmojiASTNode
+    extends BaseASTNode<ASTNodeType.EMOJI | ASTNodeType.CUSTOM_EMOJI | ASTNodeType.SOUNDBOARD> {
+    jumboable: boolean;
+}
+
+export interface LinkASTNode extends BaseASTNode<ASTNodeType.LINK> {
+    target: string;
+}
+
+export interface ParagraphASTNode extends BaseASTNode<ASTNodeType.PARAGRAPH> {
+    content: ASTNode[];
+}
+
+export interface ListASTNode extends BaseASTNode<ASTNodeType.LIST> {
+    ordered: boolean;
+    content: never;
+    items: [ASTNode, ASTNode][];
+    start?: number;
+}
+
+export type ASTNode = ASTSpec<{
+    [ASTNodeType.PARAGRAPH]: ParagraphASTNode;
+    [ASTNodeType.EMOJI]: EmojiASTNode;
+    [ASTNodeType.LINK]: LinkASTNode;
+    [ASTNodeType.LIST]: ListASTNode;
+}>;
+
+export type TitlePostProcessor = (match: ASTNode[], filters: Set<string>) => ASTNode[];
 
 export interface MessageParserOptions {
     message: FullMessage | null;
@@ -315,4 +408,38 @@ export interface ForumPostMetadata {
     hasSpoilerEmbeds?: boolean;
     content: ReactNode;
     media: UnfurledMediaItem[];
+}
+
+export interface ParserOptions {
+    channelId?: Channel["id"];
+    messageId?: Message["id"];
+    allowLinks?: boolean;
+    allowDevLinks?: boolean;
+    formatInline?: boolean;
+    noStyleAndInteraction?: boolean;
+    allowHeading?: boolean;
+    allowList?: boolean;
+    previewLinkTarget?: boolean;
+    disableAnimatedEmoji?: boolean;
+    isInteracting?: boolean;
+    allowEmojiLinks?: boolean;
+    disableAutoBlockNewlines?: boolean;
+    mentionChannels?: Channel["id"][];
+    soundboardSounds?: string[];
+    muted?: boolean;
+    unknownUserMentionPlaceholder?: boolean;
+    viewingChannelId?: Channel["id"];
+    forceWhite?: boolean;
+}
+
+export type ParseFn = (
+    text: string,
+    inline?: boolean,
+    opts?: ParserOptions,
+    postProcess?: (tree: ASTNode | ASTNode[], inline: boolean) => void
+) => ReactNode;
+
+export interface KeywordTrie {
+    trie: Record<string, unknown>;
+    search: (text: string) => Record<string, { start: number; end: number }>;
 }

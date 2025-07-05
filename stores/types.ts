@@ -8,7 +8,7 @@ import { FluxEvents, FluxStore, RelationshipStore as _RelationshipStore } from "
 import { Channel, Guild, User } from "discord-types/general";
 import * as Stores from "discord-types/stores";
 
-import { DiscordTag, FullChannel, FullMessage, FullUser } from "../types";
+import { DiscordTag, FullChannel, FullMessage, FullUser, KeywordTrie } from "../types";
 
 export type FluxEventHandlers<T extends Partial<Record<FluxEvents, unknown>>> = {
     [K in keyof T]?: (data: T[K]) => void;
@@ -119,6 +119,10 @@ export namespace ExtendedStores {
         reset(): void;
         isMember(guildId: Guild["id"], userId: User["id"]): boolean;
         requestMembersBulk(guildId: Guild["id"], userIds: User["id"][]): void;
+    }
+
+    export interface KeywordFilterStore extends FluxStore {
+        getKeywordTrie(): KeywordTrie | null;
     }
 }
 

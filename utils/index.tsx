@@ -8,10 +8,10 @@ import { DataStore } from "@api/index";
 import { LazyComponent } from "@utils/lazyReact";
 import { React } from "@webpack/common";
 import { ComponentType } from "react";
+export * from "./attachmentParsers";
 export * from "./constants";
 export * from "./discord";
 export * from "./media";
-export * from "./parsers";
 
 export function indexedDBStorageFactory<T>() {
     return {
@@ -58,4 +58,15 @@ export function diffObjects<T extends object, TMerged extends boolean = false>(
 
 export function hasFlag(value: number | undefined | null, flag: number): boolean {
     return !!value && (value & flag) === flag;
+}
+
+export function pipe<T, C extends unknown[]>(
+    args: readonly [T, ...C],
+    ...fns: Array<((...args: [T, ...C]) => T | void | null) | undefined | null | false>
+): T {
+    return fns.reduce(
+        ([result, ...rest], fn) =>
+            [typeof fn === "function" ? fn(result, ...rest) ?? result : result, ...rest] as const,
+        args
+    )![0];
 }

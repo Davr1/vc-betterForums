@@ -8,10 +8,11 @@ import { useEffect } from "@webpack/common";
 import { Guild, User } from "discord-types/general";
 
 import { MissingGuildMemberStore, UserStore } from "../../stores";
+import { FullUser } from "../../types";
 
 export function useUsers(guildId: Guild["id"], userIds: User["id"][], limit?: number) {
     const users = UserStore.use(
-        $ => userIds.map($.getUser).filter(Boolean).slice(0, limit),
+        $ => userIds.map($.getUser).filter(Boolean).slice(0, limit) as FullUser[],
         [userIds, limit]
     );
 

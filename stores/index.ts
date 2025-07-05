@@ -7,12 +7,12 @@
 import { findStoreLazy, proxyLazyWebpack } from "@webpack";
 import {
     ChannelStore as _ChannelStore,
-    Flux,
     GuildMemberStore as _GuildMemberStore,
     PermissionStore as _PermissionStore,
     ReadStateStore as _ReadStateStore,
     RelationshipStore as _RelationshipStore,
     UserStore as _UserStore,
+    Flux,
 } from "@webpack/common";
 import { FluxStore } from "@webpack/types";
 
@@ -57,6 +57,7 @@ export const GuildMemberRequesterStore = $<S.GuildMemberRequesterStore>(
 );
 export const GuildVerificationStore = $<S.GuildVerificationStore>("GuildVerificationStore");
 export const JoinedThreadsStore = $<S.JoinedThreadsStore>("JoinedThreadsStore");
+export const KeywordFilterStore = $<S.KeywordFilterStore>("KeywordFilterStore");
 export const LurkingStore = $<S.LurkingStore>("LurkingStore");
 export const ThreadMembersStore = $<S.ThreadMembersStore>("ThreadMembersStore");
 export const ThreadMessageStore = $<S.ThreadMessageStore>("ThreadMessageStore");

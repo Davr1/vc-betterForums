@@ -4,30 +4,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByCodeLazy } from "@webpack";
 import { lodash, useMemo } from "@webpack/common";
 
 import { UserSettingsProtoStore } from "../../stores";
-import { ForumPostMetadata, FullMessage, MessageParserOptions } from "../../types";
+import { ForumPostMetadata, MessageParserOptions } from "../../types";
 import { unfurlAttachment } from "../../utils";
+import { parseInlineContent } from "../../utils/messageParsers";
 import { useMessageMedia } from "../index";
-
-const parseMessageContent: (
-    message: FullMessage,
-    options: Partial<
-        Record<
-            | "formatInline"
-            | "noStyleAndInteraction"
-            | "allowHeading"
-            | "allowList"
-            | "shouldFilterKeywords",
-            boolean
-        >
-    >
-) => Pick<ForumPostMetadata, "hasSpoilerEmbeds" | "content"> = findByCodeLazy(
-    "hideSimpleEmbedContent",
-    "escapeReplacement"
-);
 
 export function useMessage({
     message,
@@ -53,18 +36,13 @@ export function useMessage({
 
     const { hasSpoilerEmbeds, content } = useMemo(
         () =>
-            message?.content
-                ? parseMessageContent(message, {
-                      formatInline,
-                      noStyleAndInteraction,
-                      shouldFilterKeywords,
-                      allowHeading: true,
-                      allowList: true,
-                  })
-                : {
-                      hasSpoilerEmbeds: false,
-                      content: null,
-                  },
+            parseInlineContent(message, {
+                formatInline,
+                noStyleAndInteraction,
+                shouldFilterKeywords,
+                allowHeading: true,
+                allowList: true,
+            }),
         [message, formatInline, noStyleAndInteraction, shouldFilterKeywords]
     );
 
