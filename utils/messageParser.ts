@@ -15,6 +15,8 @@ import {
     EmojiASTNode,
     FullEmbed,
     FullMessage,
+    MessageParserOptions,
+    MessagePostProcessor,
     ParseFn,
     ParserOptions,
 } from "../types";
@@ -59,20 +61,7 @@ function getFullOptions(message: FullMessage, options: Partial<ParserOptions>): 
     };
 }
 
-type PostProcessor = (
-    tree: ASTNode[],
-    inline: boolean,
-    message: FullMessage
-) => ASTNode[] | void | null;
-
-const definePostProcessor = (fn: PostProcessor) => fn;
-
-interface CustomOptions extends ParserOptions {
-    postProcessor?: PostProcessor;
-    shouldFilterKeywords?: boolean;
-    hideSimpleEmbedContent?: boolean;
-    contentMessage?: FullMessage | null;
-}
+const definePostProcessor = (fn: MessagePostProcessor) => fn;
 
 const removeSimpleEmbeds = definePostProcessor((tree, _, { embeds }) => {
     if (tree.length !== 1 || embeds.length !== 1) return;
@@ -168,7 +157,7 @@ function hasSpoilerEmbeds(tree: ASTNode[], inline: boolean, message: FullMessage
 
 export function parseInlineContent(
     message?: FullMessage | null,
-    options: CustomOptions = {}
+    options: MessageParserOptions = {}
 ): { hasSpoilerEmbeds: boolean; content: ReactNode } {
     if (!message)
         return {
@@ -204,9 +193,8 @@ export function parseInlineContent(
             return pipe(
                 [tree, inline, fullMessage],
                 hideSimpleEmbedContent && removeSimpleEmbeds,
-                !formatInline && jumboifyEmojis,
+                formatInline ? toInlineText : jumboifyEmojis,
                 removeQuestLinks,
-                formatInline && toInlineText,
                 postProcessor
             );
         }

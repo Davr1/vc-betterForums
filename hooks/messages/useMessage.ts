@@ -7,7 +7,7 @@
 import { lodash, useMemo } from "@webpack/common";
 
 import { UserSettingsProtoStore } from "../../stores";
-import { ForumPostMetadata, MessageParserOptions } from "../../types";
+import { ForumPostMetadata, MessageFormatOptions } from "../../types";
 import { unfurlAttachment } from "../../utils";
 import { parseInlineContent } from "../../utils/messageParser";
 import { useMessageMedia } from "../index";
@@ -16,7 +16,7 @@ export function useMessage({
     message,
     formatInline = true,
     noStyleAndInteraction = true,
-}: MessageParserOptions): ForumPostMetadata {
+}: MessageFormatOptions): ForumPostMetadata {
     const keywordFilterSettings = UserSettingsProtoStore.use(
         $ =>
             $.settings.textAndImages?.keywordFilterSettings ?? {

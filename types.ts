@@ -398,7 +398,7 @@ export type ASTNode = ASTSpec<{
 
 export type TitlePostProcessor = (match: ASTNode[], filters: Set<string>) => ASTNode[];
 
-export interface MessageParserOptions {
+export interface MessageFormatOptions {
     message: FullMessage | null;
     formatInline?: boolean;
     noStyleAndInteraction?: boolean;
@@ -442,4 +442,17 @@ export type ParseFn = (
 export interface KeywordTrie {
     trie: Record<string, unknown>;
     search: (text: string) => Record<string, { start: number; end: number }>;
+}
+
+export type MessagePostProcessor = (
+    tree: ASTNode[],
+    inline: boolean,
+    message: FullMessage
+) => ASTNode[] | void | null;
+
+export interface MessageParserOptions extends ParserOptions {
+    postProcessor?: MessagePostProcessor;
+    shouldFilterKeywords?: boolean;
+    hideSimpleEmbedContent?: boolean;
+    contentMessage?: FullMessage | null;
 }
