@@ -9,12 +9,17 @@ import { Ref } from "react";
 
 import { useCheckPermissions, useDefaultEmoji, useSortedReactions } from "../hooks";
 import { ChannelStore } from "../stores";
-import { ForumChannel, FullMessage, ReactionType, ThreadChannel } from "../types";
+import {
+    ForumChannel,
+    FullMessage,
+    PartiallyOptional,
+    ReactionType,
+    ThreadChannel,
+} from "../types";
 import { _memo } from "../utils";
 import { DynamicList } from "./DynamicList";
 import { ReactionButton, ReactionButtonProps } from "./ReactionButton";
 
-type PartiallyOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 interface ReactionContainerProps
     extends PartiallyOptional<ReactionButtonProps, "me" | "me_burst" | "count" | "burst_count"> {
     ref?: Ref<HTMLDivElement>;

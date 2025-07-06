@@ -359,42 +359,31 @@ export const enum ASTNodeType {
     SILENT_PREFIX = "silentPrefix",
 }
 
-type ASTSpec<T extends Partial<Record<ASTNodeType, unknown>>> = {
-    [K in ASTNodeType]: BaseASTNode<K> & (K extends keyof T ? T[K] : {});
-}[ASTNodeType];
-
-export interface BaseASTNode<T extends ASTNodeType> {
+export interface ASTNode<T extends ASTNodeType = ASTNodeType> {
     type: T;
     content: string | ASTNode | ASTNode[];
-    originalMatch: RegExpExecArray;
+    originalMatch?: RegExpExecArray;
 }
 
 export interface EmojiASTNode
-    extends BaseASTNode<ASTNodeType.EMOJI | ASTNodeType.CUSTOM_EMOJI | ASTNodeType.SOUNDBOARD> {
+    extends ASTNode<ASTNodeType.EMOJI | ASTNodeType.CUSTOM_EMOJI | ASTNodeType.SOUNDBOARD> {
     jumboable: boolean;
 }
 
-export interface LinkASTNode extends BaseASTNode<ASTNodeType.LINK> {
+export interface LinkASTNode extends ASTNode<ASTNodeType.LINK> {
     target: string;
 }
 
-export interface ParagraphASTNode extends BaseASTNode<ASTNodeType.PARAGRAPH> {
+export interface ParagraphASTNode extends ASTNode<ASTNodeType.PARAGRAPH> {
     content: ASTNode[];
 }
 
-export interface ListASTNode extends BaseASTNode<ASTNodeType.LIST> {
-    ordered: boolean;
+export interface ListASTNode extends ASTNode<ASTNodeType.LIST> {
     content: never;
+    ordered: boolean;
     items: [ASTNode, ASTNode][];
     start?: number;
 }
-
-export type ASTNode = ASTSpec<{
-    [ASTNodeType.PARAGRAPH]: ParagraphASTNode;
-    [ASTNodeType.EMOJI]: EmojiASTNode;
-    [ASTNodeType.LINK]: LinkASTNode;
-    [ASTNodeType.LIST]: ListASTNode;
-}>;
 
 export type TitlePostProcessor = (match: ASTNode[], filters: Set<string>) => ASTNode[];
 
@@ -411,8 +400,8 @@ export interface ForumPostMetadata {
 }
 
 export interface ParserOptions {
-    channelId: Channel["id"];
-    messageId: Message["id"];
+    channelId?: Channel["id"];
+    messageId?: Message["id"];
     allowLinks: boolean;
     allowDevLinks: boolean;
     formatInline: boolean;
@@ -447,7 +436,7 @@ export interface KeywordTrie {
 export type MessagePostProcessor = (
     tree: ASTNode[],
     inline: boolean,
-    message: FullMessage
+    message: Partial<FullMessage>
 ) => ASTNode[] | void | null;
 
 export interface MessageParserOptions extends Partial<ParserOptions> {
@@ -456,3 +445,10 @@ export interface MessageParserOptions extends Partial<ParserOptions> {
     hideSimpleEmbedContent?: boolean;
     contentMessage?: FullMessage | null;
 }
+
+export type PartiallyOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type PartiallyRequired<T, K extends keyof T> = Partial<Omit<T, K>> & Pick<T, K>;
+
+export type OmitFromTuple<T extends readonly unknown[], K extends PropertyKey> = {
+    [I in keyof T]: I extends keyof [] ? T[I] : Omit<T[I], K>;
+};

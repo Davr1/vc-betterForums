@@ -51,5 +51,5 @@ export function isExternalLink(node: ASTNode): node is LinkASTNode {
 }
 
 export function isList(node: ASTNode): node is ListASTNode {
-    return node.type === ASTNodeType.LIST && Array.isArray(node.items);
+    return node.type === ASTNodeType.LIST && "items" in node && Array.isArray(node.items);
 }

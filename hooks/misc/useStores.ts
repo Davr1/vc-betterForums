@@ -7,9 +7,7 @@
 import { useStateFromStores } from "@webpack/common";
 import { FluxStore } from "@webpack/types";
 
-type OmitFromTuple<T extends readonly unknown[], K extends PropertyKey> = {
-    [I in keyof T]: I extends keyof [] ? T[I] : Omit<T[I], K>;
-};
+import { OmitFromTuple } from "../../types";
 
 export function useStores<TStores extends readonly FluxStore[], TReturn>(
     stores: [...TStores],

@@ -5,6 +5,7 @@
  */
 
 import { parseUrl } from "@utils/misc";
+import { findByCodeLazy } from "@webpack";
 
 import { Host } from "./";
 
@@ -33,6 +34,18 @@ export function normalize(text: string): string {
         .map(char => replacements[char] ?? (punctuationsRegex.test(char) ? " " : char))
         .join("")
         .trim();
+}
+
+// https://tartarus.org/martin/PorterStemmer/
+const stemmer: (text: string) => string = findByCodeLazy("return 121===");
+
+export function normalizeWord(text: string): string {
+    return stemmer(
+        text
+            .replace(/('|\u2019|\uFF07)(s|S)$/, "")
+            .toLowerCase()
+            .trim()
+    );
 }
 
 type HostAndPath = Record<"host" | "pathPrefix", string | null>;

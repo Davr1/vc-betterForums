@@ -10,40 +10,28 @@ import { ReactNode } from "react";
 import {
     ASTNode,
     ASTNodeType,
-    EmojiASTNode,
     FullMessage,
     MessageParserOptions,
-    MessagePostProcessor,
     ParseFn,
     ParserOptions,
+    PartiallyRequired,
 } from "../types";
+import { isLink, isParagraph, pipe, replaceKeywords, treeWalker } from "./";
 import {
-    isEmoji,
-    isExternalLink,
-    isLink,
-    isParagraph,
-    isSimpleEmbedMedia,
-    matchesDiscordPath,
-    pipe,
-    replaceKeywords,
-    treeWalker,
-} from "./";
+    jumboifyEmojis,
+    removeQuestLinks,
+    removeSimpleEmbeds,
+    toInlineText,
+} from "./postProcessors";
 
-const textNodeTypes = new Set([
-    ASTNodeType.STRONG,
-    ASTNodeType.ITALICS,
-    ASTNodeType.UNDERLINE,
-    ASTNodeType.TEXT,
-    ASTNodeType.INLINE_CODE,
-    ASTNodeType.STRIKETHROUGH,
-    ASTNodeType.SPOILER,
-]);
-
-function getFullOptions(message: FullMessage, options: Partial<ParserOptions>): ParserOptions {
+function getFullOptions(
+    message: Partial<FullMessage>,
+    options: Partial<ParserOptions>
+): ParserOptions {
     const isWebhook = !!message.webhookId;
 
     return {
-        channelId: message.getChannelId(),
+        channelId: message.channel_id,
         messageId: message.id,
         allowDevLinks: !!options.allowDevLinks,
         formatInline: !!options.formatInline,
@@ -60,75 +48,17 @@ function getFullOptions(message: FullMessage, options: Partial<ParserOptions>): 
         forceWhite: !!options.forceWhite,
         allowLinks: isWebhook || !!options.allowLinks,
         allowEmojiLinks: isWebhook,
-        mentionChannels: message.mentionChannels,
+        mentionChannels: message.mentionChannels ?? [],
         soundboardSounds: message.soundboardSounds ?? [],
     };
 }
 
-const definePostProcessor = (fn: MessagePostProcessor) => fn;
-
-const removeSimpleEmbeds = definePostProcessor((tree, _, { embeds }) => {
-    if (tree.length !== 1 || embeds.length !== 1) return;
-
-    const [firstNode] = tree;
-    if (!isLink(firstNode)) return;
-
-    const [firstEmbed] = embeds;
-    if (isSimpleEmbedMedia(firstEmbed)) return []; // empty tree
-});
-
-const jumboifyEmojis = definePostProcessor((tree, inline) => {
-    if (inline) return jumboifyLine(tree);
-
-    const [firstNode] = tree;
-    if (!isParagraph(firstNode)) return;
-
-    firstNode.content = jumboifyLine(firstNode.content);
-
-    function jumboifyLine(tree: ASTNode[]): ASTNode[] {
-        const emojiNodes: EmojiASTNode[] = [];
-        for (const node of tree) {
-            if (isEmoji(node)) {
-                emojiNodes.push(node);
-            } else if (typeof node.content !== "string" || !!node.content.trim()) {
-                return tree;
-            }
-        }
-
-        if (emojiNodes.length <= 30)
-            emojiNodes.forEach(node => {
-                node.jumboable = true;
-            });
-
-        return tree;
-    }
-});
-
-const questsRegex = /^quests\/([0-9-]+)\/?$/;
-
-const removeQuestLinks = definePostProcessor(tree => {
-    const hasAllLinks = tree.every(isExternalLink);
-
-    return tree.filter(
-        node =>
-            !(isExternalLink(node) && matchesDiscordPath(node.target, questsRegex) && hasAllLinks)
-    );
-});
-
-const toInlineText = definePostProcessor((tree, ...rest) => {
-    tree.forEach(node => {
-        if (!textNodeTypes.has(node.type) || !node.content) return;
-
-        if (Array.isArray(node.content)) {
-            toInlineText(node.content, ...rest);
-        } else if (typeof node.content === "string") {
-            node.content = node.content.replace(/\n/g, " ");
-        }
-    });
-});
-
-function hasSpoilerEmbeds(tree: ASTNode[], inline: boolean, message: FullMessage): boolean {
-    if (message.embeds.length === 0) return false;
+function hasSpoilerEmbeds(
+    tree: ASTNode[],
+    inline: boolean,
+    message: Partial<FullMessage>
+): boolean {
+    if (!message.embeds || message.embeds.length === 0) return false;
 
     if (inline) return hasSpoilerContent(tree);
 
@@ -144,20 +74,20 @@ function hasSpoilerEmbeds(tree: ASTNode[], inline: boolean, message: FullMessage
 }
 
 export function parseInlineContent(
-    message?: FullMessage | null,
+    message?: PartiallyRequired<FullMessage, "content"> | null,
     options: MessageParserOptions = {}
 ): { hasSpoilerEmbeds: boolean; content: ReactNode } {
-    if (!message) return { hasSpoilerEmbeds: false, content: null };
-
     const {
         hideSimpleEmbedContent = true,
-        formatInline = false,
+        formatInline = true,
         postProcessor,
         shouldFilterKeywords,
         contentMessage,
     } = options;
 
     const fullMessage = contentMessage ?? message;
+    if (!fullMessage) return { hasSpoilerEmbeds: false, content: null };
+
     const textContent = shouldFilterKeywords
         ? replaceKeywords(fullMessage.content, { escapeReplacement: true })
         : fullMessage.content;
@@ -169,7 +99,7 @@ export function parseInlineContent(
     const parsedContent = parserFn(
         textContent,
         formatInline,
-        getFullOptions(message, options),
+        getFullOptions(fullMessage, options),
         (tree, inline) => {
             if (!Array.isArray(tree)) tree = [tree];
             spoilerEmbeds = hasSpoilerEmbeds(tree, inline, fullMessage);
