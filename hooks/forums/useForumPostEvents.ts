@@ -10,6 +10,7 @@ import { MouseEventHandler } from "react";
 
 import { ForumPostEventOptions } from "../../types";
 
+// TODO: rewrite if I find a cleaner way to import the context menu
 export const getForumPostEvents: (options: ForumPostEventOptions) => {
     handleLeftClick: MouseEventHandler<unknown>;
     handleRightClick: MouseEventHandler<unknown>;

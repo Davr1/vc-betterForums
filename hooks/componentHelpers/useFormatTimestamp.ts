@@ -13,6 +13,7 @@ import { Channel } from "discord-types/general";
 import { Duration, ReadStateStore, SortOrder } from "../../stores";
 import { TimeFormatterOptions } from "../../types";
 
+// TODO: rewrite
 const timeFormatter: (timestamp: number | null, options?: () => TimeFormatterOptions) => string =
     findByCodeLazy('"minutes",1');
 
