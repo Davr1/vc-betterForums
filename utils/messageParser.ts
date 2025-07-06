@@ -4,27 +4,31 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { parseUrl } from "@utils/misc";
 import { Parser } from "@webpack/common";
 import { ReactNode } from "react";
 
 import {
     ASTNode,
     ASTNodeType,
-    EmbedType,
     EmojiASTNode,
-    FullEmbed,
     FullMessage,
     MessageParserOptions,
     MessagePostProcessor,
     ParseFn,
     ParserOptions,
 } from "../types";
-import { Host, pipe, replaceKeywords } from "./";
-import { isEmoji, isExternalLink, isLink, isParagraph, treeWalker } from "./ast";
-import { getHostAndPath, getRemainingPath } from "./text";
+import {
+    isEmoji,
+    isExternalLink,
+    isLink,
+    isParagraph,
+    isSimpleEmbedMedia,
+    matchesDiscordPath,
+    pipe,
+    replaceKeywords,
+    treeWalker,
+} from "./";
 
-const imageTypes = new Set([EmbedType.IMAGE, EmbedType.GIFV]);
 const textNodeTypes = new Set([
     ASTNodeType.STRONG,
     ASTNodeType.ITALICS,
@@ -54,7 +58,7 @@ function getFullOptions(message: FullMessage, options: Partial<ParserOptions>): 
         unknownUserMentionPlaceholder: true,
         viewingChannelId: options.viewingChannelId,
         forceWhite: !!options.forceWhite,
-        allowLinks: isWebhook || options.allowLinks,
+        allowLinks: isWebhook || !!options.allowLinks,
         allowEmojiLinks: isWebhook,
         mentionChannels: message.mentionChannels,
         soundboardSounds: message.soundboardSounds ?? [],
@@ -70,14 +74,7 @@ const removeSimpleEmbeds = definePostProcessor((tree, _, { embeds }) => {
     if (!isLink(firstNode)) return;
 
     const [firstEmbed] = embeds;
-    if (hasMedia(firstEmbed)) return []; // empty tree
-
-    function hasMedia({ image, video, type, author, rawTitle }: FullEmbed): boolean {
-        if (!imageTypes.has(type)) return false;
-        if (!image && !video) return false;
-
-        return type === EmbedType.GIFV || (type !== EmbedType.RICH && !author && !rawTitle);
-    }
+    if (isSimpleEmbedMedia(firstEmbed)) return []; // empty tree
 });
 
 const jumboifyEmojis = definePostProcessor((tree, inline) => {
@@ -111,20 +108,11 @@ const questsRegex = /^quests\/([0-9-]+)\/?$/;
 
 const removeQuestLinks = definePostProcessor(tree => {
     const hasAllLinks = tree.every(isExternalLink);
+
     return tree.filter(
-        node => !(isExternalLink(node) && matchQuestPath(node.target) && hasAllLinks)
+        node =>
+            !(isExternalLink(node) && matchesDiscordPath(node.target, questsRegex) && hasAllLinks)
     );
-
-    function matchQuestPath(target: string): string | null {
-        const url = parseUrl(target);
-
-        const primaryHostRemainingPath = Object.values(Host)
-            .map(getHostAndPath)
-            .map(source => getRemainingPath(source, url))
-            .find(Boolean);
-
-        return primaryHostRemainingPath?.match(questsRegex)?.[1] ?? null;
-    }
 });
 
 const toInlineText = definePostProcessor((tree, ...rest) => {
@@ -159,11 +147,7 @@ export function parseInlineContent(
     message?: FullMessage | null,
     options: MessageParserOptions = {}
 ): { hasSpoilerEmbeds: boolean; content: ReactNode } {
-    if (!message)
-        return {
-            hasSpoilerEmbeds: false,
-            content: null,
-        };
+    if (!message) return { hasSpoilerEmbeds: false, content: null };
 
     const {
         hideSimpleEmbedContent = true,
@@ -200,8 +184,5 @@ export function parseInlineContent(
         }
     );
 
-    return {
-        hasSpoilerEmbeds: spoilerEmbeds,
-        content: parsedContent,
-    };
+    return { hasSpoilerEmbeds: spoilerEmbeds, content: parsedContent };
 }

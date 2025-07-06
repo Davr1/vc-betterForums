@@ -8,8 +8,7 @@ import { lodash, useMemo } from "@webpack/common";
 
 import { UserSettingsProtoStore } from "../../stores";
 import { ForumPostMetadata, MessageFormatOptions } from "../../types";
-import { unfurlAttachment } from "../../utils";
-import { parseInlineContent } from "../../utils/messageParser";
+import { parseInlineContent, unfurlAttachment } from "../../utils";
 import { useMessageMedia } from "../index";
 
 export function useMessage({
@@ -34,17 +33,15 @@ export function useMessage({
         keywordFilterSettings.slurs
     );
 
-    const { hasSpoilerEmbeds, content } = useMemo(
-        () =>
-            parseInlineContent(message, {
-                formatInline,
-                noStyleAndInteraction,
-                shouldFilterKeywords,
-                allowHeading: true,
-                allowList: true,
-            }),
-        [message, formatInline, noStyleAndInteraction, shouldFilterKeywords]
-    );
+    const { hasSpoilerEmbeds, content } = useMemo(() => {
+        return parseInlineContent(message, {
+            formatInline,
+            noStyleAndInteraction,
+            shouldFilterKeywords,
+            allowHeading: true,
+            allowList: true,
+        });
+    }, [message, formatInline, noStyleAndInteraction, shouldFilterKeywords]);
 
     const media = useMessageMedia(message, hasSpoilerEmbeds);
     const unfurledMedia = useMemo(

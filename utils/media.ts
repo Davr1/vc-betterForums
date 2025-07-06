@@ -6,7 +6,14 @@
 
 import { parseUrl } from "@utils/misc";
 
-import { BoundingBox, FullMessageAttachment, Size, UnfurledMediaItem } from "../types";
+import {
+    BoundingBox,
+    EmbedType,
+    FullEmbed,
+    FullMessageAttachment,
+    Size,
+    UnfurledMediaItem,
+} from "../types";
 
 export const imageRegex = /\.(png|jpe?g|webp|gif|heic|heif|dng|avif)$/i;
 export const videoRegex = /\.(mp4|webm|mov)$/i;
@@ -96,4 +103,13 @@ export function getPreviewSize(hasMultiple: boolean, size: Partial<Size>): Size 
     const tallestFit = adjustSize({ ...size, ...tallestPreview }, "contain");
 
     return widestFit.width >= tallestFit.width ? widestFit : tallestFit;
+}
+
+const imageTypes = new Set([EmbedType.IMAGE, EmbedType.GIFV]);
+
+export function isSimpleEmbedMedia({ image, video, type, author, rawTitle }: FullEmbed): boolean {
+    if (!imageTypes.has(type)) return false;
+    if (!image && !video) return false;
+
+    return type === EmbedType.GIFV || (type !== EmbedType.RICH && !author && !rawTitle);
 }

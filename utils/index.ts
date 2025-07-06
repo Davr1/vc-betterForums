@@ -8,10 +8,13 @@ import { DataStore } from "@api/index";
 import { LazyComponent } from "@utils/lazyReact";
 import { React } from "@webpack/common";
 import { ComponentType } from "react";
+export * from "./ast";
 export * from "./attachmentParser";
 export * from "./constants";
 export * from "./discord";
 export * from "./media";
+export * from "./messageParser";
+export * from "./text";
 
 export function indexedDBStorageFactory<T>() {
     return {

@@ -411,25 +411,25 @@ export interface ForumPostMetadata {
 }
 
 export interface ParserOptions {
-    channelId?: Channel["id"];
-    messageId?: Message["id"];
-    allowLinks?: boolean;
-    allowDevLinks?: boolean;
-    formatInline?: boolean;
-    noStyleAndInteraction?: boolean;
-    allowHeading?: boolean;
-    allowList?: boolean;
-    previewLinkTarget?: boolean;
-    disableAnimatedEmoji?: boolean;
-    isInteracting?: boolean;
-    allowEmojiLinks?: boolean;
-    disableAutoBlockNewlines?: boolean;
-    mentionChannels?: Channel["id"][];
+    channelId: Channel["id"];
+    messageId: Message["id"];
+    allowLinks: boolean;
+    allowDevLinks: boolean;
+    formatInline: boolean;
+    noStyleAndInteraction: boolean;
+    allowHeading: boolean;
+    allowList: boolean;
+    previewLinkTarget: boolean;
+    disableAnimatedEmoji: boolean;
+    isInteracting: boolean;
+    allowEmojiLinks: boolean;
+    disableAutoBlockNewlines: boolean;
+    mentionChannels: Channel["id"][];
     soundboardSounds?: string[];
-    muted?: boolean;
-    unknownUserMentionPlaceholder?: boolean;
+    muted: boolean;
+    unknownUserMentionPlaceholder: boolean;
     viewingChannelId?: Channel["id"];
-    forceWhite?: boolean;
+    forceWhite: boolean;
 }
 
 export type ParseFn = (
@@ -450,7 +450,7 @@ export type MessagePostProcessor = (
     message: FullMessage
 ) => ASTNode[] | void | null;
 
-export interface MessageParserOptions extends ParserOptions {
+export interface MessageParserOptions extends Partial<ParserOptions> {
     postProcessor?: MessagePostProcessor;
     shouldFilterKeywords?: boolean;
     hideSimpleEmbedContent?: boolean;

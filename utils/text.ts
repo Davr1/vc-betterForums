@@ -6,7 +6,9 @@
 
 import { parseUrl } from "@utils/misc";
 
-export const replacements = Object.freeze({
+import { Host } from "./";
+
+const replacements = Object.freeze({
     "-": "-",
     " ": " ",
     "[": " ",
@@ -55,7 +57,21 @@ export function getHostAndPath(url: string): HostAndPath {
     const parsedUrl = parseUrl(url);
 
     return {
-        host: parsedUrl?.host ?? url,
+        host: parsedUrl?.host ?? (!url.startsWith("/") ? url : null),
         pathPrefix: parsedUrl?.pathname ?? (url.startsWith("/") ? url : null),
     };
+}
+
+export function matchesDiscordPath(target: string, regex: RegExp): boolean {
+    const url = parseUrl(target);
+    if (!url) return false;
+
+    const primaryHostRemainingPath = Object.values(Host)
+        .map(getHostAndPath)
+        .map(source => getRemainingPath(source, url))
+        .find(Boolean);
+
+    if (!primaryHostRemainingPath) return false;
+
+    return regex.test(primaryHostRemainingPath);
 }

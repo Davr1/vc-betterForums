@@ -12,7 +12,7 @@ import { Channel, Message } from "discord-types/general";
 
 import { KeywordFilterStore } from "../stores";
 import { ParsedContent, ThreadChannel, UnfurledMediaItem } from "../types";
-import { normalize } from "./text";
+import { normalize } from "./";
 
 export const MessageUtils: {
     jumpToMessage: (options: {
