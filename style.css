@@ -431,7 +431,7 @@
 }
 
 .vc-better-forums-typing-indicator {
-    background-color: var(--background-tertiary);
+    background-color: var(--background-base-lowest);
     border-radius: var(--radius-md);
     justify-content: center;
     padding: 6px 5px;

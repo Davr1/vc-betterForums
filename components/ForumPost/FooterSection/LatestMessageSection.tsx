@@ -59,6 +59,8 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
 
     if (isEmpty && messageCount === 0) return <FooterSection.Spacer />;
 
+    const isActive = highlightNewMessages && !!unreadCount && !forumState.isMuted;
+
     return (
         <FooterSection
             className={cl("vc-better-forums-latest-message", {
@@ -67,7 +69,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
             icon={<Icons.Chat />}
             text={messageCountText}
             onClick={messageId ? clickHandler : undefined}
-            active={highlightNewMessages && !!unreadCount && !forumState.isMuted}
+            active={isActive}
         >
             {isTypingIndicator ? (
                 <Typing channel={channel} users={typingUsers} />
@@ -82,7 +84,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
                     <MessageContent
                         channel={channel}
                         message={mostRecentMessage!}
-                        variant={unreadCount ? "text-sm/semibold" : "text-sm/normal"}
+                        variant={isActive ? "text-sm/semibold" : "text-sm/normal"}
                         lineClamp={1}
                         visibleIcons
                     />
