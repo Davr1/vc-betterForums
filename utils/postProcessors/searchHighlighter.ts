@@ -25,22 +25,14 @@ class HighlightBuilder {
 }
 
 function postProcesor(tree: ASTNode | ASTNode[], words: Set<string>): void {
-    if (Array.isArray(tree)) {
-        // tree is an array
-        tree.forEach(node => postProcesor(node, words));
-        return;
-    }
+    // array
+    if (Array.isArray(tree)) return tree.forEach(node => postProcesor(node, words));
 
-    if (tree.content && typeof tree.content !== "string") {
-        // tree is a single node
-        postProcesor(tree.content, words);
-        return;
-    }
+    // single node
+    if (tree.content && typeof tree.content !== "string") return postProcesor(tree.content, words);
 
-    if (typeof tree.content !== "string" || tree.type === ASTNodeType.CODE_BLOCK) {
-        // tree is unformattable/preformated text
-        return;
-    }
+    // unformattable/preformated text
+    if (typeof tree.content !== "string" || tree.type === ASTNodeType.CODE_BLOCK) return;
 
     const nodes = tree.content
         .split(/(\W+)/g)

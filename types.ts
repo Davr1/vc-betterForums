@@ -160,6 +160,7 @@ export interface FullMessage extends Omit<Message, "components"> {
     embeds: FullEmbed[];
     components: MessageComponent[];
     soundboardSounds?: string[];
+    reactions: MessageReactionWithBurst[];
 }
 
 export interface MessageComponent {
@@ -446,9 +447,26 @@ export interface MessageParserOptions extends Partial<ParserOptions> {
     contentMessage?: FullMessage | null;
 }
 
+export interface SortedReaction {
+    id: string;
+    type: ReactionType;
+    count: number;
+    reaction: MessageReactionWithBurst;
+}
+
 export type PartiallyOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type PartiallyRequired<T, K extends keyof T> = Partial<Omit<T, K>> & Pick<T, K>;
 
 export type OmitFromTuple<T extends readonly unknown[], K extends PropertyKey> = {
-    [I in keyof T]: I extends keyof [] ? T[I] : Omit<T[I], K>;
+    [I in keyof T]: I extends keyof [] ? T[I] : Omit<RemoveIndex<T[I]>, K>;
+};
+
+export type RemoveIndex<T> = {
+    [K in keyof T as string extends K
+        ? never
+        : number extends K
+        ? never
+        : symbol extends K
+        ? never
+        : K]: T[K];
 };

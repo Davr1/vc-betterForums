@@ -9,6 +9,7 @@ import { findByProps, proxyLazyWebpack } from "@webpack";
 import { Channel } from "discord-types/general";
 
 import { Icons } from "../components/icons";
+import { ChannelState, LayoutType, SortOrder, TagSetting } from "../stores";
 import { CustomTag } from "../types";
 
 export const tagDefinitions = proxyLazyWebpack(() => {
@@ -65,6 +66,14 @@ export const dummyChannel: Channel = proxyLazyWebpack(() => {
     );
 
     return Object.freeze(new DmChannel({ id: "0" }));
+});
+
+export const defaultChannelState: ChannelState = Object.freeze({
+    layoutType: LayoutType.LIST,
+    sortOrder: SortOrder.CREATION_DATE,
+    tagFilter: new Set<string>(),
+    scrollPosition: 0,
+    tagSetting: TagSetting.MATCH_SOME,
 });
 
 const BASE_URL = "discord.com";

@@ -38,6 +38,23 @@ export enum ShowReplyPreview {
     ALWAYS,
 }
 
+const sliderProps = ({
+    formatFn = null,
+    min = null,
+    max = null,
+}: {
+    formatFn?: ((value: number) => string | number) | null;
+    min?: number | null;
+    max?: number | null;
+}) => ({
+    onMarkerRender: (value: number) => {
+        if (min !== null && value <= min) return getIntlMessage("FORM_LABEL_OFF");
+        if (max !== null && value >= max) return getIntlMessage("FORM_LABEL_ALL");
+
+        return formatFn ? formatFn(value) : value;
+    },
+});
+
 export const settings = definePluginSettings({
     keepState: {
         type: OptionType.BOOLEAN,
@@ -56,14 +73,7 @@ export const settings = definePluginSettings({
         default: 3,
         markers: [MaxTagCount.OFF, ...makeRange(1, 5), MaxTagCount.ALL],
         stickToMarkers: true,
-        componentProps: {
-            onMarkerRender: (value: number) =>
-                value === MaxTagCount.OFF
-                    ? getIntlMessage("FORM_LABEL_OFF")
-                    : value === MaxTagCount.ALL
-                    ? getIntlMessage("FORM_LABEL_ALL")
-                    : value,
-        },
+        componentProps: sliderProps({ min: MaxTagCount.OFF, max: MaxTagCount.ALL }),
     },
     maxMediaCount: {
         type: OptionType.SLIDER,
@@ -72,14 +82,7 @@ export const settings = definePluginSettings({
         default: 3,
         markers: [MaxMediaCount.OFF, ...makeRange(1, 5), MaxMediaCount.ALL],
         stickToMarkers: true,
-        componentProps: {
-            onMarkerRender: (value: number) =>
-                value === MaxMediaCount.OFF
-                    ? getIntlMessage("FORM_LABEL_OFF")
-                    : value === MaxMediaCount.ALL
-                    ? getIntlMessage("FORM_LABEL_ALL")
-                    : value,
-        },
+        componentProps: sliderProps({ min: MaxMediaCount.OFF, max: MaxMediaCount.ALL }),
     },
     mediaSize: {
         type: OptionType.SLIDER,
@@ -87,9 +90,7 @@ export const settings = definePluginSettings({
         default: 72,
         markers: [48, 56, 64, 72, 80, 96, 128],
         stickToMarkers: true,
-        componentProps: {
-            onMarkerRender: (value: number) => `${value}px`,
-        },
+        componentProps: sliderProps({ formatFn: value => `${value}px` }),
     },
     messagePreviewLineCount: {
         type: OptionType.SLIDER,
@@ -97,10 +98,7 @@ export const settings = definePluginSettings({
         default: 3,
         markers: [...makeRange(1, 5), MessagePreviewLineCount.ALL],
         stickToMarkers: true,
-        componentProps: {
-            onMarkerRender: (value: number) =>
-                value === MessagePreviewLineCount.ALL ? getIntlMessage("FORM_LABEL_ALL") : value,
-        },
+        componentProps: sliderProps({ max: MessagePreviewLineCount.ALL }),
     },
     useExactCounts: {
         type: OptionType.BOOLEAN,
@@ -141,14 +139,7 @@ export const settings = definePluginSettings({
         default: 3,
         markers: [MaxReactionCount.OFF, ...makeRange(1, 9), MaxReactionCount.ALL],
         stickToMarkers: true,
-        componentProps: {
-            onMarkerRender: (value: number) =>
-                value === MaxReactionCount.OFF
-                    ? getIntlMessage("FORM_LABEL_OFF")
-                    : value === MaxReactionCount.ALL
-                    ? getIntlMessage("FORM_LABEL_ALL")
-                    : value,
-        },
+        componentProps: sliderProps({ min: MaxReactionCount.OFF, max: MaxReactionCount.ALL }),
     },
     tagOverrides: {
         type: OptionType.COMPONENT,

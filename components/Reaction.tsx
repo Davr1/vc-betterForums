@@ -35,6 +35,7 @@ function ReactionContainer({
     emojiSizeTooltip = "reaction",
     className = "vc-better-forums-reaction-button",
     ref,
+    isPendingMember = false,
     ...props
 }: ReactionContainerProps) {
     return (
@@ -71,7 +72,7 @@ export const DefaultReaction = _memo<ReactionProps>(function DefaultReaction({
     );
 
     const defaultEmoji = useDefaultEmoji(forumChannel);
-    const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
+    const { disableReactionCreates, isLurking } = useCheckPermissions(channel);
 
     if (!defaultEmoji || disableReactionCreates) return null;
 
@@ -80,7 +81,6 @@ export const DefaultReaction = _memo<ReactionProps>(function DefaultReaction({
             message={firstMessage}
             readOnly={channel.isArchivedLockedThread()}
             isLurking={isLurking}
-            isPendingMember={isPendingMember}
             emoji={defaultEmoji}
             hideCount
             type={ReactionType.NORMAL}
@@ -96,8 +96,8 @@ export const Reactions = _memo<ReactionProps>(function Reactions({
     maxWidth,
     maxCount,
 }) {
-    const { disableReactionCreates, isLurking, isPendingMember } = useCheckPermissions(channel);
-    const readonly = disableReactionCreates || channel.isArchivedLockedThread();
+    const { disableReactionCreates, isLurking } = useCheckPermissions(channel);
+    const readOnly = disableReactionCreates || channel.isArchivedLockedThread();
 
     const reactions = useSortedReactions(firstMessage);
 
@@ -117,9 +117,8 @@ export const Reactions = _memo<ReactionProps>(function Reactions({
             {(reaction, ref: Ref<HTMLDivElement>) => (
                 <ReactionContainer
                     message={firstMessage}
-                    readOnly={readonly}
+                    readOnly={readOnly}
                     isLurking={isLurking}
-                    isPendingMember={isPendingMember}
                     type={reaction.type}
                     ref={ref}
                     {...reaction.reaction}

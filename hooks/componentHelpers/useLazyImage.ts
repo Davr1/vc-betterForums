@@ -64,12 +64,7 @@ export function useLazyImage({ items, prefferedSize, mediaIndex = 0 }: LazyImage
         if (!prefferedSize) return null;
 
         const { width, height } = adjustSize(
-            {
-                width: image?.width,
-                height: image?.height,
-                maxWidth: prefferedSize,
-                maxHeight: prefferedSize,
-            },
+            { ...image, maxWidth: prefferedSize, maxHeight: prefferedSize },
             "cover"
         );
 

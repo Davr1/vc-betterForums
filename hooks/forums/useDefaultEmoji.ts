@@ -13,22 +13,17 @@ import { useStores } from "../misc/useStores";
 export function useDefaultEmoji(channel: ForumChannel): ReactionEmoji | null {
     const emoji = channel.defaultReactionEmoji;
 
-    const customEmoji = useStores(
-        [EmojiStore],
-        $ => emoji?.emojiId && $.getUsableCustomEmojiById(emoji.emojiId),
-        [emoji?.emojiId]
-    );
+    const customEmoji = useStores([EmojiStore], $ => $.getUsableCustomEmojiById(emoji?.emojiId), [
+        emoji?.emojiId,
+    ]);
 
-    if (!emoji) return null;
+    if (customEmoji) return customEmoji;
 
-    if (emoji.emojiId && customEmoji) return customEmoji;
+    if (!emoji?.emojiName) return null;
 
-    if (emoji.emojiName)
-        return {
-            id: emoji.emojiId ?? undefined,
-            name: emoji.emojiName,
-            animated: false,
-        };
-
-    return null;
+    return {
+        id: emoji.emojiId ?? undefined,
+        name: emoji.emojiName,
+        animated: false,
+    };
 }

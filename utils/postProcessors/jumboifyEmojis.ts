@@ -14,23 +14,22 @@ export const jumboifyEmojis = definePostProcessor((tree, inline) => {
     const [firstNode] = tree;
     if (!isParagraph(firstNode)) return;
 
-    firstNode.content = jumboifyLine(firstNode.content);
+    jumboifyLine(firstNode.content);
 });
 
-function jumboifyLine(tree: ASTNode[]): ASTNode[] {
+function jumboifyLine(tree: ASTNode[]): void {
     const emojiNodes: EmojiASTNode[] = [];
     for (const node of tree) {
         if (isEmoji(node)) {
             emojiNodes.push(node);
         } else if (typeof node.content !== "string" || !!node.content.trim()) {
-            return tree;
+            return;
         }
     }
 
-    if (emojiNodes.length <= 30)
-        emojiNodes.forEach(node => {
-            node.jumboable = true;
-        });
+    if (emojiNodes.length > 30) return;
 
-    return tree;
+    emojiNodes.forEach(node => {
+        node.jumboable = true;
+    });
 }

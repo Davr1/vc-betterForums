@@ -17,14 +17,17 @@ const textNodeTypes = new Set([
     ASTNodeType.SPOILER,
 ]);
 
-export const toInlineText = definePostProcessor((tree, ...rest) => {
+export const toInlineText = definePostProcessor((tree, ...rest) =>
     tree.forEach(node => {
+        // not a text node
         if (!textNodeTypes.has(node.type) || !node.content) return;
 
-        if (Array.isArray(node.content)) {
-            toInlineText(node.content, ...rest);
-        } else if (typeof node.content === "string") {
-            node.content = node.content.replace(/\n/g, " ");
-        }
-    });
-});
+        // array
+        if (Array.isArray(node.content)) return toInlineText(node.content, ...rest);
+
+        // not a string
+        if (typeof node.content !== "string") return;
+
+        node.content = node.content.replace(/\n/g, " ");
+    })
+);

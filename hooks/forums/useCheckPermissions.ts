@@ -18,8 +18,7 @@ import { useIsActiveChannelOrUnarchivableThread } from "./useIsActiveChannelOrUn
 export function useCheckPermissions(
     channel: Channel
 ): Record<
-    | `disableReaction${"Reads" | "Creates" | "Updates"}`
-    | `is${"Lurking" | "Guest" | "PendingMember"}`,
+    `disableReaction${"Reads" | "Creates" | "Updates"}` | `is${"Lurking" | "Guest"}`,
     boolean
 > {
     const guildId = channel?.getGuildId();
@@ -36,7 +35,7 @@ export function useCheckPermissions(
         [guildId]
     );
 
-    const canAddNewReactions = PermissionStore.use(
+    const canAddReactions = PermissionStore.use(
         $ => canChat && $.can(PermissionsBits.ADD_REACTIONS, channel),
         [canChat, channel]
     );
@@ -50,27 +49,22 @@ export function useCheckPermissions(
             disableReactionUpdates: true,
             isLurking: false,
             isGuest: false,
-            isPendingMember: false,
         };
 
     const isPrivate = channel.isPrivate();
     const isSystemDM = channel.isSystemDM();
     const active = (canChat || isPrivate) && isActiveChannelOrUnarchivableThread;
 
+    const canAddNewReactions =
+        (canAddReactions || isPrivate) && !isSystemDM && isActiveChannelOrUnarchivableThread;
+
+    const disableReactionUpdates = isLurking || isGuest || !active;
+
     return {
         disableReactionReads: false,
-        disableReactionCreates:
-            isLurking ||
-            isGuest ||
-            !active ||
-            !(
-                (canAddNewReactions || isPrivate) &&
-                !isSystemDM &&
-                isActiveChannelOrUnarchivableThread
-            ),
-        disableReactionUpdates: isLurking || isGuest || !active,
+        disableReactionCreates: disableReactionUpdates || !canAddNewReactions,
+        disableReactionUpdates,
         isLurking,
         isGuest,
-        isPendingMember: false,
     };
 }

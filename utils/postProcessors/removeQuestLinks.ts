@@ -10,9 +10,7 @@ import { definePostProcessor } from "./";
 const questsRegex = /^quests\/([0-9-]+)\/?$/;
 
 export const removeQuestLinks = definePostProcessor(tree => {
-    const hasAllLinks = tree.every(isExternalLink);
-
-    if (!hasAllLinks) return;
+    if (!tree.every(isExternalLink)) return;
 
     return tree.filter(
         node => !(isExternalLink(node) && matchesDiscordPath(node.target, questsRegex))

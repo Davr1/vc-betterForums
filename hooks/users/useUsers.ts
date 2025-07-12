@@ -10,16 +10,18 @@ import { Guild, User } from "discord-types/general";
 import { MissingGuildMemberStore, UserStore } from "../../stores";
 import { FullUser } from "../../types";
 
-export function useUsers(guildId: Guild["id"], userIds: User["id"][], limit?: number) {
-    const users = UserStore.use(
-        $ => userIds.map($.getUser).filter(Boolean).slice(0, limit) as FullUser[],
-        [userIds, limit]
-    );
-
+export function useUsers(
+    guildId: Guild["id"],
+    userIds: User["id"][],
+    limit: number = Number.MAX_SAFE_INTEGER
+) {
     useEffect(
         () => MissingGuildMemberStore.requestMembersBulk(guildId, userIds),
         [guildId, userIds]
     );
 
-    return users;
+    return UserStore.use(
+        $ => userIds.values().map($.getUser).filter(Boolean).take(limit).toArray(),
+        [userIds, limit]
+    ) as FullUser[];
 }

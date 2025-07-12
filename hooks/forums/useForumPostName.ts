@@ -14,11 +14,11 @@ import { getSearchHighlighter } from "../../utils/postProcessors";
 
 export function useForumPostName(channel: Channel): ReactNode {
     const searchQuery = ForumSearchStore.use(
-        $ => $.getSearchQuery(channel.parent_id),
+        $ => $.getSearchQuery(channel.parent_id) ?? "",
         [channel.parent_id]
     );
 
-    const postProcessor = useMemo(() => getSearchHighlighter(searchQuery ?? ""), [searchQuery]);
+    const postProcessor = useMemo(() => getSearchHighlighter(searchQuery), [searchQuery]);
 
     return useMemo(
         () => parseInlineContent({ content: channel.name, embeds: [] }, { postProcessor }).content,

@@ -13,11 +13,11 @@ import { useUsers } from "../hooks";
 import { _memo } from "../utils";
 import { Username } from "./Username";
 
-const typingIntlKeys = {
+const typingIntlKeys = Object.freeze({
     1: "ONE_USER_TYPING",
     2: "TWO_USERS_TYPING",
     3: "THREE_USERS_TYPING",
-};
+});
 const defaultIntlKey = "SEVERAL_USERS_TYPING";
 
 interface TypingTextProps extends TextProps {

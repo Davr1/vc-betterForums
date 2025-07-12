@@ -19,9 +19,5 @@ export function useIsActiveChannelOrUnarchivableThread(channel: Channel | null):
 
     if (!channel.isThread() || channel.isActiveThread()) return true;
 
-    return (
-        channel.isArchivedThread() &&
-        channel.threadMetadata?.locked !== true &&
-        canSendMessagesInThreads
-    );
+    return channel.threadMetadata?.locked !== true && canSendMessagesInThreads;
 }

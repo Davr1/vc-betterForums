@@ -10,22 +10,20 @@ import { ForumPostMessagesStore, ThreadMessageStore } from "../../stores";
 import { FullMessage, ThreadChannel } from "../../types";
 import { useStores } from "../misc/useStores";
 
-export function useRecentMessage(channel: ThreadChannel): FullMessage | null {
+export function useRecentMessage({ id, lastMessageId }: ThreadChannel): FullMessage | null {
     return useStores(
         [ThreadMessageStore, ForumPostMessagesStore, MessageStore],
         (threadMessageStore, forumPostMessagesStore, messageStore) => {
-            const recentMessage = threadMessageStore.getMostRecentMessage(channel.id);
-            const { firstMessage } = forumPostMessagesStore.getMessage(channel.id);
+            const recentMessage = threadMessageStore.getMostRecentMessage(id);
+            const { firstMessage } = forumPostMessagesStore.getMessage(id);
 
             if (recentMessage && recentMessage.id !== firstMessage?.id) return recentMessage;
 
             // channel.lastMessageId and recentMessage.id can be out of sync
-            if (channel.lastMessageId === firstMessage?.id) return null;
+            if (lastMessageId === firstMessage?.id) return null;
 
-            return (
-                (messageStore.getMessage(channel.id, channel.lastMessageId) as FullMessage) ?? null
-            );
+            return (messageStore.getMessage(id, lastMessageId) as FullMessage) ?? null;
         },
-        [channel.id, channel.lastMessageId]
+        [id, lastMessageId]
     );
 }

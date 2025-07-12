@@ -18,20 +18,14 @@ export function useTypingUsers(
         [UserStore, TypingStore, RelationshipStore],
         (userStore, typingStore, relationshipStore) => {
             const currentUserId = userStore.getCurrentUser()?.id;
-            const typingUsers = typingStore.getTypingUsers(channelId);
-            const users: User["id"][] = [];
+            const typingUsers = Object.keys(typingStore.getTypingUsers(channelId)).values();
 
-            for (const userId in typingUsers) {
-                if (users.length >= limit) break;
-                const user = UserStore.getUser(userId);
-                if (!user || user.id === currentUserId) continue;
-
-                if (!relationshipStore.isBlockedOrIgnored(user.id)) {
-                    users.push(user.id);
-                }
-            }
-
-            return users;
+            return typingUsers
+                .filter(id => id !== currentUserId)
+                .filter(UserStore.getUser)
+                .filter(id => !relationshipStore.isBlockedOrIgnored(id))
+                .take(limit)
+                .toArray();
         },
         [channelId, limit]
     );

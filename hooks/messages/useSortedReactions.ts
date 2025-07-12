@@ -6,13 +6,9 @@
 
 import { useMemo } from "@webpack/common";
 
-import { FullMessage, MessageReactionWithBurst, ReactionType } from "../../types";
+import { FullMessage, ReactionType, SortedReaction } from "../../types";
 
-export function useSortedReactions(
-    message: FullMessage
-): { id: string; type: ReactionType; count: number; reaction: MessageReactionWithBurst }[] {
-    const reactions = message.reactions as MessageReactionWithBurst[];
-
+export function useSortedReactions({ reactions }: FullMessage): SortedReaction[] {
     return useMemo(() => {
         return reactions
             .map(reaction => ({

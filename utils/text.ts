@@ -70,7 +70,7 @@ export function getHostAndPath(url: string): HostAndPath {
     const parsedUrl = parseUrl(url);
 
     return {
-        host: parsedUrl?.host ?? (!url.startsWith("/") ? url : null),
+        host: parsedUrl?.host ?? (url.startsWith("/") ? null : url),
         pathPrefix: parsedUrl?.pathname ?? (url.startsWith("/") ? url : null),
     };
 }
@@ -80,6 +80,7 @@ export function matchesDiscordPath(target: string, regex: RegExp): boolean {
     if (!url) return false;
 
     const primaryHostRemainingPath = Object.values(Host)
+        .values()
         .map(getHostAndPath)
         .map(source => getRemainingPath(source, url))
         .find(Boolean);
