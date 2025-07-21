@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { FluxStore } from "@vencord/discord-types";
 import { useStateFromStores } from "@webpack/common";
-import { FluxStore } from "@webpack/types";
 
 import { OmitFromTuple } from "../../types";
 

@@ -5,9 +5,8 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
-import { makeRange } from "@components/PluginSettings/components";
 import { getIntlMessage } from "@utils/discord";
-import { OptionType } from "@utils/types";
+import { makeRange, OptionType } from "@utils/types";
 
 import { TagSection } from "./components/Settings";
 import { CustomTag } from "./types";

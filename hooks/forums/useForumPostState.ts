@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Channel, Guild } from "@vencord/discord-types";
 import { GuildStore, lodash, SnowflakeUtils } from "@webpack/common";
-import { Channel, Guild } from "discord-types/general";
 
 import { JoinedThreadsStore, MissingGuildMemberStore, ReadStateStore } from "../../stores";
 import { ForumPostState } from "../../types";

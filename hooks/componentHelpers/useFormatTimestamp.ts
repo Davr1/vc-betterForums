@@ -6,9 +6,9 @@
 
 import { getIntlMessage } from "@utils/discord";
 import { runtimeHashMessageKey } from "@utils/intlHash";
+import { Channel } from "@vencord/discord-types";
 import { findByCodeLazy } from "@webpack";
 import { i18n, SnowflakeUtils, useMemo } from "@webpack/common";
-import { Channel } from "discord-types/general";
 
 import { Duration, ReadStateStore, SortOrder } from "../../stores";
 import { TimeFormatterOptions } from "../../types";

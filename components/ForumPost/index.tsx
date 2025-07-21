@@ -6,8 +6,8 @@
 
 import { ErrorBoundary } from "@components/index";
 import { getIntlMessage } from "@utils/discord";
+import { Channel } from "@vencord/discord-types";
 import { Clickable, Flex, useEffect } from "@webpack/common";
-import { Channel } from "discord-types/general";
 import { ComponentProps, ComponentType, Ref } from "react";
 
 import { cl } from "../..";
@@ -24,6 +24,7 @@ import { Body } from "./Body";
 import { Footer } from "./Footer";
 import { Media } from "./Media";
 import { Tags } from "./Tags";
+import { Title } from "./Title";
 
 const ClickableWithRing: ComponentType<
     ComponentProps<typeof Clickable> & {
@@ -95,3 +96,4 @@ ForumPost.Media = Media;
 ForumPost.Body = Body;
 ForumPost.Footer = Footer;
 ForumPost.Tags = Tags;
+ForumPost.Title = Title;

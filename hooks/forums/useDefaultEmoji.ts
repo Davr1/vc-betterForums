@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { ReactionEmoji } from "@vencord/discord-types";
 import { EmojiStore } from "@webpack/common";
-import { ReactionEmoji } from "discord-types/general";
 
 import { ForumChannel } from "../../types";
 import { useStores } from "../misc/useStores";

@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Channel } from "@vencord/discord-types";
 import { GuildRoleStore, GuildStore, useEffect } from "@webpack/common";
-import { Channel } from "discord-types/general";
 
 import { GuildMemberRequesterStore, GuildMemberStore, RelationshipStore } from "../../stores";
-import { FullGuildMember, FullUser, Member } from "../../types";
+import { FullUser, Member } from "../../types";
 import { useStores } from "../misc/useStores";
 
 export function useMember(user: FullUser | null, channel: Channel): Member {
@@ -20,8 +20,7 @@ export function useMember(user: FullUser | null, channel: Channel): Member {
     }, [guildId, userId]);
 
     const member = GuildMemberStore.use(
-        $ =>
-            !guildId || !userId ? null : ($.getMember(guildId, userId) as FullGuildMember | null),
+        $ => (!guildId || !userId ? null : $.getMember(guildId, userId)),
         [guildId, userId]
     );
 

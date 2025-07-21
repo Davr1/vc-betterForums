@@ -5,10 +5,9 @@
  */
 
 import { ModalAPI } from "@utils/modal";
+import { Channel, CustomEmoji, Message, UnicodeEmoji } from "@vencord/discord-types";
 import { findByCodeLazy, findByPropsLazy } from "@webpack";
 import { FluxDispatcher, IconUtils } from "@webpack/common";
-import { CustomEmoji, UnicodeEmoji } from "@webpack/types";
-import { Channel, Message } from "discord-types/general";
 
 import { KeywordFilterStore } from "../stores";
 import { ParsedContent, ThreadChannel, UnfurledMediaItem } from "../types";

@@ -15,7 +15,6 @@ export { useForumChannelState } from "./forums/useForumChannelState";
 export { useForumChannelStore } from "./forums/useForumChannelStore";
 export { useForumPostComposerStore } from "./forums/useForumPostComposerStore";
 export { useForumPostEvents } from "./forums/useForumPostEvents";
-export { useForumPostName } from "./forums/useForumPostName";
 export { useForumPostState } from "./forums/useForumPostState";
 export { useIsActiveChannelOrUnarchivableThread } from "./forums/useIsActiveChannelOrUnarchivableThread";
 export { useMessageCount } from "./forums/useMessageCount";

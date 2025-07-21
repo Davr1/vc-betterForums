@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Channel, Message, User } from "@vencord/discord-types";
 import { findComponentByCodeLazy } from "@webpack";
-import { Channel, Message, User } from "discord-types/general";
 import { ReactNode } from "react";
 
 interface BadgeProps {

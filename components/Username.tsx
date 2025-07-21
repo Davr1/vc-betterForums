@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Channel, Message, TextProps, User } from "@vencord/discord-types";
 import { Text } from "@webpack/common";
-import { TextProps } from "@webpack/types";
-import { Channel, Message, User } from "discord-types/general";
 
 import { cl } from "..";
 import { useMember, useUsernameHook } from "../hooks";

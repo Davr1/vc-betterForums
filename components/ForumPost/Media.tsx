@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { TextProps } from "@vencord/discord-types";
 import { Flex, Text, Tooltip, useCallback } from "@webpack/common";
-import { TextProps } from "@webpack/types";
 import { CSSProperties, Ref } from "react";
 
 import { cl } from "../..";

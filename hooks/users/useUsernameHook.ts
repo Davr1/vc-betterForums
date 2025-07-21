@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Channel, Guild, Message, User } from "@vencord/discord-types";
 import { findByCodeLazy } from "@webpack";
-import { Channel, Guild, Message, User } from "discord-types/general";
 import { ReactNode } from "react";
 
 import { Member } from "../../types";

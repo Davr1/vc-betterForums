@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex, Heading, Text, useCallback } from "@webpack/common";
+import { Flex, Heading, useCallback } from "@webpack/common";
 
-import { useForumPostName, useForumPostState } from "../../hooks";
+import { useForumPostState } from "../../hooks";
 import { MessagePreviewLineCount, settings } from "../../settings";
 import { UserStore } from "../../stores";
 import { FullMessage, ThreadChannel } from "../../types";
@@ -28,7 +28,6 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
         "messagePreviewLineCount",
         "showFollowButton",
     ]);
-    const threadName = useForumPostName(channel);
 
     const owner = UserStore.use(
         $ => (channel?.ownerId ? $.getUser(channel.ownerId) : null),
@@ -51,19 +50,7 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
                 variant="heading-lg/semibold"
                 className="vc-better-forums-thread-title-container"
             >
-                <Text
-                    lineClamp={2}
-                    color={
-                        isMuted
-                            ? "interactive-muted"
-                            : hasUnreads
-                            ? "header-primary"
-                            : "text-secondary"
-                    }
-                    className="vc-better-forums-thread-title"
-                >
-                    {threadName}
-                </Text>
+                <ForumPost.Title channel={channel} isMuted={isMuted} isUnread={hasUnreads} />
                 <ForumPost.Tags channel={channel} />
             </Heading>
             <MessageContent

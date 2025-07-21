@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Guild, User } from "@vencord/discord-types";
 import { useEffect } from "@webpack/common";
-import { Guild, User } from "discord-types/general";
 
 import { MissingGuildMemberStore, UserStore } from "../../stores";
 import { FullUser } from "../../types";

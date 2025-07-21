@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Channel } from "@vencord/discord-types";
 import { Text, Timestamp as TimestampComponent, Tooltip } from "@webpack/common";
-import { Channel } from "discord-types/general";
 
 import { useFormatTimestamp, useForumChannelState } from "../hooks";
 import { _memo } from "../utils";

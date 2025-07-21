@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { FluxStore } from "@vencord/discord-types";
 import { findStoreLazy, proxyLazyWebpack } from "@webpack";
 import {
     ChannelStore as _ChannelStore,
@@ -14,9 +15,9 @@ import {
     UserStore as _UserStore,
     Flux,
 } from "@webpack/common";
-import { FluxStore } from "@webpack/types";
 
 import { useStores } from "../hooks";
+import { RemoveIndex } from "../types";
 import { ExtendedStores as S } from "./types";
 export * from "./types";
 
@@ -24,7 +25,7 @@ export const BaseStore = proxyLazyWebpack(
     () =>
         class BaseStore extends Flux.Store {
             use<TReturn>(
-                mapper: (store: Omit<this, "use">) => TReturn,
+                mapper: (store: Omit<RemoveIndex<this>, "use">) => TReturn,
                 deps?: unknown[],
                 isEqual?: (old: TReturn, newer: TReturn) => boolean
             ): TReturn {

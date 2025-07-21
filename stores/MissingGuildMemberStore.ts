@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Guild, User } from "@vencord/discord-types";
 import { proxyLazyWebpack } from "@webpack";
 import { FluxDispatcher, lodash } from "@webpack/common";
-import { Guild, User } from "discord-types/general";
 
 import {
     BaseStore,

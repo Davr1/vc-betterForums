@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Channel, User } from "discord-types/general";
+import { Channel, User } from "@vencord/discord-types";
 
 import { _memo } from "../utils";
 import { AvatarPile } from "./AvatarPile";

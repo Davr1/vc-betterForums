@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Guild, User } from "@vencord/discord-types";
 import { findComponentByCodeLazy } from "@webpack";
-import { Guild, User } from "discord-types/general";
 import { ComponentType, ReactNode } from "react";
 
 export interface FacePileProps {

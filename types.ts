@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Emoji } from "@webpack/types";
 import {
     Channel,
     Embed,
+    Emoji,
     GuildMember,
     Message,
     MessageAttachment,
     MessageReaction,
     User,
-} from "discord-types/general";
+} from "@vencord/discord-types";
 import { ReactNode, Ref } from "react";
 
 import { RichEditorType } from "./components/RichEditor";
@@ -102,18 +102,8 @@ export interface CustomTag extends Omit<DiscordTag, "name"> {
     disabled?: boolean;
 }
 
-export interface FullGuildMember extends GuildMember {
-    avatarDecoration?: { asset: string; skuId: string };
-    colorStrings?: Record<
-        "primaryColor" | "secondaryColor" | "tertiaryColor",
-        GuildMember["colorString"]
-    >;
-    colorRoleId?: string;
-}
-
 export interface FullUser extends User {
     global_name?: string;
-    globalName?: string;
     primaryGuild?: Partial<{
         badge: string;
         identityEnabled: boolean;
@@ -260,10 +250,10 @@ interface EmbedImage {
 
 export type EmojiSize = "reaction" | "jumbo";
 
-export interface Member extends Partial<Omit<FullGuildMember, "avatar" | "avatarDecoration">> {
+export interface Member extends Partial<Omit<GuildMember, "avatar" | "avatarDecoration">> {
     colorRoleName?: string;
-    guildMemberAvatar?: FullGuildMember["avatar"];
-    guildMemberAvatarDecoration?: FullGuildMember["avatarDecoration"];
+    guildMemberAvatar?: GuildMember["avatar"];
+    guildMemberAvatarDecoration?: GuildMember["avatarDecoration"];
     primaryGuild?: FullUser["primaryGuild"];
 }
 

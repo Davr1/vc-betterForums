@@ -5,9 +5,8 @@
  */
 
 import { getIntlMessage } from "@utils/discord";
+import { Channel, TextProps, User } from "@vencord/discord-types";
 import { Text, useMemo } from "@webpack/common";
-import { TextProps } from "@webpack/types";
-import { Channel, User } from "discord-types/general";
 
 import { useUsers } from "../hooks";
 import { _memo } from "../utils";

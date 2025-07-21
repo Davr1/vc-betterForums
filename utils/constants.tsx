@@ -5,8 +5,8 @@
  */
 
 import { getIntlMessage } from "@utils/discord";
+import { Channel } from "@vencord/discord-types";
 import { findByProps, proxyLazyWebpack } from "@webpack";
-import { Channel } from "discord-types/general";
 
 import { Icons } from "../components/icons";
 import { ChannelState, LayoutType, SortOrder, TagSetting } from "../stores";
@@ -60,7 +60,7 @@ export const tagDefinitions = proxyLazyWebpack(() => {
 });
 
 export const dummyChannel: Channel = proxyLazyWebpack(() => {
-    const DmChannel: Channel & { new (base?: Partial<Channel>): Channel } = findByProps(
+    const DmChannel: Channel & { new(base?: Partial<Channel>): Channel; } = findByProps(
         "fromServer",
         "sortRecipients"
     );

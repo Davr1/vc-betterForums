@@ -4,9 +4,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { FluxEvents, FluxStore, RelationshipStore as _RelationshipStore } from "@webpack/types";
-import { Channel, Guild, User } from "discord-types/general";
-import * as Stores from "discord-types/stores";
+import * as Stores from "@vencord/discord-types";
+import {
+    Channel,
+    FluxEvents,
+    FluxStore,
+    Guild,
+    RelationshipStore as PartialRelationshipStore,
+    User,
+} from "@vencord/discord-types";
 
 import { DiscordTag, FullChannel, FullMessage, FullUser, KeywordTrie } from "../types";
 
@@ -62,7 +68,7 @@ export namespace ExtendedStores {
         getOldestUnreadMessageId(channelId: Channel["id"]): FullMessage["id"] | null;
     }
 
-    export interface RelationshipStore extends _RelationshipStore {
+    export interface RelationshipStore extends PartialRelationshipStore {
         isBlockedOrIgnored(userId: User["id"]): boolean;
         isBlockedForMessage(message: FullMessage): boolean;
         isIgnoredForMessage(message: FullMessage): boolean;

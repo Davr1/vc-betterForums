@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Channel, TextProps } from "@vencord/discord-types";
 import { Text } from "@webpack/common";
-import { TextProps } from "@webpack/types";
-import { Channel } from "discord-types/general";
 
 import { cl } from "..";
 import { useFormattedMessage } from "../hooks";
