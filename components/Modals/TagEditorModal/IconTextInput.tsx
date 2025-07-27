@@ -8,12 +8,12 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { parseUrl } from "@utils/misc";
 import { Text, useCallback, useState } from "@webpack/common";
 
-import { cl } from "../..";
-import { useRichEditor } from "../../hooks";
-import { CustomTag, ParsedContent } from "../../types";
-import { _memo } from "../../utils";
-import { Icons } from "../icons";
-import { defineRichEditorType, Layout, RichEditor, ToolbarType } from "../RichEditor";
+import { cl } from "../../..";
+import { useRichEditor } from "../../../hooks";
+import { CustomTag, ParsedContent } from "../../../types";
+import { _memo } from "../../../utils";
+import { Icons } from "../../icons";
+import { defineRichEditorType, Layout, RichEditor, ToolbarType } from "../../RichEditor";
 
 const type = defineRichEditorType({
     emojis: { button: true },

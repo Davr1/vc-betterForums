@@ -10,7 +10,12 @@ import { getIntlMessage } from "@utils/discord";
 import { ContextMenuApi, Menu, useCallback } from "@webpack/common";
 import { MouseEvent } from "react";
 
-import { useAppliedTags, useForumChannelState, useForumChannelStore } from "../../hooks";
+import {
+    useAppliedTags,
+    useForumChannelState,
+    useForumChannelStore,
+    useTagActions,
+} from "../../hooks";
 import { MaxTagCount, settings } from "../../settings";
 import { CustomTag, ThreadChannel } from "../../types";
 import { _memo } from "../../utils";
@@ -27,7 +32,8 @@ interface TagsContextMenuProps {
 function TagsContextMenu({ tag }: TagsContextMenuProps) {
     const isDev = DeveloperMode.useSetting();
     const copy = useCallback(() => copyToClipboard(tag.id), [tag.id]);
-    const openEditor = TagEditorModal.use(tag.id);
+    const { updateTag } = useTagActions();
+    const openEditor = TagEditorModal.use(tag.id, updateTag);
 
     return (
         <Menu.Menu

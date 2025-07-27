@@ -29,6 +29,7 @@ export { useAllCustomTags } from "./tags/useAllCustomTags";
 export { useAllForumTags } from "./tags/useAllForumTags";
 export { useAppliedTags } from "./tags/useAppliedTags";
 export { useTag } from "./tags/useTag";
+export { useTagActions } from "./tags/useTagActions";
 export { useTagIcon } from "./tags/useTagIcon";
 export { useMember } from "./users/useMember";
 export { useTypingUsers } from "./users/useTypingUsers";

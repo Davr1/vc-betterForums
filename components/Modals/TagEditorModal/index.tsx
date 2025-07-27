@@ -21,6 +21,7 @@ import {
     Checkbox,
     Flex,
     Forms,
+    lodash,
     Text,
     TextInput,
     useCallback,
@@ -28,22 +29,22 @@ import {
     useState,
 } from "@webpack/common";
 
-import { cl } from "../..";
-import { useTag } from "../../hooks";
-import { settings } from "../../settings";
-import { CustomTag } from "../../types";
-import { diffObjects, Merger } from "../../utils";
-import { Tag } from "../Tags";
+import { cl } from "../../..";
+import { useTag } from "../../../hooks";
+import { settings } from "../../../settings";
+import { CustomTag } from "../../../types";
+import { diffObjects, Merger } from "../../../utils";
+import { InfoTooltip } from "../../Settings/InfoTooltip";
+import { TagRevertPreview } from "../../Settings/TagRevertPreview";
+import { Tag } from "../../Tags";
 import { ColorPicker } from "./ColorPicker";
 import { IconTextInput } from "./IconTextInput";
-import { InfoTooltip } from "./InfoTooltip";
-import { TagRevertPreview } from "./TagRevertPreview";
 
 interface TagEditorModalProps {
     modalProps: ModalProps;
     tag: CustomTag;
     modalKey: string;
-    onSubmit?: (tag: CustomTag) => void;
+    onSubmit?: (tag: Partial<CustomTag> | null) => void;
 }
 
 export function TagEditorModal({
@@ -75,15 +76,11 @@ export function TagEditorModal({
                 confirmText: "Yes",
                 cancelText: "No",
                 onConfirm: () => {
-                    if (fullTag.custom) {
-                        settings.store.tagOverrides[fullTag.id] = { disabled: fullTag.disabled };
-                    } else {
-                        delete settings.store.tagOverrides[fullTag.id];
-                    }
+                    onSubmit?.(fullTag.custom ? lodash.pick(fullTag, "disabled") : null);
                     modalProps.onClose();
                 },
             }),
-        [originalTag, fullTag]
+        [originalTag, fullTag, onSubmit]
     );
 
     return (
@@ -121,7 +118,9 @@ export function TagEditorModal({
                         onChange={() => update({ invertedColor: !tag.invertedColor })}
                         reverse
                     >
-                        <Forms.FormTitle tag="h5">Invert colors</Forms.FormTitle>
+                        <Forms.FormTitle tag="h5" className="vc-better-forums-settings-row-title">
+                            Invert colors
+                        </Forms.FormTitle>
                     </Checkbox>
                 </Forms.FormSection>
                 <Forms.FormSection>
@@ -135,7 +134,7 @@ export function TagEditorModal({
                         onChange={() => update({ monochromeIcon: !tag.monochromeIcon })}
                         reverse
                     >
-                        <Forms.FormTitle tag="h5">
+                        <Forms.FormTitle tag="h5" className="vc-better-forums-settings-row-title">
                             <div className="vc-better-forums-settings-row">
                                 <span>Use monochrome icon</span>
                                 <InfoTooltip text="Removes icon colors for better contrast" />
@@ -197,16 +196,17 @@ const merger: Merger<CustomTag> = {
     },
 };
 
-TagEditorModal.use = (tagId: CustomTag["id"]) => {
+TagEditorModal.use = (
+    tagId: CustomTag["id"],
+    onSubmit?: (id: CustomTag["id"], tag: Partial<CustomTag> | null) => void
+) => {
     const modalKey = `tag_editor_modal_${tagId}`;
     const tag = useTag(tagId);
 
     const handleSubmit = useCallback(
-        (t: CustomTag) => {
-            if (!tag) return;
-            settings.store.tagOverrides[tagId] = diffObjects(tag, t, merger);
-        },
-        [tagId, tag]
+        (t: Partial<CustomTag> | null) =>
+            tag && onSubmit?.(tagId, t ? diffObjects(tag, t, merger) : null),
+        [tagId, tag, onSubmit]
     );
 
     return useCallback(() => {

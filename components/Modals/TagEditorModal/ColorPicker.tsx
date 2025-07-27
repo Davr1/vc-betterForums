@@ -7,10 +7,10 @@
 import { Flex, Tooltip, useCallback } from "@webpack/common";
 import { JSX } from "react";
 
-import { cl } from "../..";
-import { CustomTagColor } from "../../types";
-import { _memo } from "../../utils";
-import { Icons } from "../icons";
+import { cl } from "../../..";
+import { CustomTagColor } from "../../../types";
+import { _memo } from "../../../utils";
+import { Icons } from "../../icons";
 
 const colors = [
     "red",
