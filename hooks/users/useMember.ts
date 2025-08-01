@@ -28,7 +28,7 @@ export function useMember(user: FullUser | null, channel: Channel): Member {
         [GuildStore, GuildRoleStore],
         (guildStore, guildRoleStore) => {
             const guild = guildStore.getGuild(guildId);
-            const guildRoles = guild ? guildRoleStore.getRoles(guild.id) : undefined;
+            const guildRoles = guild ? guildRoleStore.getSortedRoles(guild.id) : undefined;
             return { guild, guildRoles };
         },
         [guildId]

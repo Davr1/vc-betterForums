@@ -41,7 +41,10 @@ export interface RichEditorProps {
     parentModalKey?: string;
 }
 
-export const RichEditor = findComponentByCodeLazy<RichEditorProps>('"chat input type must be set"');
+export const RichEditor = findComponentByCodeLazy<RichEditorProps>(
+    '"chat input type must be set"',
+    "USER_PROFILE_REPLY"
+);
 
 export interface SlateNode {
     type: string;
