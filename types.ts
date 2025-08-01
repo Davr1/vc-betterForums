@@ -14,7 +14,7 @@ import {
     MessageReaction,
     User,
 } from "@vencord/discord-types";
-import { ReactNode, Ref } from "react";
+import { ReactNode } from "react";
 
 import { RichEditorType } from "./components/RichEditor";
 
@@ -307,9 +307,8 @@ export interface RichEditorOptions {
 }
 
 export interface ForumPostEventOptions {
-    facepileRef?: Ref<HTMLElement>;
-    goToThread: (channel: Channel, shiftKey: boolean) => void;
-    channel: Channel;
+    goToThread: (channel: ThreadChannel, shiftKey: boolean) => void;
+    channel: ThreadChannel;
 }
 
 export const enum ASTNodeType {
