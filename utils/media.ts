@@ -13,6 +13,7 @@ import {
     FullMessageAttachment,
     Size,
     UnfurledMediaItem,
+    ValidMediaItem,
 } from "../types";
 
 export const imageRegex = /\.(png|jpe?g|webp|gif|heic|heif|dng|avif)$/i;
@@ -42,6 +43,10 @@ export function isVideo({ filename, proxy_url }: FullMessageAttachment): boolean
 export function isMedia(attachment: FullMessageAttachment | null) {
     if (!attachment) return false;
     return isImage(attachment) || isVideo(attachment);
+}
+
+export function isValidMediaItem(item: UnfurledMediaItem): item is ValidMediaItem {
+    return item.type === "IMAGE" || item.type === "VIDEO";
 }
 
 export function getEmbedMediaType(media: UnfurledMediaItem): UnfurledMediaItem["type"] {

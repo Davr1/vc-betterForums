@@ -180,6 +180,10 @@ export interface UnfurledMediaItem
     alt?: string;
 }
 
+export interface ValidMediaItem extends Omit<UnfurledMediaItem, "type"> {
+    type: "IMAGE" | "VIDEO";
+}
+
 export interface ContentScanMetadata {
     version: FullMessageAttachment["content_scan_version"];
     flags: number;
@@ -292,7 +296,7 @@ export type TimeFormatterOptions = Record<
 >;
 
 export interface LazyImageOptions {
-    items: UnfurledMediaItem[];
+    items: ForumPostMetadata["media"];
     mediaIndex?: number;
     prefferedSize?: number | null;
 }
@@ -386,7 +390,7 @@ export interface MessageFormatOptions {
 export interface ForumPostMetadata {
     hasSpoilerEmbeds?: boolean;
     content: ReactNode;
-    media: UnfurledMediaItem[];
+    media: ValidMediaItem[];
 }
 
 export interface ParserOptions {

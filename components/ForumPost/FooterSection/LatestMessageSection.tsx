@@ -17,7 +17,7 @@ import {
 } from "../../../hooks";
 import { settings } from "../../../settings";
 import { ThreadChannel } from "../../../types";
-import { _memo, MessageUtils } from "../../../utils";
+import { _memo, MessageActions } from "../../../utils";
 import { Icons } from "../../icons";
 import { MessageContent } from "../../MessageContent";
 import { Typing } from "../../Typing";
@@ -53,7 +53,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
     const clickHandler = useCallback(() => {
         // wait until router navigation
         setImmediate(() =>
-            MessageUtils.jumpToMessage({ channelId: channel.id, messageId, flash: true })
+            MessageActions.jumpToMessage({ channelId: channel.id, messageId, flash: true })
         );
     }, [channel.id, messageId]);
 

@@ -5,15 +5,11 @@
  */
 
 import { Menu } from "@vencord/discord-types";
-import {
-    DefaultExtractAndLoadChunksRegex,
-    extractAndLoadChunksLazy,
-    filters,
-    mapMangledModuleLazy,
-} from "@webpack";
+import { DefaultExtractAndLoadChunksRegex, extractAndLoadChunksLazy } from "@webpack";
 import { ComponentProps, ComponentType } from "react";
 
 import { ThreadChannel } from "../../types";
+import { findSingleExportLazy } from "../../utils";
 
 export const requireThreadContextMenu = extractAndLoadChunksLazy(
     ["openThreadContextMenu"],
@@ -24,7 +20,6 @@ interface ThreadContextMenuProps extends ComponentProps<Menu["Menu"]> {
     channel: ThreadChannel;
 }
 
-export const ThreadContextMenu: ComponentType<ThreadContextMenuProps> = mapMangledModuleLazy(
-    ".CHANNEL_LIST_THREAD_MENU]",
-    { default: filters.byCode("children:") }
-).default;
+export const ThreadContextMenu = findSingleExportLazy<ComponentType<ThreadContextMenuProps>>(
+    ".CHANNEL_LIST_THREAD_MENU]"
+);

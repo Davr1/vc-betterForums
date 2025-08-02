@@ -4,17 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { openMediaModal } from "@utils/modal";
 import { useCallback, useMemo, WindowStore } from "@webpack/common";
 
 import { Image, ImageProps, MediaLayoutType } from "../../components/Image";
 import { LazyImageOptions, UnfurledMediaItem } from "../../types";
-import {
-    adjustSize,
-    animatedMediaRegex,
-    getPreviewSize,
-    matchesUrlSuffix,
-    openMediaViewer,
-} from "../../utils";
+import { adjustSize, animatedMediaRegex, getPreviewSize, matchesUrlSuffix } from "../../utils";
 import { useStores } from "../misc/useStores";
 
 export function useLazyImage({ items, prefferedSize, mediaIndex = 0 }: LazyImageOptions) {
@@ -46,10 +41,10 @@ export function useLazyImage({ items, prefferedSize, mediaIndex = 0 }: LazyImage
 
     const onZoom: ImageProps["onZoom"] = useCallback(
         event => {
-            if (!image) return;
+            if (!items || !image) return;
             event.currentTarget?.blur?.();
 
-            openMediaViewer({
+            openMediaModal({
                 items,
                 shouldHideMediaOptions: false,
                 location: "LazyImageZoomable",

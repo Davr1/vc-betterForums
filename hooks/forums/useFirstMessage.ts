@@ -4,19 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Channel } from "@vencord/discord-types";
-import { filters, mapMangledModuleLazy } from "@webpack";
+import { filters } from "@webpack";
 
-import { FullMessage } from "../../types";
+import { FullMessage, ThreadChannel } from "../../types";
+import { findSingleExportLazy } from "../../utils";
 
-interface ForumPostRequesterStore {
-    useFirstMessage: (channel: Channel) => {
+export const useFirstMessage = findSingleExportLazy<
+    (channel: ThreadChannel) => {
         loaded: boolean;
         firstMessage: FullMessage | null;
-    };
-}
-
-export const { useFirstMessage }: ForumPostRequesterStore = mapMangledModuleLazy(
-    'type:"LOAD_FORUM_POSTS"',
-    { useFirstMessage: filters.byCode("firstMessage:") }
-);
+    }
+>('type:"LOAD_FORUM_POSTS"', filters.byCode("firstMessage:"));

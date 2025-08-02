@@ -6,14 +6,14 @@
 
 import { ModalAPI } from "@utils/modal";
 import { Channel, CustomEmoji, Message, UnicodeEmoji } from "@vencord/discord-types";
-import { findByCodeLazy, findByPropsLazy } from "@webpack";
+import { findByPropsLazy } from "@webpack";
 import { FluxDispatcher, IconUtils } from "@webpack/common";
 
 import { KeywordFilterStore } from "../stores";
-import { ParsedContent, ThreadChannel, UnfurledMediaItem } from "../types";
+import { ParsedContent, ThreadChannel } from "../types";
 import { normalize } from "./";
 
-export const MessageUtils: {
+export const MessageActions: {
     jumpToMessage: (options: {
         channelId: Channel["id"];
         messageId: Message["id"];
@@ -25,7 +25,7 @@ export const MessageUtils: {
     }) => void;
 } = findByPropsLazy("jumpToMessage");
 
-export const ThreadUtils: {
+export const ThreadActions: {
     joinThread(thread: ThreadChannel): void;
     leaveThread(thread: ThreadChannel): void;
 } = findByPropsLazy("joinThread", "leaveThread");
@@ -37,14 +37,6 @@ export const EmojiUtils: {
 export const MessageParserUtils: {
     parse: (channel: Channel, content: string) => ParsedContent;
 } = findByPropsLazy("parsePreprocessor", "unparse", "parse");
-
-export const openMediaViewer: (options: {
-    items: Partial<UnfurledMediaItem>[];
-    shouldHideMediaOptions?: boolean;
-    location?: string;
-    contextKey?: "default" | "popout";
-    startingIndex?: number;
-}) => void = findByCodeLazy("shouldHideMediaOptions", "LIGHTBOX");
 
 export function closeAllScreens(): void {
     ModalAPI.closeAllModals();

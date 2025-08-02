@@ -5,7 +5,16 @@
  */
 
 import { DataStore } from "@api/index";
+import { proxyLazy } from "@utils/lazy";
 import { LazyComponent } from "@utils/lazyReact";
+import {
+    CodeFilter,
+    FilterFn,
+    findModuleId,
+    handleModuleNotFound,
+    mapMangledModule,
+    wreq,
+} from "@webpack";
 import { React } from "@webpack/common";
 import { ComponentType } from "react";
 
@@ -37,6 +46,26 @@ export function indexedDBStorageFactory<T>() {
 export function _memo<TProps extends object = {}>(component: ComponentType<TProps>) {
     return LazyComponent(() => React.memo(component));
 }
+
+const defaultKeys = Object.freeze(["default", "Z", "ZP"]);
+
+export const findSingleExportLazy = proxyLazy(
+    () =>
+        <T>(moduleFilter: string | RegExp | CodeFilter, exportFilter?: FilterFn): T => {
+            if (exportFilter) {
+                return mapMangledModule(moduleFilter, { default: exportFilter }).default;
+            }
+
+            const id = findModuleId(
+                ...(Array.isArray(moduleFilter) ? moduleFilter : [moduleFilter])
+            );
+            if (!id) handleModuleNotFound(findSingleExportLazy.name, moduleFilter);
+
+            const mod = wreq(id as PropertyKey);
+
+            return defaultKeys.map(key => mod[key]).filter(Boolean)[0];
+        }
+);
 
 export type Merger<T extends object> = {
     [K in keyof T]?: boolean | ((p1: T[K], p2: T[K], objs: [T, T]) => boolean);

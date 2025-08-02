@@ -10,7 +10,7 @@ import { useForumPostState } from "../../hooks";
 import { MessagePreviewLineCount, settings } from "../../settings";
 import { UserStore } from "../../stores";
 import { FullMessage, ThreadChannel } from "../../types";
-import { _memo, ThreadUtils } from "../../utils";
+import { _memo, ThreadActions } from "../../utils";
 import { MessageContent } from "../MessageContent";
 import { Timestamp } from "../Timestamp";
 import { Username } from "../Username";
@@ -35,7 +35,7 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
     );
 
     const followAction = useCallback(
-        () => (hasJoined ? ThreadUtils.leaveThread(channel) : ThreadUtils.joinThread(channel)),
+        () => (hasJoined ? ThreadActions.leaveThread(channel) : ThreadActions.joinThread(channel)),
         [hasJoined, channel]
     );
 

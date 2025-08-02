@@ -8,7 +8,7 @@ import { lodash, useMemo } from "@webpack/common";
 
 import { UserSettingsProtoStore } from "../../stores";
 import { ForumPostMetadata, MessageFormatOptions } from "../../types";
-import { parseInlineContent, unfurlAttachment } from "../../utils";
+import { isValidMediaItem, parseInlineContent, unfurlAttachment } from "../../utils";
 import { useMessageMedia } from "../index";
 
 export function useMessage({
@@ -45,7 +45,7 @@ export function useMessage({
 
     const media = useMessageMedia(message, hasSpoilerEmbeds);
     const unfurledMedia = useMemo(
-        () => media.map(item => unfurlAttachment(item, message)),
+        () => media.map(item => unfurlAttachment(item, message)).filter(isValidMediaItem),
         [message, media]
     );
 
