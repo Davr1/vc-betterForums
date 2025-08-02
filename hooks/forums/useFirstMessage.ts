@@ -5,11 +5,18 @@
  */
 
 import { Channel } from "@vencord/discord-types";
-import { findByCodeLazy } from "@webpack";
+import { filters, mapMangledModuleLazy } from "@webpack";
 
 import { FullMessage } from "../../types";
 
-export const useFirstMessage: (channel: Channel) => {
-    loaded: boolean;
-    firstMessage: FullMessage | null;
-} = findByCodeLazy("loaded:", "firstMessage:", "getChannel", "getMessage");
+interface ForumPostRequesterStore {
+    useFirstMessage: (channel: Channel) => {
+        loaded: boolean;
+        firstMessage: FullMessage | null;
+    };
+}
+
+export const { useFirstMessage }: ForumPostRequesterStore = mapMangledModuleLazy(
+    'type:"LOAD_FORUM_POSTS"',
+    { useFirstMessage: filters.byCode("firstMessage:") }
+);

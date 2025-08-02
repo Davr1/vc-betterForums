@@ -24,7 +24,7 @@ interface ThreadContextMenuProps extends ComponentProps<Menu["Menu"]> {
     channel: ThreadChannel;
 }
 
-export const { ThreadContextMenu }: { ThreadContextMenu: ComponentType<ThreadContextMenuProps> } =
-    mapMangledModuleLazy(".CHANNEL_LIST_THREAD_MENU]", {
-        ThreadContextMenu: filters.byCode("children:"),
-    });
+export const ThreadContextMenu: ComponentType<ThreadContextMenuProps> = mapMangledModuleLazy(
+    ".CHANNEL_LIST_THREAD_MENU]",
+    { default: filters.byCode("children:") }
+).default;
