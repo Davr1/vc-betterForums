@@ -7,16 +7,16 @@
 import { ErrorBoundary } from "@components/index";
 import { getIntlMessage } from "@utils/discord";
 import { Channel } from "@vencord/discord-types";
-import { Clickable, Flex, useEffect } from "@webpack/common";
+import { Clickable, Flex, useEffect, useRef } from "@webpack/common";
 import { ComponentProps, ComponentType, Ref } from "react";
 
 import { cl } from "../..";
 import {
     useFirstMessage,
-    useFocusRing,
     useForumPostComposerStore,
     useForumPostEvents,
     useMessageCount,
+    useResizeObserver,
 } from "../../hooks";
 import { ChannelSectionStore, ChannelStore } from "../../stores";
 import { ThreadChannel } from "../../types";
@@ -40,6 +40,8 @@ interface ForumPostProps {
 }
 
 export function ForumPost({ goToThread, threadId }: ForumPostProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
+
     const channel = ChannelStore.use($ => $.getChannel(threadId) as ThreadChannel, [threadId]);
 
     const isOpen = ChannelSectionStore.use(
@@ -50,19 +52,19 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
     const { firstMessage } = useFirstMessage(channel);
     const { messageCountText } = useMessageCount(channel);
 
-    const { ref: ringTarget, width, height } = useFocusRing<HTMLDivElement>();
+    const { width, height } = useResizeObserver(containerRef);
     const { handleLeftClick, handleRightClick } = useForumPostEvents({ goToThread, channel });
 
     const setCardHeight = useForumPostComposerStore(store => store.setCardHeight);
     useEffect(() => {
-        if (typeof height === "number") setCardHeight(threadId, height);
+        if (height) setCardHeight(threadId, height);
     }, [height, setCardHeight, threadId]);
 
     return (
         <ErrorBoundary>
             <ClickableWithRing
                 onClick={handleLeftClick}
-                focusProps={{ ringTarget }}
+                focusProps={{ ringTarget: containerRef }}
                 onContextMenu={handleRightClick}
                 aria-label={getIntlMessage("FORUM_POST_ARIA_LABEL", {
                     title: channel.name,
@@ -70,7 +72,7 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
                 })}
             >
                 <Flex
-                    ref={ringTarget}
+                    ref={containerRef}
                     data-item-id={threadId}
                     direction={Flex.Direction.VERTICAL}
                     className={cl("vc-better-forums-thread", {

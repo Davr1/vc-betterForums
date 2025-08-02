@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-export { useFocusRing } from "./componentHelpers/useFocusRing";
 export { useFormatTimestamp } from "./componentHelpers/useFormatTimestamp";
 export { useLazyImage } from "./componentHelpers/useLazyImage";
 export { useRichEditor } from "./componentHelpers/useRichEditor";
@@ -24,6 +23,7 @@ export { useFormattedMessage } from "./messages/useFormattedMessage";
 export { useMessage } from "./messages/useMessage";
 export { useMessageMedia } from "./messages/useMessageMedia";
 export { useSortedReactions } from "./messages/useSortedReactions";
+export { useResizeObserver } from "./misc/useResizeObserver";
 export { useStores } from "./misc/useStores";
 export { useAllCustomTags } from "./tags/useAllCustomTags";
 export { useAllForumTags } from "./tags/useAllForumTags";
