@@ -12,7 +12,7 @@ import {
     FilterFn,
     findModuleId,
     handleModuleNotFound,
-    mapMangledModule,
+    mapMangledModuleLazy,
     wreq,
 } from "@webpack";
 import { React } from "@webpack/common";
@@ -49,23 +49,23 @@ export function _memo<TProps extends object = {}>(component: ComponentType<TProp
 
 const defaultKeys = Object.freeze(["default", "Z", "ZP"]);
 
-export const findSingleExportLazy = proxyLazy(
-    () =>
-        <T>(moduleFilter: string | RegExp | CodeFilter, exportFilter?: FilterFn): T => {
-            if (exportFilter) {
-                return mapMangledModule(moduleFilter, { default: exportFilter }).default;
-            }
+export const findSingleExportLazy = function findSingleExportLazy<T>(
+    moduleFilter: string | RegExp | CodeFilter,
+    exportFilter?: FilterFn
+): T {
+    return exportFilter
+        ? mapMangledModuleLazy(moduleFilter, { default: exportFilter }).default
+        : proxyLazy(() => getDefaultExport(moduleFilter));
+};
 
-            const id = findModuleId(
-                ...(Array.isArray(moduleFilter) ? moduleFilter : [moduleFilter])
-            );
-            if (!id) handleModuleNotFound(findSingleExportLazy.name, moduleFilter);
+function getDefaultExport<T>(filter: string | RegExp | CodeFilter): T {
+    const id = findModuleId(...(Array.isArray(filter) ? filter : [filter]));
+    if (!id) handleModuleNotFound(findSingleExportLazy.name, filter);
 
-            const mod = wreq(id as PropertyKey);
+    const mod = wreq(id as PropertyKey);
 
-            return defaultKeys.map(key => mod[key]).filter(Boolean)[0];
-        }
-);
+    return defaultKeys.map(key => mod[key]).filter(Boolean)[0];
+}
 
 export type Merger<T extends object> = {
     [K in keyof T]?: boolean | ((p1: T[K], p2: T[K], objs: [T, T]) => boolean);
