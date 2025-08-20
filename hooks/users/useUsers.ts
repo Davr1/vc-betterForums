@@ -7,7 +7,7 @@
 import { Guild, User } from "@vencord/discord-types";
 import { useEffect } from "@webpack/common";
 
-import { MissingGuildMemberStore, UserStore } from "../../stores";
+import { GuildMemberRequesterStore, MissingGuildMemberStore, UserStore } from "../../stores";
 import { FullUser } from "../../types";
 
 export function useUsers(
@@ -15,10 +15,11 @@ export function useUsers(
     userIds: User["id"][],
     limit: number = Number.MAX_SAFE_INTEGER
 ) {
-    useEffect(
-        () => MissingGuildMemberStore.requestMembersBulk(guildId, userIds),
-        [guildId, userIds]
-    );
+    useEffect(() => {
+        userIds
+            .filter(id => MissingGuildMemberStore.isMember(guildId, id))
+            .forEach(id => GuildMemberRequesterStore.requestMember(guildId, id));
+    }, [guildId, userIds]);
 
     return UserStore.use(
         $ => userIds.values().map($.getUser).filter(Boolean).take(limit).toArray(),

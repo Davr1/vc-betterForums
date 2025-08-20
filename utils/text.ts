@@ -5,8 +5,9 @@
  */
 
 import { parseUrl } from "@utils/misc";
-import { findByCodeLazy } from "@webpack";
+import { findByProps, proxyLazyWebpack } from "@webpack";
 
+import { Stemmer } from "../types";
 import { Host } from "./";
 
 const replacements = Object.freeze({
@@ -36,11 +37,15 @@ export function normalize(text: string): string {
         .trim();
 }
 
-// https://tartarus.org/martin/PorterStemmer/
-const stemmer: (text: string) => string = findByCodeLazy("return 121===");
+// https://github.com/mazko/jssnowball
+const stem = proxyLazyWebpack(() => {
+    const stemmer: { newStemmer: (locale: string) => Stemmer } = findByProps("newStemmer");
+
+    return stemmer.newStemmer("english").stem;
+});
 
 export function normalizeWord(text: string): string {
-    return stemmer(
+    return stem(
         text
             .replace(/('|\u2019|\uFF07)(s|S)$/, "")
             .toLowerCase()

@@ -447,6 +447,10 @@ export interface SortedReaction {
     reaction: MessageReactionWithBurst;
 }
 
+export interface Stemmer {
+    stem(text: string): string;
+}
+
 export type TagOverrides = Record<CustomTag["id"], Partial<CustomTag>>;
 
 export type PartiallyOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

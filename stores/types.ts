@@ -124,7 +124,6 @@ export namespace ExtendedStores {
     export interface MissingGuildMemberStore extends FluxStore {
         reset(): void;
         isMember(guildId: Guild["id"], userId: User["id"]): boolean;
-        requestMembersBulk(guildId: Guild["id"], userIds: User["id"][]): void;
     }
 
     export interface KeywordFilterStore extends FluxStore {

@@ -8,13 +8,7 @@ import { Guild, User } from "@vencord/discord-types";
 import { proxyLazyWebpack } from "@webpack";
 import { FluxDispatcher, lodash } from "@webpack/common";
 
-import {
-    BaseStore,
-    CustomStore,
-    ExtendedStores,
-    FluxEventHandlers,
-    GuildMemberRequesterStore,
-} from "./";
+import { BaseStore, CustomStore, ExtendedStores, FluxEventHandlers } from "./";
 
 interface Member {
     user: Pick<User, "id">;
@@ -85,12 +79,6 @@ export const MissingGuildMemberStore = proxyLazyWebpack(() => {
             more often than not (user that posted the thread must have also been a guild member at some point),
             and reduces flashes with incorrect state during loading. */
             return !this.missingMembers.get(guildId)?.has(userId);
-        }
-
-        public requestMembersBulk(guildId: Guild["id"], userIds: User["id"][]): void {
-            userIds
-                .filter(id => this.isMember(guildId, id))
-                .forEach(id => GuildMemberRequesterStore.requestMember(guildId, id));
         }
 
         public reset() {
