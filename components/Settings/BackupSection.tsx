@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { SettingsSection } from "@components/settings/tabs/plugins/components/Common";
 import { Margins } from "@utils/margins";
-import { Button, Flex, Forms, Text, TextInput, useCallback, useState } from "@webpack/common";
+import { Button, Flex, Text, TextInput, useCallback, useState } from "@webpack/common";
 
 import { cl } from "../..";
 import { TagOverrides } from "../../types";
@@ -53,12 +54,12 @@ export const BackupSection = _memo<BackupSectionProps>(function BackupSection({
     }, []);
 
     return (
-        <Forms.FormSection>
-            <Forms.FormTitle tag="h3">Backup & restore</Forms.FormTitle>
-            <Forms.FormText className={Margins.bottom8} type={Forms.FormText.Types.DESCRIPTION}>
-                Import and export your forum tag overrides as JSON for easy sharing
-            </Forms.FormText>
-            <div className={Margins.bottom16}>
+        <SettingsSection
+            name="Backup & restore"
+            description="Import and export your forum tag overrides as JSON for easy sharing"
+            error={null}
+        >
+            <div className={Margins.bottom8}>
                 <Flex className="vc-better-forums-settings-row">
                     <TextInput
                         value={text}
@@ -105,6 +106,6 @@ export const BackupSection = _memo<BackupSectionProps>(function BackupSection({
                     </Button>
                 )}
             </Flex>
-        </Forms.FormSection>
+        </SettingsSection>
     );
 });

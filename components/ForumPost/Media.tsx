@@ -11,7 +11,7 @@ import { CSSProperties, Ref } from "react";
 import { cl } from "../..";
 import { useLazyImage, useMessage } from "../../hooks";
 import { MaxMediaCount, settings } from "../../settings";
-import { FullMessage, UnfurledMediaItem } from "../../types";
+import { FullMessage, ValidMediaItem } from "../../types";
 import { _memo } from "../../utils";
 import { DynamicList } from "../DynamicList";
 import { Icons } from "../icons";
@@ -73,7 +73,7 @@ export const Media = _memo<MediaProps>(function Media({ message, maxWidth }) {
 });
 
 interface MediaItemProps {
-    items: UnfurledMediaItem[];
+    items: ValidMediaItem[];
     mediaIndex: number;
     prefferedSize?: number | null;
     extraCount?: number | null;

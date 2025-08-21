@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Margins } from "@utils/margins";
-import { Flex, Forms } from "@webpack/common";
+import { SettingsSection } from "@components/settings/tabs/plugins/components/Common";
+import { Flex } from "@webpack/common";
 
 import { CustomTag } from "../../types";
 import { _memo } from "../../utils";
@@ -25,11 +25,7 @@ export const TagListSection = _memo<TagListSectionProps>(function TagListSection
     ...props
 }) {
     return (
-        <Forms.FormSection>
-            <Forms.FormTitle tag="h3">{title}</Forms.FormTitle>
-            <Forms.FormText className={Margins.bottom8} type={Forms.FormText.Types.DESCRIPTION}>
-                {description}
-            </Forms.FormText>
+        <SettingsSection name={title} description={description ?? ""} error={null}>
             {tags.length > 0 && (
                 <Flex
                     direction={Flex.Direction.VERTICAL}
@@ -40,6 +36,6 @@ export const TagListSection = _memo<TagListSectionProps>(function TagListSection
                     ))}
                 </Flex>
             )}
-        </Forms.FormSection>
+        </SettingsSection>
     );
 });
