@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
 import { Margins } from "@utils/margins";
 import { parseUrl } from "@utils/misc";
@@ -22,7 +23,6 @@ import {
     Flex,
     Forms,
     lodash,
-    Text,
     TextInput,
     useCallback,
     useMemo,
@@ -86,9 +86,9 @@ export function TagEditorModal({
     return (
         <ModalRoot {...modalProps}>
             <ModalHeader separator={false}>
-                <Text variant="heading-lg/semibold" style={{ flexGrow: 1 }}>
+                <BaseText size="lg" weight="semibold" style={{ flexGrow: 1 }}>
                     Edit tag
-                </Text>
+                </BaseText>
                 <ModalCloseButton onClick={modalProps.onClose} />
             </ModalHeader>
 

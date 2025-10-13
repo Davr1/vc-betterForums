@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BaseText } from "@components/BaseText";
 import { getIntlMessage } from "@utils/discord";
-import { Text, useCallback } from "@webpack/common";
+import { useCallback } from "@webpack/common";
 
 import { cl } from "../../..";
 import {
@@ -84,7 +85,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
                     <MessageContent
                         channel={channel}
                         message={mostRecentMessage!}
-                        variant={isActive ? "text-sm/semibold" : "text-sm/normal"}
+                        weight={isActive ? "semibold" : "normal"}
                         style={textClampStyle(1)}
                         visibleIcons
                     />
@@ -93,11 +94,11 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
                 !!unreadCount && "•"
             )}
             {!!unreadCount && (
-                <Text variant="text-sm/semibold" color="text-brand">
+                <BaseText size="sm" weight="semibold" style={{ color: "var(--text-brand)" }}>
                     {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
                         count: unreadCountText,
                     })}
-                </Text>
+                </BaseText>
             )}
         </FooterSection>
     );

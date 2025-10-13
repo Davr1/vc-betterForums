@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Text } from "@webpack/common";
+import { BaseText } from "@components/BaseText";
 import { HTMLProps, ReactNode } from "react";
 
 import { cl } from "../../..";
@@ -38,13 +38,14 @@ export function FooterSection({
             {...props}
         >
             {icon}
-            <Text
-                variant="text-sm/semibold"
-                color="currentColor"
+            <BaseText
+                size="sm"
+                weight="semibold"
+                style={{ color: "currentcolor" }}
                 className="vc-better-forums-footer-section-text"
             >
                 {text}
-            </Text>
+            </BaseText>
             {children}
         </div>
     );

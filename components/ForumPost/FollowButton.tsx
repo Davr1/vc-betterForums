@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BaseText } from "@components/BaseText";
 import { getIntlMessage } from "@utils/discord";
-import { Text, Tooltip } from "@webpack/common";
+import { Tooltip } from "@webpack/common";
 
 import { cl } from "../..";
 import { _memo } from "../../utils";
@@ -40,9 +41,9 @@ export const FollowButton = _memo<FollowButtonProps>(function FollowButton({
                     {...props}
                 >
                     <Icon size={14} />
-                    <Text color="currentColor" variant="text-sm/normal">
+                    <BaseText size="sm" weight="normal" style={{ color: "currentcolor" }}>
                         {getIntlMessage(intlKey)}
-                    </Text>
+                    </BaseText>
                 </button>
             )}
         </Tooltip>

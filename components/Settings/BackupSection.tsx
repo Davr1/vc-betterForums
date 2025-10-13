@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
 import { SettingsSection } from "@components/settings/tabs/plugins/components/Common";
 import { Margins } from "@utils/margins";
-import { Flex, Text, TextInput, useCallback, useState } from "@webpack/common";
+import { Flex, TextInput, useCallback, useState } from "@webpack/common";
 
 import { cl } from "../..";
 import { TagOverrides } from "../../types";
@@ -81,10 +82,10 @@ export const BackupSection = _memo<BackupSectionProps>(function BackupSection({
                     )}
                 </Flex>
                 {error && (
-                    <Text variant="text-sm/medium" className="vc-better-forums-error">
+                    <BaseText size="sm" weight="medium" className="vc-better-forums-error">
                         <Icons.Error />
                         <span>{error}</span>
-                    </Text>
+                    </BaseText>
                 )}
             </div>
             <Flex className="vc-better-forums-settings-row">

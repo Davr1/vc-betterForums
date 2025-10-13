@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BaseText } from "@components/BaseText";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { parseUrl } from "@utils/misc";
-import { Text, useCallback, useState } from "@webpack/common";
+import { useCallback, useState } from "@webpack/common";
 
 import { cl } from "../../..";
 import { useRichEditor } from "../../../hooks";
@@ -96,10 +97,10 @@ export const IconTextInput = _memo(function IconTextInput({
                 {...props}
             />
             {error && (
-                <Text variant="text-sm/medium" className="vc-better-forums-error">
+                <BaseText size="sm" weight="medium" className="vc-better-forums-error">
                     <Icons.Error />
                     <span>{error}</span>
-                </Text>
+                </BaseText>
             )}
         </ErrorBoundary>
     );

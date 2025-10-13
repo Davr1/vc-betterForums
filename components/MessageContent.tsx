@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Channel, TextProps } from "@vencord/discord-types";
-import { Text } from "@webpack/common";
+import { BaseText, BaseTextProps } from "@components/BaseText";
+import { Channel } from "@vencord/discord-types";
 
 import { cl } from "..";
 import { useFormattedMessage } from "../hooks";
 import { FullMessage } from "../types";
 import { _memo, textClampStyle } from "../utils";
 
-interface MessageContentProps extends Omit<TextProps, "children"> {
+interface MessageContentProps extends Omit<BaseTextProps, "children"> {
     channel: Channel;
     message: FullMessage | null;
     messageClassName?: string;
@@ -27,6 +27,7 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
     messageClassName,
     visibleIcons,
     lineClamp,
+    style,
     ...props
 }) {
     const { content, systemMessage, leadingIcon, trailingIcon } = useFormattedMessage({
@@ -43,19 +44,20 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
     });
 
     const text = (
-        <Text
+        <BaseText
             style={{
+                color: "currentcolor",
                 fontStyle: systemMessage ? "italic" : "normal",
                 ...textClampStyle(lineClamp),
-                ...props.style,
+                ...style,
             }}
-            color="currentColor"
-            variant="text-sm/normal"
+            size="sm"
+            weight="normal"
             className={cl(className, "vc-better-forums-latest-message-content-wrapper")}
             {...props}
         >
             {content}
-        </Text>
+        </BaseText>
     );
 
     return visibleIcons ? [leadingIcon, text, trailingIcon] : text;

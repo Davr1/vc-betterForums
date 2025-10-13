@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { TextProps } from "@vencord/discord-types";
-import { Flex, Text, Tooltip, useCallback } from "@webpack/common";
+import { BaseText, BaseTextProps } from "@components/BaseText";
+import { Flex, Tooltip, useCallback } from "@webpack/common";
 import { CSSProperties, Ref } from "react";
 
 import { cl } from "../..";
@@ -109,16 +109,16 @@ const MediaItem = _memo<MediaItemProps>(function MediaItem({
             <MediaCount
                 count={extraCount}
                 className="vc-better-forums-thumbnail-decorator-overlay"
-                variant="text-sm/semibold"
-                color="text-primary"
+                weight="semibold"
                 isExtra
                 displayIcon={!prefferedSize || prefferedSize > 48}
+                style={{ color: "var(--text-primary)" }}
             />
         </div>
     );
 });
 
-interface MediaCountProps extends TextProps {
+interface MediaCountProps extends BaseTextProps {
     count?: number | null;
     isExtra?: boolean;
     displayIcon?: boolean;
@@ -134,14 +134,15 @@ const MediaCount = _memo<MediaCountProps>(function MediaCount({
     if (!count) return null;
 
     return (
-        <Text
-            variant="text-sm/normal"
+        <BaseText
+            size="sm"
+            weight="normal"
             className={cl("vc-better-forums-thumbnail-decorator", className)}
             {...props}
         >
             {isExtra ? "+" : null}
             {count}
             {displayIcon && <Icons.Image size="1em" />}
-        </Text>
+        </BaseText>
     );
 });

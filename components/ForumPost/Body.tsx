@@ -54,12 +54,14 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
             <MessageContent
                 channel={channel}
                 message={message}
-                color="text-secondary"
-                style={textClampStyle(
-                    messagePreviewLineCount === MessagePreviewLineCount.ALL
-                        ? null
-                        : messagePreviewLineCount
-                )}
+                style={{
+                    color: "var(--text-secondary)",
+                    ...textClampStyle(
+                        messagePreviewLineCount === MessagePreviewLineCount.ALL
+                            ? null
+                            : messagePreviewLineCount
+                    ),
+                }}
             />
         </Flex>
     );

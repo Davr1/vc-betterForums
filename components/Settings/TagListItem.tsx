@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
-import { Alerts, Checkbox, Flex, Parser, Text, useCallback, useMemo } from "@webpack/common";
+import { Alerts, Checkbox, Flex, Parser, useCallback, useMemo } from "@webpack/common";
 
 import { cl } from "../..";
 import { settings } from "../../settings";
@@ -71,13 +72,14 @@ export const TagListItem = _memo<TagListItemProps>(function TagItem({
                     className={cl({ "vc-better-forums-tag-disabled": unavailable })}
                 />
                 {tag.channelId && (
-                    <Text
-                        variant="text-sm/normal"
+                    <BaseText
+                        size="sm"
+                        weight="normal"
                         className="vc-better-forums-channel-mention"
                         onClick={closeAllScreens}
                     >
                         {Parser.parse(`<#${tag.channelId}>`)}
-                    </Text>
+                    </BaseText>
                 )}
             </Flex>
             <Flex className="vc-better-forums-settings-row" justify={Flex.Justify.END}>
