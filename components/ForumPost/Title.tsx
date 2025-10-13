@@ -31,12 +31,16 @@ export const Title = _memo<TitleProps>(function Title({ channel, isMuted, isUnre
         [channel.name, postProcessor]
     );
 
+    const color = isMuted ? "interactive-muted" : isUnread ? "header-primary" : "text-secondary";
+
     return (
         <BaseText
             size="lg"
             weight="semibold"
-            color={isMuted ? "interactive-muted" : isUnread ? "header-primary" : "text-secondary"}
-            style={textClampStyle(2)}
+            style={{
+                color: `var(--${color})`,
+                ...textClampStyle(2),
+            }}
             className="vc-better-forums-thread-title"
         >
             {content}

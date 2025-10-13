@@ -54,7 +54,10 @@
 
 .vc-better-forums-badge-container {
     display: inline-block;
-    margin-left: 0.25rem;
+
+    &:not(:empty) {
+        margin-left: 0.25rem;
+    }
 
     * {
         margin: 0 !important;
