@@ -4,16 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import {
-    Alerts,
-    Button,
-    Checkbox,
-    Flex,
-    Parser,
-    Text,
-    useCallback,
-    useMemo,
-} from "@webpack/common";
+import { Button } from "@components/Button";
+import { Alerts, Checkbox, Flex, Parser, Text, useCallback, useMemo } from "@webpack/common";
 
 import { cl } from "../..";
 import { settings } from "../../settings";
@@ -88,31 +80,17 @@ export const TagListItem = _memo<TagListItemProps>(function TagItem({
                     </Text>
                 )}
             </Flex>
-            <Flex justify={Flex.Justify.END}>
+            <Flex className="vc-better-forums-settings-row" justify={Flex.Justify.END}>
                 {tag.custom ? (
-                    <Button
-                        color={Button.Colors.TRANSPARENT}
-                        look={Button.Looks.LINK}
-                        size={Button.Sizes.SMALL}
-                        onClick={handleReset}
-                    >
+                    <Button variant="dangerSecondary" size="small" onClick={handleReset}>
                         Reset
                     </Button>
                 ) : (
-                    <Button
-                        color={Button.Colors.RED}
-                        look={Button.Looks.LINK}
-                        size={Button.Sizes.SMALL}
-                        onClick={handleDelete}
-                    >
+                    <Button variant="dangerSecondary" size="small" onClick={handleDelete}>
                         Remove
                     </Button>
                 )}
-                <Button
-                    innerClassName="vc-better-forums-button"
-                    size={Button.Sizes.SMALL}
-                    onClick={openEditor}
-                >
+                <Button className="vc-better-forums-button" size="small" onClick={openEditor}>
                     <Icons.Pencil />
                     Edit
                 </Button>

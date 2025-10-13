@@ -26,6 +26,7 @@ export * from "./files";
 export * from "./json";
 export * from "./media";
 export * from "./messageParser";
+export * from "./style";
 export * from "./text";
 export * from "./validators";
 

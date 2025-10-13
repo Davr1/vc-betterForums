@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Button, Forms, TextInput, useCallback, useState } from "@webpack/common";
+import { Button } from "@components/Button";
+import { TextInput, useCallback, useState } from "@webpack/common";
 
 import { CustomTag } from "../../types";
 import { _memo } from "../../utils";
@@ -24,7 +25,7 @@ export const NewOverrideSection = _memo<NewOverideSectionProps>(function NewOver
     }, [onCreate, newTagId]);
 
     return (
-        <Forms.FormSection className="vc-better-forums-settings-row">
+        <section className="vc-better-forums-settings-row">
             <TextInput
                 value={newTagId}
                 onChange={setNewTagId}
@@ -37,6 +38,6 @@ export const NewOverrideSection = _memo<NewOverideSectionProps>(function NewOver
             <Button onClick={handleCreate} disabled={!newTagId.trim()}>
                 Create override
             </Button>
-        </Forms.FormSection>
+        </section>
     );
 });

@@ -17,7 +17,7 @@ import {
 } from "../../../hooks";
 import { settings } from "../../../settings";
 import { ThreadChannel } from "../../../types";
-import { _memo, MessageActions } from "../../../utils";
+import { _memo, MessageActions, textClampStyle } from "../../../utils";
 import { Icons } from "../../icons";
 import { MessageContent } from "../../MessageContent";
 import { Typing } from "../../Typing";
@@ -85,7 +85,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
                         channel={channel}
                         message={mostRecentMessage!}
                         variant={isActive ? "text-sm/semibold" : "text-sm/normal"}
-                        lineClamp={1}
+                        style={textClampStyle(1)}
                         visibleIcons
                     />
                 </div>

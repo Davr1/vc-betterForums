@@ -10,13 +10,14 @@ import { Text } from "@webpack/common";
 import { cl } from "..";
 import { useFormattedMessage } from "../hooks";
 import { FullMessage } from "../types";
-import { _memo } from "../utils";
+import { _memo, textClampStyle } from "../utils";
 
 interface MessageContentProps extends Omit<TextProps, "children"> {
     channel: Channel;
     message: FullMessage | null;
     messageClassName?: string;
     visibleIcons?: boolean;
+    lineClamp?: number;
 }
 
 export const MessageContent = _memo<MessageContentProps>(function MessageContent({
@@ -45,12 +46,12 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
         <Text
             style={{
                 fontStyle: systemMessage ? "italic" : "normal",
+                ...textClampStyle(lineClamp),
                 ...props.style,
             }}
             color="currentColor"
             variant="text-sm/normal"
             className={cl(className, "vc-better-forums-latest-message-content-wrapper")}
-            lineClamp={lineClamp}
             {...props}
         >
             {content}

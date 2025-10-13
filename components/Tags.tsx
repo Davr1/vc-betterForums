@@ -4,13 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Text, Tooltip, useCallback } from "@webpack/common";
+import { BaseText } from "@components/BaseText";
+import { Tooltip, useCallback } from "@webpack/common";
 import { HTMLProps, MouseEvent, ReactNode } from "react";
 
 import { cl } from "..";
 import { useTagIcon } from "../hooks";
 import { CustomTag } from "../types";
-import { _memo } from "../utils";
+import { _memo, textClampStyle } from "../utils";
 
 interface TagProps extends Omit<HTMLProps<HTMLDivElement>, "onContextMenu" | "onClick"> {
     tag: CustomTag;
@@ -74,9 +75,13 @@ export const Tag = _memo<TagProps>(function Tag({
             ) : (
                 tag.icon
             )}
-            <Text variant="text-xs/bold" lineClamp={1} color="currentColor">
+            <BaseText
+                size="xs"
+                weight="bold"
+                style={{ color: "currentcolor", ...textClampStyle(1) }}
+            >
                 {tag.name ?? "Unknown tag"}
-            </Text>
+            </BaseText>
         </div>
     );
 });
@@ -95,9 +100,9 @@ export const MoreTags = _memo<MoreTagsProps>(function MoreTags({ tags, renderTag
         >
             {props => (
                 <div className="vc-better-forums-tag" {...props}>
-                    <Text variant="text-xs/semibold" color="currentColor">
+                    <BaseText size="xs" weight="semibold" style={{ color: "currentcolor" }}>
                         +{tags.length}
-                    </Text>
+                    </BaseText>
                 </div>
             )}
         </Tooltip>

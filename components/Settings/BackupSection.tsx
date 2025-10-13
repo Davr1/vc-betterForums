@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button } from "@components/Button";
 import { SettingsSection } from "@components/settings/tabs/plugins/components/Common";
 import { Margins } from "@utils/margins";
-import { Button, Flex, Text, TextInput, useCallback, useState } from "@webpack/common";
+import { Flex, Text, TextInput, useCallback, useState } from "@webpack/common";
 
 import { cl } from "../..";
 import { TagOverrides } from "../../types";
@@ -88,8 +89,7 @@ export const BackupSection = _memo<BackupSectionProps>(function BackupSection({
             </div>
             <Flex className="vc-better-forums-settings-row">
                 <Button
-                    className="vc-better-forums-button-wide"
-                    innerClassName="vc-better-forums-button"
+                    className={cl("vc-better-forums-button", "vc-better-forums-button-wide")}
                     onClick={handleExport}
                 >
                     <Icons.Download size={18} />
@@ -97,8 +97,7 @@ export const BackupSection = _memo<BackupSectionProps>(function BackupSection({
                 </Button>
                 {onLoad && (
                     <Button
-                        className="vc-better-forums-button-wide"
-                        innerClassName="vc-better-forums-button"
+                        className={cl("vc-better-forums-button", "vc-better-forums-button-wide")}
                         onClick={() => handleImport(() => readFile("TagOverrides"))}
                     >
                         <Icons.Upload size={18} />

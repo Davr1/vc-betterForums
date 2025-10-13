@@ -4,13 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex, Heading, useCallback } from "@webpack/common";
+import { Heading } from "@components/Heading";
+import { Flex, useCallback } from "@webpack/common";
 
 import { useForumPostState } from "../../hooks";
 import { MessagePreviewLineCount, settings } from "../../settings";
 import { UserStore } from "../../stores";
 import { FullMessage, ThreadChannel } from "../../types";
-import { _memo, ThreadActions } from "../../utils";
+import { _memo, textClampStyle, ThreadActions } from "../../utils";
 import { MessageContent } from "../MessageContent";
 import { Timestamp } from "../Timestamp";
 import { Username } from "../Username";
@@ -46,10 +47,7 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
                 <Timestamp channel={channel} />
                 {showFollowButton && <FollowButton hasJoined={hasJoined} onClick={followAction} />}
             </Flex>
-            <Heading
-                variant="heading-lg/semibold"
-                className="vc-better-forums-thread-title-container"
-            >
+            <Heading className="vc-better-forums-thread-title-container">
                 <ForumPost.Title channel={channel} isMuted={isMuted} isUnread={hasUnreads} />
                 <ForumPost.Tags channel={channel} />
             </Heading>
@@ -57,11 +55,11 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
                 channel={channel}
                 message={message}
                 color="text-secondary"
-                lineClamp={
+                style={textClampStyle(
                     messagePreviewLineCount === MessagePreviewLineCount.ALL
-                        ? undefined
+                        ? null
                         : messagePreviewLineCount
-                }
+                )}
             />
         </Flex>
     );

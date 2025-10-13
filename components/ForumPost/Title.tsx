@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { BaseText } from "@components/BaseText";
 import { Channel } from "@vencord/discord-types";
-import { Text, useMemo } from "@webpack/common";
+import { useMemo } from "@webpack/common";
 
 import { ForumSearchStore } from "../../stores";
-import { _memo, parseInlineContent } from "../../utils";
+import { _memo, parseInlineContent, textClampStyle } from "../../utils";
 import { getSearchHighlighter } from "../../utils/postProcessors";
 
 interface TitleProps {
@@ -31,12 +32,14 @@ export const Title = _memo<TitleProps>(function Title({ channel, isMuted, isUnre
     );
 
     return (
-        <Text
-            lineClamp={2}
+        <BaseText
+            size="lg"
+            weight="semibold"
             color={isMuted ? "interactive-muted" : isUnread ? "header-primary" : "text-secondary"}
+            style={textClampStyle(2)}
             className="vc-better-forums-thread-title"
         >
             {content}
-        </Text>
+        </BaseText>
     );
 });

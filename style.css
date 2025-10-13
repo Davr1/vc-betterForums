@@ -44,10 +44,12 @@
     gap: var(--space-xs);
     align-items: center;
     flex-wrap: wrap;
+    margin: 0;
 }
 
 .vc-better-forums-thread-title {
     transition: color 150ms ease;
+    line-height: 24px;
 }
 
 .vc-better-forums-badge-container {
@@ -345,6 +347,9 @@
 .vc-better-forums-latest-message-content {
     margin-right: auto;
     width: auto;
+    height: 1lh;
+    padding-block: 4px;
+    margin-block: -4px;
     display: flex;
     gap: 4px;
     align-items: center;

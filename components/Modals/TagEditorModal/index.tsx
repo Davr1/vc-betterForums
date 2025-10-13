@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button } from "@components/Button";
 import { Margins } from "@utils/margins";
 import { parseUrl } from "@utils/misc";
 import {
@@ -17,7 +18,6 @@ import {
 } from "@utils/modal";
 import {
     Alerts,
-    Button,
     Checkbox,
     Flex,
     Forms,
@@ -93,26 +93,26 @@ export function TagEditorModal({
             </ModalHeader>
 
             <ModalContent className={cl("vc-better-forums-modal-content", Margins.bottom8)}>
-                <Forms.FormSection className="vc-better-forums-tag-preview">
+                <section className="vc-better-forums-tag-preview">
                     <Tag tag={fullTag} />
-                </Forms.FormSection>
-                <Forms.FormSection>
+                </section>
+                <section>
                     <Forms.FormTitle tag="h5">Name</Forms.FormTitle>
                     <TextInput
                         value={tag.name}
                         onChange={name => update({ name })}
                         placeholder={originalTag.name}
                     />
-                </Forms.FormSection>
-                <Forms.FormSection>
+                </section>
+                <section>
                     <Forms.FormTitle tag="h5">Color</Forms.FormTitle>
                     <ColorPicker
                         color={tag.color ?? null}
                         onChange={color => update({ color })}
                         inverted={tag.invertedColor}
                     />
-                </Forms.FormSection>
-                <Forms.FormSection>
+                </section>
+                <section>
                     <Checkbox
                         value={!!tag.invertedColor}
                         onChange={() => update({ invertedColor: !tag.invertedColor })}
@@ -122,12 +122,12 @@ export function TagEditorModal({
                             Invert colors
                         </Forms.FormTitle>
                     </Checkbox>
-                </Forms.FormSection>
-                <Forms.FormSection>
+                </section>
+                <section>
                     <Forms.FormTitle tag="h5">Icon</Forms.FormTitle>
                     <IconTextInput onChange={update} modalKey={modalKey} {...fullTag} />
-                </Forms.FormSection>
-                <Forms.FormSection>
+                </section>
+                <section>
                     <Checkbox
                         value={(isReactIcon || tag.monochromeIcon) ?? false}
                         disabled={isReactIcon}
@@ -141,7 +141,7 @@ export function TagEditorModal({
                             </div>
                         </Forms.FormTitle>
                     </Checkbox>
-                </Forms.FormSection>
+                </section>
             </ModalContent>
 
             <ModalFooter
@@ -149,24 +149,15 @@ export function TagEditorModal({
                 direction={Flex.Direction.HORIZONTAL_REVERSE}
             >
                 <Flex className="vc-better-forums-settings-row" grow={0}>
-                    <Button
-                        color={Button.Colors.PRIMARY}
-                        size={Button.Sizes.SMALL}
-                        onClick={() => modalProps.onClose()}
-                    >
+                    <Button variant="secondary" size="small" onClick={() => modalProps.onClose()}>
                         Cancel
                     </Button>
-                    <Button onClick={handleSubmit} size={Button.Sizes.SMALL}>
+                    <Button onClick={handleSubmit} size="small">
                         Save
                     </Button>
                 </Flex>
                 {fullTag.id in tagOverrides && (
-                    <Button
-                        color={Button.Colors.RED}
-                        look={Button.Looks.LINK}
-                        size={Button.Sizes.SMALL}
-                        onClick={deleteTag}
-                    >
+                    <Button variant="dangerSecondary" size="small" onClick={deleteTag}>
                         Remove
                     </Button>
                 )}
