@@ -58,7 +58,7 @@ export const IconTextInput = _memo(function IconTextInput({
                 case !!emoji: {
                     if (emoji.type === 1) {
                         icon.emojiId = emoji.id;
-                        icon.emojiName = emoji.name;
+                        icon.emojiName = emoji.originalName || emoji.name;
                     } else {
                         icon.emojiName = emoji.surrogates;
                     }
