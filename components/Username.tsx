@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Channel, Message, TextProps, User } from "@vencord/discord-types";
-import { Text } from "@webpack/common";
+import { BaseText, BaseTextProps } from "@components/BaseText";
+import { Channel, Message, User } from "@vencord/discord-types";
 
 import { cl } from "..";
 import { useMember, useUsernameHook } from "../hooks";
 import { _memo } from "../utils";
 import { Badge } from "./Badge";
 
-interface UsernameProps extends TextProps {
+interface UsernameProps extends BaseTextProps {
     user: User | null;
     message?: Message | null;
     channel: Channel;
@@ -27,6 +27,7 @@ export const Username = _memo<UsernameProps>(function Username({
     renderColon,
     renderBadge,
     className,
+    style,
     ...props
 }) {
     const member = useMember(user, channel);
@@ -43,11 +44,12 @@ export const Username = _memo<UsernameProps>(function Username({
     const usernameElement = useUsername(member)(username, channel.id);
 
     return (
-        <Text
+        <BaseText
             tag="span"
             className={cl("vc-better-forums-username", className)}
-            variant="text-sm/semibold"
-            color="currentColor"
+            size="sm"
+            weight="semibold"
+            style={{ color: "currentcolor", ...style }}
             {...props}
         >
             {usernameElement}
@@ -57,6 +59,6 @@ export const Username = _memo<UsernameProps>(function Username({
                 </div>
             ) : null}
             {renderColon ? ": " : null}
-        </Text>
+        </BaseText>
     );
 });
