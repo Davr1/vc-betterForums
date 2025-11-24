@@ -1,4 +1,6 @@
 .vc-better-forums-thread {
+    display: flex;
+    flex-direction: column;
     gap: var(--space-10);
     padding: var(--space-sm);
     background-color: var(--background-base-low);
@@ -32,12 +34,12 @@
 
 .vc-better-forums-thread-header {
     height: 1lh;
+    flex-grow: 0;
 }
 
 .vc-better-forums-thread-body,
 .vc-better-forums-thread-header,
 .vc-better-forums-footer {
-    gap: var(--space-6);
     min-width: 0;
     margin: 0 !important;
 }
@@ -70,6 +72,7 @@
 
 .vc-better-forums-tag-info {
     min-width: 0;
+    flex-grow: 1;
     mask: linear-gradient(to left, transparent 0%, black 20px);
 
     * {
@@ -97,6 +100,10 @@
     min-width: 0;
     max-width: 100%;
     position: relative;
+
+    *:has(>&) {
+        width: 100%;
+    }
 
     > * {
         max-width: 100%;
@@ -141,6 +148,7 @@
     }
 
     &.vc-better-forums-tag-clickable {
+
         &,
         * {
             cursor: pointer;
@@ -305,8 +313,7 @@
     interpolate-size: allow-keywords;
 }
 
-[data-list-id^="forum-channel-list"]:not([class*="scrolling"])
-    .vc-better-forums-footer-section-clickable:not(.vc-better-forums-footer-section-active) {
+[data-list-id^="forum-channel-list"]:not([class*="scrolling"]) .vc-better-forums-footer-section-clickable:not(.vc-better-forums-footer-section-active) {
     cursor: pointer;
 
     &:hover {
@@ -323,6 +330,7 @@
 }
 
 .vc-better-forums-footer-section-active {
+
     &,
     &:active,
     &:hover {
@@ -336,6 +344,7 @@
     flex-grow: 1;
 
     @starting-style {
+
         /* skip initial resize animation on first render */
         .vc-better-forums-latest-message-content {
             width: auto;
@@ -462,6 +471,7 @@
 }
 
 .vc-better-forums-reaction {
+
     &,
     & > div {
         display: flex;
@@ -539,8 +549,7 @@
     }
 }
 
-.vc-better-forums-thread:not(.vc-better-forums-thread-open, :hover)
-    .vc-better-forums-follow-button:not(.vc-better-forums-follow-button-active) {
+.vc-better-forums-thread:not(.vc-better-forums-thread-open, :hover) .vc-better-forums-follow-button:not(.vc-better-forums-follow-button-active) {
     opacity: 0;
 }
 
@@ -555,13 +564,9 @@
     }
 }
 
-.vc-better-forums-settings-stack {
-    gap: var(--space-xs);
-}
-
 .vc-better-forums-settings-row {
     display: flex;
-    gap: var(--space-xs);
+    gap: var(--space-xs) !important;
     align-items: center;
 }
 
@@ -618,12 +623,6 @@
     }
 }
 
-.vc-better-forums-color-option {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
 .vc-better-forums-tag-preview {
     display: flex;
     align-items: center;
@@ -631,10 +630,6 @@
     overflow: hidden;
     mask: linear-gradient(to left, transparent 0%, black 20px);
     flex-shrink: 0;
-}
-
-.vc-better-forums-color-picker {
-    gap: var(--space-xs);
 }
 
 .vc-better-forums-color-swatch {
@@ -697,6 +692,7 @@
 }
 
 .vc-better-forums-custom-input {
+
     input::-webkit-inner-spin-button,
     input::-webkit-outer-spin-button {
         display: none;
@@ -724,4 +720,9 @@
 .vc-better-forums-channel-mention {
     white-space: nowrap;
     user-select: none;
+}
+
+.vc-better-forums-modal-footer {
+    justify-content: space-between;
+    flex-direction: row-reverse;
 }

@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ErrorBoundary } from "@components/index";
+import { ErrorBoundary, Flex } from "@components/index";
 import { getIntlMessage } from "@utils/discord";
 import { Channel } from "@vencord/discord-types";
-import { Clickable, Flex, useEffect, useRef } from "@webpack/common";
+import { Clickable, useEffect, useRef } from "@webpack/common";
 import { ComponentProps, ComponentType, Ref } from "react";
 
 import { cl } from "../..";
@@ -71,10 +71,9 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
                     count: messageCountText,
                 })}
             >
-                <Flex
+                <div
                     ref={containerRef}
                     data-item-id={threadId}
-                    direction={Flex.Direction.VERTICAL}
                     className={cl("vc-better-forums-thread", {
                         "vc-better-forums-thread-open": isOpen,
                     })}
@@ -88,7 +87,7 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
                         message={firstMessage}
                         containerWidth={width}
                     />
-                </Flex>
+                </div>
             </ClickableWithRing>
         </ErrorBoundary>
     );

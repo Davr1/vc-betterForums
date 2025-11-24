@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex, Tooltip, useCallback } from "@webpack/common";
+import { Tooltip, useCallback } from "@webpack/common";
 import { JSX } from "react";
 
+import { Flex } from "@components/Flex";
 import { cl } from "../../..";
 import { CustomTagColor } from "../../../types";
 import { _memo } from "../../../utils";
@@ -70,7 +71,7 @@ export const ColorPicker = _memo<ColorPickerProps>(function ColorPicker({
     onChange,
 }) {
     return (
-        <Flex className="vc-better-forums-color-picker">
+        <Flex gap="var(--space-xs)">
             {colors.map(clr => (
                 <ColorPickerSwatch
                     color={clr}

@@ -5,8 +5,8 @@
  */
 
 import { SettingsSection } from "@components/settings/tabs/plugins/components/Common";
-import { Flex } from "@webpack/common";
 
+import { Flex } from "@components/Flex";
 import { CustomTag } from "../../types";
 import { _memo } from "../../utils";
 import { TagListItem, TagListItemProps } from "./TagListItem";
@@ -27,10 +27,7 @@ export const TagListSection = _memo<TagListSectionProps>(function TagListSection
     return (
         <SettingsSection name={title} description={description ?? ""} error={null}>
             {tags.length > 0 && (
-                <Flex
-                    direction={Flex.Direction.VERTICAL}
-                    className="vc-better-forums-settings-stack"
-                >
+                <Flex flexDirection="column" gap="var(--space-xs)">
                     {tags.map(tag => (
                         <TagListItem tag={tag} key={tag.id} {...props} />
                     ))}

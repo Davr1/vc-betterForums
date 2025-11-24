@@ -5,7 +5,7 @@
  */
 
 import { BaseText, BaseTextProps } from "@components/BaseText";
-import { Flex, Tooltip, useCallback } from "@webpack/common";
+import { Tooltip, useCallback } from "@webpack/common";
 import { CSSProperties, Ref } from "react";
 
 import { cl } from "../..";
@@ -56,7 +56,7 @@ export const Media = _memo<MediaProps>(function Media({ message, maxWidth }) {
             items={media}
             maxCount={maxMediaCount === MaxMediaCount.ALL ? undefined : maxMediaCount}
             maxWidth={maxWidth}
-            direction={Flex.Direction.HORIZONTAL_REVERSE}
+            flexDirection="row-reverse"
             renderFallback={renderFallback}
         >
             {(_, ref: Ref<HTMLDivElement>, index, max) => (

@@ -5,8 +5,9 @@
  */
 
 import { Heading } from "@components/Heading";
-import { Flex, useCallback } from "@webpack/common";
+import { useCallback } from "@webpack/common";
 
+import { Flex } from "@components/Flex";
 import { useForumPostState } from "../../hooks";
 import { MessagePreviewLineCount, settings } from "../../settings";
 import { UserStore } from "../../stores";
@@ -41,8 +42,8 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
     );
 
     return (
-        <Flex className="vc-better-forums-thread-body" direction={Flex.Direction.VERTICAL}>
-            <Flex className="vc-better-forums-thread-header" align={Flex.Align.CENTER} grow={0}>
+        <Flex className="vc-better-forums-thread-body" flexDirection="column" gap={6}>
+            <Flex className="vc-better-forums-thread-header" alignItems="center" gap={6}>
                 <Username channel={channel} user={owner ?? message?.author ?? null} />
                 <Timestamp channel={channel} />
                 {showFollowButton && <FollowButton hasJoined={hasJoined} onClick={followAction} />}

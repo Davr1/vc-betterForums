@@ -6,8 +6,9 @@
 
 import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
-import { Alerts, Checkbox, Flex, Parser, useCallback, useMemo } from "@webpack/common";
+import { Alerts, Checkbox, Parser, useCallback, useMemo } from "@webpack/common";
 
+import { Flex } from "@components/Flex";
 import { cl } from "../..";
 import { settings } from "../../settings";
 import { CustomTag } from "../../types";
@@ -57,8 +58,8 @@ export const TagListItem = _memo<TagListItemProps>(function TagItem({
         <div className={cl("vc-better-forums-tag-setting", "vc-better-forums-settings-row")}>
             <Flex
                 className={cl("vc-better-forums-settings-row", "vc-better-forums-tag-info")}
-                justify={Flex.Justify.START}
-                align={Flex.Align.CENTER}
+                justifyContent="start"
+                alignItems="center"
             >
                 {tag.custom && (
                     <Checkbox value={!fullTag.disabled} onChange={handleToggle} size={20} />
@@ -82,7 +83,7 @@ export const TagListItem = _memo<TagListItemProps>(function TagItem({
                     </BaseText>
                 )}
             </Flex>
-            <Flex className="vc-better-forums-settings-row" justify={Flex.Justify.END}>
+            <Flex className="vc-better-forums-settings-row" justifyContent="end">
                 {tag.custom ? (
                     <Button variant="dangerSecondary" size="small" onClick={handleReset}>
                         Reset

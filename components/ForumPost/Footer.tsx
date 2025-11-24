@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex } from "@webpack/common";
-
+import { Flex } from "@components/Flex";
 import { MaxReactionCount, settings } from "../../settings";
 import { FullMessage, ThreadChannel } from "../../types";
 import { _memo } from "../../utils";
@@ -29,7 +28,7 @@ export const Footer = _memo<FooterProps>(function Footer({ channel, message, con
     const hasReactions = message?.reactions && message.reactions.length > 0;
 
     return (
-        <Flex className="vc-better-forums-footer">
+        <Flex className="vc-better-forums-footer" gap={6}>
             {showThreadMembers && <FooterSection.Members channel={channel} />}
             <FooterSection.LatestMessage channel={channel} />
             {message &&

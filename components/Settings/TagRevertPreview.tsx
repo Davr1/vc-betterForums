@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex } from "@webpack/common";
-
 import { CustomTag } from "../../types";
 import { _memo } from "../../utils";
 import { Icons } from "../icons";
@@ -21,10 +19,10 @@ export const TagRevertPreview = _memo<TagRevertPreviewProps>(function TagRevertP
     revertedTag,
 }) {
     return (
-        <Flex className="vc-better-forums-tag-revert-preview">
+        <div className="vc-better-forums-tag-revert-preview">
             <Tag tag={tag} />
             <Icons.RightArrow size={20} />
             <Tag tag={revertedTag} />
-        </Flex>
+        </div>
     );
 });

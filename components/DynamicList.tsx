@@ -4,12 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex, useLayoutEffect, useRef, useState } from "@webpack/common";
+import { useLayoutEffect, useRef, useState } from "@webpack/common";
 import { ReactNode, Ref } from "react";
 
+import { Flex, FlexProps } from "@components/Flex";
 import { cl } from "..";
 
-interface DynamicListProps<TItem, TChildElement extends HTMLElement> {
+interface DynamicListProps<TItem, TChildElement extends HTMLElement>
+    extends Pick<FlexProps, "flexDirection" | "alignItems" | "className"> {
     items: TItem[];
     maxCount?: number;
     maxWidth?: number;
@@ -17,9 +19,6 @@ interface DynamicListProps<TItem, TChildElement extends HTMLElement> {
     predicate?: (item: TItem, index: number, max: number) => boolean;
     renderFallback?: () => ReactNode;
     gap?: number;
-    align?: string;
-    direction?: string;
-    className?: string;
 }
 
 export function DynamicList<TItem, TChildElement extends HTMLElement>({
@@ -29,10 +28,8 @@ export function DynamicList<TItem, TChildElement extends HTMLElement>({
     children,
     predicate,
     renderFallback,
-    align,
-    direction,
     gap,
-    className,
+    ...props
 }: DynamicListProps<TItem, TChildElement>) {
     const itemCount =
         typeof maxCount === "number" ? Math.min(items.length, maxCount) : items.length;
@@ -92,14 +89,7 @@ export function DynamicList<TItem, TChildElement extends HTMLElement>({
     if (itemCount === 0) return renderFallback?.() ?? null;
 
     return (
-        <Flex
-            className={className}
-            grow={0}
-            shrink={0}
-            align={align}
-            direction={direction}
-            style={{ gap, margin: 0 }}
-        >
+        <Flex style={{ margin: 0, flexGrow: 0, flexShrink: 0 }} gap={gap} {...props}>
             {renderedItems}
             {visibleCount === 0 && renderFallback?.()}
         </Flex>

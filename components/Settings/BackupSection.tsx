@@ -8,8 +8,9 @@ import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
 import { SettingsSection } from "@components/settings/tabs/plugins/components/Common";
 import { Margins } from "@utils/margins";
-import { Flex, TextInput, useCallback, useState } from "@webpack/common";
+import { TextInput, useCallback, useState } from "@webpack/common";
 
+import { Flex } from "@components/Flex";
 import { cl } from "../..";
 import { TagOverrides } from "../../types";
 import {

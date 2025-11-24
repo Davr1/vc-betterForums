@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Flex } from "@webpack/common";
 import { Ref } from "react";
 
 import { useCheckPermissions, useDefaultEmoji, useSortedReactions } from "../hooks";
@@ -108,8 +107,8 @@ export const Reactions = _memo<ReactionProps>(function Reactions({
             items={reactions}
             maxWidth={maxWidth}
             maxCount={maxCount}
-            direction={Flex.Direction.HORIZONTAL_REVERSE}
-            align={Flex.Align.STRETCH}
+            flexDirection="row-reverse"
+            alignItems="stretch"
             gap={6}
             predicate={visibilityPredicate}
             className="vc-better-forums-reactions"

@@ -20,7 +20,6 @@ import {
 import {
     Alerts,
     Checkbox,
-    Flex,
     Forms,
     lodash,
     TextInput,
@@ -29,6 +28,7 @@ import {
     useState,
 } from "@webpack/common";
 
+import { Flex } from "@components/Flex";
 import { cl } from "../../..";
 import { useTag } from "../../../hooks";
 import { settings } from "../../../settings";
@@ -144,11 +144,8 @@ export function TagEditorModal({
                 </section>
             </ModalContent>
 
-            <ModalFooter
-                justify={Flex.Justify.BETWEEN}
-                direction={Flex.Direction.HORIZONTAL_REVERSE}
-            >
-                <Flex className="vc-better-forums-settings-row" grow={0}>
+            <ModalFooter className="vc-better-forums-modal-footer">
+                <Flex className="vc-better-forums-settings-row" style={{ flexGrow: 0 }}>
                     <Button variant="secondary" size="small" onClick={() => modalProps.onClose()}>
                         Cancel
                     </Button>
