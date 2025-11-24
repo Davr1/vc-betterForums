@@ -58,6 +58,7 @@ export const Media = _memo<MediaProps>(function Media({ message, maxWidth }) {
             maxWidth={maxWidth}
             flexDirection="row-reverse"
             renderFallback={renderFallback}
+            gap={0}
         >
             {(_, ref: Ref<HTMLDivElement>, index, max) => (
                 <MediaItem

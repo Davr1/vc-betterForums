@@ -27,6 +27,10 @@
     }
 }
 
+.vc-better-forums-thread-body {
+    flex-grow: 1;
+}
+
 .vc-better-forums-thread-body-container {
     position: relative;
     min-width: 0;

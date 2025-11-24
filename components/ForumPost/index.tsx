@@ -78,7 +78,7 @@ export function ForumPost({ goToThread, threadId }: ForumPostProps) {
                         "vc-better-forums-thread-open": isOpen,
                     })}
                 >
-                    <Flex className="vc-better-forums-thread-body-container">
+                    <Flex className="vc-better-forums-thread-body-container" gap={0}>
                         <ForumPost.Body channel={channel} message={firstMessage} />
                         <ForumPost.Media message={firstMessage} maxWidth={width - mediaThreshold} />
                     </Flex>
