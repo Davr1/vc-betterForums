@@ -17,7 +17,7 @@ interface MessageContentProps extends Omit<BaseTextProps, "children"> {
     message: FullMessage | null;
     messageClassName?: string;
     visibleIcons?: boolean;
-    lineClamp?: number;
+    lineClamp?: number | null;
 }
 
 export const MessageContent = _memo<MessageContentProps>(function MessageContent({

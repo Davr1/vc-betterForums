@@ -6,23 +6,29 @@
 
 import { BaseText } from "@components/BaseText";
 import { getIntlMessage } from "@utils/discord";
-import { Tooltip } from "@webpack/common";
+import { Tooltip, useCallback } from "@webpack/common";
 
+import { ThreadChannel } from "userplugins/betterForums/types";
 import { cl } from "../..";
-import { _memo } from "../../utils";
+import { _memo, ThreadActions } from "../../utils";
 import { Icons } from "../icons";
 
 interface FollowButtonProps {
     hasJoined?: boolean;
-    onClick?: (hasJoined: boolean) => void;
+    channel: ThreadChannel;
 }
 
 export const FollowButton = _memo<FollowButtonProps>(function FollowButton({
     hasJoined = false,
-    onClick: handleClick,
+    channel,
 }) {
     const Icon = hasJoined ? Icons.Tick : Icons.Bell;
     const intlKey = hasJoined ? "FORUM_UNFOLLOW_BUTTON" : "FORUM_FOLLOW_BUTTON";
+
+    const followAction = useCallback(
+        () => (hasJoined ? ThreadActions.leaveThread(channel) : ThreadActions.joinThread(channel)),
+        [hasJoined, channel]
+    );
 
     return (
         <Tooltip text={getIntlMessage("FORUM_FOLLOW_TOOLTIP")} hideOnClick>
@@ -36,7 +42,7 @@ export const FollowButton = _memo<FollowButtonProps>(function FollowButton({
                     onClick={event => {
                         event.stopPropagation();
                         onClick();
-                        handleClick?.(hasJoined);
+                        followAction();
                     }}
                     {...props}
                 >

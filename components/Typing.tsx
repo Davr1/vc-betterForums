@@ -6,6 +6,7 @@
 
 import { Channel, User } from "@vencord/discord-types";
 
+import { BaseTextProps } from "@components/BaseText";
 import { _memo } from "../utils";
 import { AvatarPile } from "./AvatarPile";
 import { ThreeDots } from "./ThreeDots";
@@ -15,12 +16,12 @@ const renderTypingIndicator = () => (
     <ThreeDots themed dotRadius={2} className="vc-better-forums-typing-indicator" />
 );
 
-interface TypingProps {
+interface TypingProps extends BaseTextProps {
     channel: Channel;
     users: User["id"][];
 }
 
-export const Typing = _memo<TypingProps>(function Typing({ channel, users }) {
+export const Typing = _memo<TypingProps>(function Typing({ channel, users, ...props }) {
     return (
         <div className="vc-better-forums-typing">
             <AvatarPile
@@ -34,6 +35,7 @@ export const Typing = _memo<TypingProps>(function Typing({ channel, users }) {
                 channel={channel}
                 className="vc-better-forums-typing-text"
                 userIds={users}
+                {...props}
             />
         </div>
     );

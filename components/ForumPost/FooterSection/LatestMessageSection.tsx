@@ -18,7 +18,7 @@ import {
 } from "../../../hooks";
 import { settings } from "../../../settings";
 import { ThreadChannel } from "../../../types";
-import { _memo, MessageActions, textClampStyle } from "../../../utils";
+import { _memo, MessageActions } from "../../../utils";
 import { Icons } from "../../icons";
 import { MessageContent } from "../../MessageContent";
 import { Typing } from "../../Typing";
@@ -42,8 +42,10 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
     const hasTypingUsers = typingUsers.length > 0;
 
     const forumState = useForumPostState(channel);
-    const { messageCount, messageCountText, unreadCount, unreadCountText } =
-        useMessageCount(channel);
+    const { messageCount, messageCountText, unreadCount, unreadCountText } = useMessageCount(
+        channel,
+        forumState.hasUnreads
+    );
 
     const { isReplyPreview, isTypingIndicator, isEmpty } = usePreview(
         forumState,
@@ -73,7 +75,11 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
             active={isActive}
         >
             {isTypingIndicator ? (
-                <Typing channel={channel} users={typingUsers} />
+                <Typing
+                    channel={channel}
+                    users={typingUsers}
+                    weight={isActive ? "semibold" : "normal"}
+                />
             ) : isReplyPreview ? (
                 <div className="vc-better-forums-latest-message-content">
                     <Username
@@ -86,7 +92,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
                         channel={channel}
                         message={mostRecentMessage!}
                         weight={isActive ? "semibold" : "normal"}
-                        style={textClampStyle(1)}
+                        lineClamp={1}
                         visibleIcons
                     />
                 </div>

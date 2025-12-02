@@ -5,7 +5,7 @@
  */
 
 import { Channel, User } from "@vencord/discord-types";
-import { UserStore } from "@webpack/common";
+import { lodash, UserStore } from "@webpack/common";
 
 import { RelationshipStore, TypingStore } from "../../stores";
 import { useStores } from "../misc/useStores";
@@ -27,6 +27,7 @@ export function useTypingUsers(
                 .take(limit)
                 .toArray();
         },
-        [channelId, limit]
+        [channelId, limit],
+        lodash.isEqual
     );
 }

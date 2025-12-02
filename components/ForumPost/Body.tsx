@@ -5,14 +5,13 @@
  */
 
 import { Heading } from "@components/Heading";
-import { useCallback } from "@webpack/common";
 
 import { Flex } from "@components/Flex";
 import { useForumPostState } from "../../hooks";
 import { MessagePreviewLineCount, settings } from "../../settings";
 import { UserStore } from "../../stores";
 import { FullMessage, ThreadChannel } from "../../types";
-import { _memo, textClampStyle, ThreadActions } from "../../utils";
+import { _memo } from "../../utils";
 import { MessageContent } from "../MessageContent";
 import { Timestamp } from "../Timestamp";
 import { Username } from "../Username";
@@ -31,22 +30,14 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
         "showFollowButton",
     ]);
 
-    const owner = UserStore.use(
-        $ => (channel?.ownerId ? $.getUser(channel.ownerId) : null),
-        [channel?.ownerId]
-    );
-
-    const followAction = useCallback(
-        () => (hasJoined ? ThreadActions.leaveThread(channel) : ThreadActions.joinThread(channel)),
-        [hasJoined, channel]
-    );
+    const owner = UserStore.use($ => $.getUser(channel?.ownerId) ?? null, [channel?.ownerId]);
 
     return (
         <Flex className="vc-better-forums-thread-body" flexDirection="column" gap={6}>
             <Flex className="vc-better-forums-thread-header" alignItems="center" gap={6}>
                 <Username channel={channel} user={owner ?? message?.author ?? null} />
                 <Timestamp channel={channel} />
-                {showFollowButton && <FollowButton hasJoined={hasJoined} onClick={followAction} />}
+                {showFollowButton && <FollowButton hasJoined={hasJoined} channel={channel} />}
             </Flex>
             <Heading className="vc-better-forums-thread-title-container">
                 <ForumPost.Title channel={channel} isMuted={isMuted} isUnread={hasUnreads} />
@@ -55,14 +46,12 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
             <MessageContent
                 channel={channel}
                 message={message}
-                style={{
-                    color: "var(--text-secondary)",
-                    ...textClampStyle(
-                        messagePreviewLineCount === MessagePreviewLineCount.ALL
-                            ? null
-                            : messagePreviewLineCount
-                    ),
-                }}
+                style={{ color: "var(--text-secondary)" }}
+                lineClamp={
+                    messagePreviewLineCount === MessagePreviewLineCount.ALL
+                        ? null
+                        : messagePreviewLineCount
+                }
             />
         </Flex>
     );

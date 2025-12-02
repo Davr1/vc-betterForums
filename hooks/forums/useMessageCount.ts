@@ -10,7 +10,6 @@ import { useMemo } from "@webpack/common";
 import { settings } from "../../settings";
 import { ForumPostUnreadCountStore, ThreadMessageStore } from "../../stores";
 import { MessageCount } from "../../types";
-import { useForumPostState } from "./useForumPostState";
 
 function roundNumber(n: number): number {
     const magnitude = Math.pow(10, Math.floor(Math.log10(n)));
@@ -27,9 +26,8 @@ function formatUnreadCount(count: number | undefined | null, totalCount: number)
     return formatMessageCount(Math.min(count, totalCount));
 }
 
-export function useMessageCount(channel: Channel): MessageCount {
+export function useMessageCount(channel: Channel, hasUnreads: boolean = false): MessageCount {
     const { useExactCounts } = settings.use(["useExactCounts"]);
-    const { hasUnreads } = useForumPostState(channel);
 
     const messageCount = ThreadMessageStore.use($ => $.getCount(channel.id) ?? 0, [channel.id]);
 

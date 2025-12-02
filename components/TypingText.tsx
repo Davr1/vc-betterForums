@@ -5,9 +5,10 @@
  */
 
 import { getIntlMessage } from "@utils/discord";
-import { Channel, TextProps, User } from "@vencord/discord-types";
-import { Text, useMemo } from "@webpack/common";
+import { Channel, User } from "@vencord/discord-types";
+import { useMemo } from "@webpack/common";
 
+import { BaseText, BaseTextProps } from "@components/BaseText";
 import { useUsers } from "../hooks";
 import { _memo } from "../utils";
 import { Username } from "./Username";
@@ -19,7 +20,7 @@ const typingIntlKeys = Object.freeze({
 });
 const defaultIntlKey = "SEVERAL_USERS_TYPING";
 
-interface TypingTextProps extends TextProps {
+interface TypingTextProps extends BaseTextProps {
     channel: Channel;
     userIds: User["id"][];
 }
@@ -27,6 +28,7 @@ interface TypingTextProps extends TextProps {
 export const TypingText = _memo<TypingTextProps>(function TypingText({
     channel,
     userIds,
+    style,
     ...props
 }) {
     const users = useUsers(channel.getGuildId(), userIds);
@@ -43,8 +45,16 @@ export const TypingText = _memo<TypingTextProps>(function TypingText({
     }, [users, usernames]);
 
     return (
-        <Text variant="text-sm/normal" {...props}>
+        <BaseText
+            size="sm"
+            weight="normal"
+            style={{
+                color: "currentcolor",
+                ...style,
+            }}
+            {...props}
+        >
             {content}
-        </Text>
+        </BaseText>
     );
 });
