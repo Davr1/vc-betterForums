@@ -31,7 +31,7 @@ export const Timestamp = _memo<TimestampProps>(function Timestamp({ channel }) {
             {props => (
                 <Text
                     variant="text-sm/normal"
-                    color="text-secondary"
+                    color="text-subtle"
                     className="vc-better-forums-timestamp-text"
                     {...props}
                 >

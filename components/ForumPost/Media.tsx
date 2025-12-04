@@ -113,7 +113,7 @@ const MediaItem = _memo<MediaItemProps>(function MediaItem({
                 weight="semibold"
                 isExtra
                 displayIcon={!prefferedSize || prefferedSize > 48}
-                style={{ color: "var(--text-primary)" }}
+                style={{ color: "var(--text-default)" }}
             />
         </div>
     );
