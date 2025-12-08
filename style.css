@@ -132,7 +132,7 @@
     transition: all 150ms ease;
     border: 1px solid var(--border-subtle);
     background: var(--button-secondary-background);
-    color: var(--text-secondary);
+    color: var(--text-subtle);
     width: max-content;
 
     &,
@@ -159,23 +159,23 @@
         }
 
         &:hover {
-            color: var(--text-primary);
+            color: var(--text-default);
             background-color: var(--button-secondary-background-hover);
         }
 
         &:active {
-            color: var(--text-primary);
+            color: var(--text-default);
             background-color: var(--button-secondary-background-active);
         }
 
         &.vc-better-forums-tag-filtered {
             &:hover {
-                color: var(--text-primary);
+                color: var(--text-default);
                 background-color: var(--opacity-blurple-32);
             }
 
             &:active {
-                color: var(--text-primary);
+                color: var(--text-default);
                 background-color: var(--opacity-blurple-12);
             }
         }
@@ -308,7 +308,7 @@
     gap: var(--space-xxs);
     border-radius: var(--radius-sm);
     background-color: var(--background-mod-subtle);
-    color: var(--text-secondary);
+    color: var(--text-subtle);
     user-select: none;
     outline: 1px solid transparent;
     outline-offset: -1px;
@@ -321,13 +321,13 @@
     cursor: pointer;
 
     &:hover {
-        color: var(--text-primary);
+        color: var(--text-default);
         background-color: var(--background-mod-normal);
         outline-color: var(--border-faint);
     }
 
     &:active {
-        color: var(--text-primary);
+        color: var(--text-default);
         background-color: var(--background-mod-strong);
         outline-color: var(--border-strong);
     }

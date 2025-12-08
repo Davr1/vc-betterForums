@@ -31,7 +31,7 @@ export const Title = _memo<TitleProps>(function Title({ channel, isMuted, isUnre
         [channel.name, postProcessor]
     );
 
-    const color = isMuted ? "interactive-muted" : isUnread ? "header-primary" : "text-secondary";
+    const color = isMuted ? "interactive-muted" : isUnread ? "header-primary" : "text-subtle";
 
     return (
         <BaseText

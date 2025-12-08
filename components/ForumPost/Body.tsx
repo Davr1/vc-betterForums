@@ -46,7 +46,7 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
             <MessageContent
                 channel={channel}
                 message={message}
-                style={{ color: "var(--text-secondary)" }}
+                style={{ color: "var(--text-subtle)" }}
                 lineClamp={
                     messagePreviewLineCount === MessagePreviewLineCount.ALL
                         ? null
