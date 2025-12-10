@@ -145,9 +145,9 @@
     }
 
     &.vc-better-forums-tag-filtered {
-        background-color: var(--message-reacted-background);
-        color: var(--message-reacted-text);
-        border-color: var(--brand-500);
+        background-color: var(--opacity-blurple-24);
+        color: var(--text-brand);
+        border-color: var(--blurple-50);
     }
 
     &.vc-better-forums-tag-clickable {
@@ -158,12 +158,12 @@
 
         &:hover {
             color: var(--text-default);
-            background-color: var(--control-secondary-background-default-hover);
+            background-color: var(--control-secondary-background-hover);
         }
 
         &:active {
             color: var(--text-default);
-            background-color: var(--control-secondary-background-default-active);
+            background-color: var(--control-secondary-background-active);
         }
 
         &.vc-better-forums-tag-filtered {
