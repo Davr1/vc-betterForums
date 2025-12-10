@@ -118,7 +118,6 @@ export namespace ExtendedStores {
 
     export interface UserStore extends FluxStore, Omit<Stores.UserStore, "getUser"> {
         getUser(userId: User["id"]): FullUser | undefined;
-        getCurrentUser(): FullUser;
     }
 
     export interface MissingGuildMemberStore extends FluxStore {
