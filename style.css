@@ -5,7 +5,7 @@
     padding: var(--space-sm);
     background-color: var(--background-base-low);
     border: 1px solid var(--border-subtle);
-    transition: box-shadow 0.2s ease-out, transform 0.2s ease-out, background 0.2s ease-out,
+    transition: box-shadow 0.2s ease-out, background 0.2s ease-out,
         border 0.2s ease-out;
     cursor: pointer;
     overflow: hidden;
@@ -13,15 +13,14 @@
 
     &:hover,
     &:active {
-        background-color: var(--background-modifier-hover);
-        border-color: var(--background-modifier-hover);
-        box-shadow: var(--elevation-high);
-        transform: translateY(-2px);
+        background-color: var(--interactive-background-hover);
+        border-color: var(--interactive-background-hover);
+        box-shadow: var(--shadow-high);
     }
 
     &.vc-better-forums-thread-open {
-        border-color: var(--background-modifier-selected);
-        background-color: var(--background-modifier-selected);
+        border-color: var(--interactive-background-selected);
+        background-color: var(--interactive-background-selected);
         box-shadow: none;
         transform: none;
     }
@@ -131,7 +130,7 @@
     letter-spacing: 0.02rem;
     transition: all 150ms ease;
     border: 1px solid var(--border-subtle);
-    background: var(--button-secondary-background);
+    background: var(--control-secondary-background-default);
     color: var(--text-subtle);
     width: max-content;
 
@@ -152,7 +151,6 @@
     }
 
     &.vc-better-forums-tag-clickable {
-
         &,
         * {
             cursor: pointer;
@@ -160,12 +158,12 @@
 
         &:hover {
             color: var(--text-default);
-            background-color: var(--button-secondary-background-hover);
+            background-color: var(--control-secondary-background-default-hover);
         }
 
         &:active {
             color: var(--text-default);
-            background-color: var(--button-secondary-background-active);
+            background-color: var(--control-secondary-background-default-active);
         }
 
         &.vc-better-forums-tag-filtered {
@@ -323,7 +321,7 @@
     &:hover {
         color: var(--text-default);
         background-color: var(--background-mod-normal);
-        outline-color: var(--border-faint);
+        outline-color: var(--border-muted);
     }
 
     &:active {
@@ -334,7 +332,6 @@
 }
 
 .vc-better-forums-footer-section-active {
-
     &,
     &:active,
     &:hover {
@@ -348,7 +345,6 @@
     flex-grow: 1;
 
     @starting-style {
-
         /* skip initial resize animation on first render */
         .vc-better-forums-latest-message-content {
             width: auto;
@@ -475,7 +471,6 @@
 }
 
 .vc-better-forums-reaction {
-
     &,
     & > div {
         display: flex;
@@ -514,7 +509,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-xxs);
-    color: var(--interactive-normal);
+    color: var(--interactive-text-default);
     padding: 0.3rem 0.2rem;
     margin: -0.3rem -0.2rem;
     transition: color 150ms ease, opacity 150ms ease;
@@ -526,7 +521,7 @@
     right: 0;
 
     &:hover {
-        color: var(--interactive-active);
+        color: var(--interactive-text-active);
     }
 }
 
@@ -545,7 +540,7 @@
     background: unset;
 
     &:hover {
-        color: var(--interactive-active);
+        color: var(--interactive-text-active);
     }
 
     &.vc-better-forums-follow-button-active {
@@ -579,7 +574,7 @@
 }
 
 .vc-better-forums-tag-setting {
-    background-color: var(--button-secondary-background);
+    background-color: var(--control-secondary-background-default);
     padding: var(--space-xs);
     padding-left: var(--space-sm);
     border-radius: var(--radius-md);
@@ -676,7 +671,7 @@
 }
 
 .vc-better-forums-emoji-button {
-    color: var(--interactive-normal);
+    color: var(--interactive-text-default);
     transition: color 100ms ease;
     padding: var(--space-xs);
     display: flex;
@@ -696,6 +691,7 @@
 }
 
 .vc-better-forums-custom-input {
+    transition: box-shadow 0.2s, border-color 0.2s ease-in-out !important;
 
     input::-webkit-inner-spin-button,
     input::-webkit-outer-spin-button {
@@ -703,7 +699,7 @@
     }
 
     &.vc-better-forums-custom-input-error {
-        border-color: var(--text-danger) !important;
+        border-color: var(--text-feedback-critical) !important;
         border-width: 2px;
     }
 
@@ -717,7 +713,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    color: var(--text-danger);
+    color: var(--text-feedback-critical);
     margin-top: var(--space-sm);
 }
 
