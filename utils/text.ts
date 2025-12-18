@@ -7,7 +7,7 @@
 import { parseUrl } from "@utils/misc";
 import { findByProps, proxyLazyWebpack } from "@webpack";
 
-import { Stemmer } from "../types";
+import { ASTNode, ASTNodeType, Stemmer } from "../types";
 import { Host } from "./";
 
 const replacements = Object.freeze({
@@ -43,6 +43,22 @@ const stem = proxyLazyWebpack(() => {
 
     return stemmer.newStemmer("english").stem;
 });
+
+export class InlineNodeBuilder {
+    private readonly nodes: ASTNode[] = [];
+    public addWord(text: string, type: ASTNodeType) {
+        const lastNode = this.nodes.at(-1);
+
+        if (lastNode?.type === type) {
+            lastNode.content += text;
+        } else {
+            this.nodes.push({ type, content: text });
+        }
+    }
+    public build(): ASTNode[] {
+        return this.nodes;
+    }
+}
 
 export function normalizeWord(text: string): string {
     return stem(

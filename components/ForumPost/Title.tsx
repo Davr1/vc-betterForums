@@ -24,7 +24,7 @@ export const Title = _memo<TitleProps>(function Title({ channel, isMuted, isUnre
         [channel.parent_id]
     );
 
-    const postProcessor = useMemo(() => getSearchHighlighter(searchQuery), [searchQuery]);
+    const postProcessor = useMemo(() => getSearchHighlighter(searchQuery, true), [searchQuery]);
 
     const { content } = useMemo(
         () => parseInlineContent({ content: channel.name, embeds: [] }, { postProcessor }),

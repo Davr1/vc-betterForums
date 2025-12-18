@@ -5,31 +5,27 @@
  */
 
 import { ASTNode, ASTNodeType, MessagePostProcessor } from "../../types";
-import { normalizeWord } from "../text";
+import { isList } from "../ast";
+import { InlineNodeBuilder, normalizeWord } from "../text";
 import { definePostProcessor } from "./";
 
-class HighlightBuilder {
-    private readonly nodes: ASTNode[] = [];
-    public addWord(text: string, type: ASTNodeType) {
-        const lastNode = this.nodes.at(-1);
-
-        if (lastNode?.type === type) {
-            lastNode.content += text;
-        } else {
-            this.nodes.push({ type, content: text });
-        }
-    }
-    public build(): ASTNode[] {
-        return this.nodes;
-    }
+function matches(text: string, words: Set<string>, partial: boolean = false): boolean {
+    const word = normalizeWord(text);
+    if (!word) return false;
+    if (words.has(word)) return true;
+    return partial && word.length >= 3 && words.values().some(sub => word.includes(sub));
 }
 
-function postProcesor(tree: ASTNode | ASTNode[], words: Set<string>): void {
+function postProcesor(tree: ASTNode | ASTNode[], words: Set<string>, partial: boolean): void {
     // array
-    if (Array.isArray(tree)) return tree.forEach(node => postProcesor(node, words));
+    if (Array.isArray(tree)) return tree.forEach(node => postProcesor(node, words, partial));
+
+    // markdown list
+    if (isList(tree)) return tree.items.forEach(node => postProcesor(node, words, partial));
 
     // single node
-    if (tree.content && typeof tree.content !== "string") return postProcesor(tree.content, words);
+    if (tree.content && typeof tree.content !== "string")
+        return postProcesor(tree.content, words, partial);
 
     // unformattable/preformated text
     if (typeof tree.content !== "string" || tree.type === ASTNodeType.CODE_BLOCK) return;
@@ -37,12 +33,11 @@ function postProcesor(tree: ASTNode | ASTNode[], words: Set<string>): void {
     const nodes = tree.content
         .split(/(\W+)/g)
         .reduce((acc, word) => {
-            const normalized = normalizeWord(word);
-            const highlighted = !!normalized && words.has(normalized);
-            acc.addWord(word, highlighted ? ASTNodeType.HIGHLIGHT : ASTNodeType.TEXT);
+            const type = matches(word, words, partial) ? ASTNodeType.HIGHLIGHT : ASTNodeType.TEXT;
+            acc.addWord(word, type);
 
             return acc;
-        }, new HighlightBuilder())
+        }, new InlineNodeBuilder())
         .build();
 
     // nothing was highlighted
@@ -52,8 +47,8 @@ function postProcesor(tree: ASTNode | ASTNode[], words: Set<string>): void {
         tree.type === ASTNodeType.TEXT ? nodes : [{ type: ASTNodeType.TEXT, content: nodes }];
 }
 
-export function getSearchHighlighter(text: string): MessagePostProcessor {
+export function getSearchHighlighter(text: string, partial: boolean = false): MessagePostProcessor {
     const words = new Set(text.split(/\W+/).values().map(normalizeWord).filter(Boolean));
 
-    return definePostProcessor(tree => (words.size === 0 ? tree : postProcesor(tree, words)));
+    return definePostProcessor(tree => (!words.size ? tree : postProcesor(tree, words, partial)));
 }
