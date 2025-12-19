@@ -8,9 +8,9 @@ import { User } from "@vencord/discord-types";
 
 import { useUsers } from "../hooks";
 import { _memo } from "../utils";
-import { FacePile, FacePileProps } from "./FacePile";
+import { UserSummaryItem, UserSummaryItemProps } from "./UserSummaryItem";
 
-interface AvatarPileProps extends Omit<FacePileProps, "users"> {
+interface AvatarPileProps extends Omit<UserSummaryItemProps, "users"> {
     userIds: User["id"][];
 }
 
@@ -26,7 +26,7 @@ export const AvatarPile = _memo<AvatarPileProps>(function AvatarPile({
 }) {
     const users = useUsers(guildId, userIds, 5);
     return (
-        <FacePile
+        <UserSummaryItem
             guildId={guildId}
             users={users}
             max={max}

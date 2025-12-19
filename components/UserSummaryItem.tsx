@@ -5,10 +5,10 @@
  */
 
 import { Guild, User } from "@vencord/discord-types";
-import { findComponentByCodeLazy } from "@webpack";
+import { UserSummaryItem as _UserSummaryItem } from "@webpack/common";
 import { ComponentType, ReactNode } from "react";
 
-export interface FacePileProps {
+export interface UserSummaryItemProps {
     users: User[];
     guildId: Guild["id"];
     className?: string;
@@ -21,7 +21,7 @@ export interface FacePileProps {
     showUserPopout?: boolean;
     useFallbackUserForPopout?: boolean;
     renderIcon?: boolean;
-    renderUser?: ComponentType<Omit<FacePileProps, "renderUser">>;
+    renderUser?: ComponentType<Omit<UserSummaryItemProps, "renderUser">>;
 }
 
-export const FacePile = findComponentByCodeLazy<FacePileProps>("this.props.renderIcon");
+export const UserSummaryItem = _UserSummaryItem as ComponentType<UserSummaryItemProps>;
