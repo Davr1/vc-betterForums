@@ -6,7 +6,7 @@
 
 import "./style.css";
 
-import { classNameFactory } from "@api/Styles";
+import { classNameFactory } from "@utils/css";
 import { proxyLazy } from "@utils/lazy";
 import definePlugin from "@utils/types";
 import { zustandCreate, zustandPersist } from "@webpack/common";

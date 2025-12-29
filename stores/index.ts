@@ -8,12 +8,14 @@ import { FluxStore } from "@vencord/discord-types";
 import { findStoreLazy, proxyLazyWebpack } from "@webpack";
 import {
     ChannelStore as _ChannelStore,
+    Flux,
     GuildMemberStore as _GuildMemberStore,
     PermissionStore as _PermissionStore,
     ReadStateStore as _ReadStateStore,
     RelationshipStore as _RelationshipStore,
-    UserStore as _UserStore,
-    Flux,
+    TypingStore as _TypingStore,
+    UserSettingsProtoStore as _UserSettingsProtoStore,
+    UserStore as _UserStore
 } from "@webpack/common";
 
 import { useStores } from "../hooks";
@@ -36,7 +38,7 @@ export const BaseStore = proxyLazyWebpack(
 
 export type CustomStore<TStore extends FluxStore> = TStore & InstanceType<typeof BaseStore>;
 
-function $<T extends FluxStore>(store: string | (() => unknown)): CustomStore<T> {
+function $<T extends FluxStore>(store: string | (() => T)): CustomStore<T> {
     const lazyStore: T = typeof store === "string" ? findStoreLazy(store) : proxyLazyWebpack(store);
 
     return new Proxy(lazyStore, {
@@ -62,14 +64,14 @@ export const KeywordFilterStore = $<S.KeywordFilterStore>("KeywordFilterStore");
 export const LurkingStore = $<S.LurkingStore>("LurkingStore");
 export const ThreadMembersStore = $<S.ThreadMembersStore>("ThreadMembersStore");
 export const ThreadMessageStore = $<S.ThreadMessageStore>("ThreadMessageStore");
-export const TypingStore = $<S.TypingStore>("TypingStore");
-export const UserSettingsProtoStore = $<S.UserSettingsProtoStore>("UserSettingsProtoStore");
 
-export const ChannelStore = $<S.ChannelStore>(() => _ChannelStore);
-export const GuildMemberStore = $<S.GuildMemberStore>(() => _GuildMemberStore);
-export const PermissionStore = $<S.PermissionStore>(() => _PermissionStore);
-export const ReadStateStore = $<S.ReadStateStore>(() => _ReadStateStore);
-export const RelationshipStore = $<S.RelationshipStore>(() => _RelationshipStore);
-export const UserStore = $<S.UserStore>(() => _UserStore);
+export const ChannelStore = $(() => _ChannelStore as S.ChannelStore);
+export const GuildMemberStore = $(() => _GuildMemberStore);
+export const PermissionStore = $(() => _PermissionStore);
+export const ReadStateStore = $(() => _ReadStateStore);
+export const RelationshipStore = $(() => _RelationshipStore as unknown as S.RelationshipStore);
+export const TypingStore = $(() => _TypingStore);
+export const UserSettingsProtoStore = $(() => _UserSettingsProtoStore);
+export const UserStore = $(() => _UserStore as S.UserStore);
 
 export { MissingGuildMemberStore } from "./MissingGuildMemberStore";

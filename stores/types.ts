@@ -54,36 +54,14 @@ export namespace ExtendedStores {
         getHasSearchResults(channelId: Channel["id"]): boolean;
     }
 
-    export interface ReadStateStore extends FluxStore {
-        hasTrackedUnread(channelId: Channel["id"]): boolean;
-        hasOpenedThread(channelId: Channel["id"]): boolean;
-        getTrackedAckMessageId(channelId: Channel["id"]): FullMessage["id"] | null;
-        isNewForumThread(
-            channelId: Channel["id"],
-            parentChannelId: Channel["id"],
-            guild: Guild
-        ): boolean;
-        isForumPostUnread(channelId: Channel["id"]): boolean;
-        lastMessageId(channelId: Channel["id"]): FullMessage["id"] | null;
-        getOldestUnreadMessageId(channelId: Channel["id"]): FullMessage["id"] | null;
-    }
-
-    export interface RelationshipStore extends PartialRelationshipStore {
-        isBlockedOrIgnored(userId: User["id"]): boolean;
+    export interface RelationshipStore
+        extends Omit<PartialRelationshipStore, "isBlockedForMessage" | "isIgnoredForMessage"> {
         isBlockedForMessage(message: FullMessage): boolean;
         isIgnoredForMessage(message: FullMessage): boolean;
     }
 
-    export interface GuildMemberStore extends FluxStore, Stores.GuildMemberStore {
-        isCurrentUserGuest(guildId: Guild["id"]): boolean;
-    }
-
     export interface LurkingStore extends FluxStore {
         isLurking(guildId: Guild["id"]): boolean;
-    }
-
-    export interface PermissionStore extends FluxStore {
-        can(permission: BigInt, channel: Channel): boolean;
     }
 
     export interface GuildVerificationStore extends FluxStore {
