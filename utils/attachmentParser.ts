@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { isTruthy } from "@utils/guards";
 import { parseUrl } from "@utils/misc";
 import { lodash } from "@webpack/common";
 
@@ -163,13 +164,13 @@ export function getAttachments(attachments: FullMessage["attachments"]): Attachm
     return attachments
         .filter(isMedia)
         .map((item, index) => AttachmentParser.fromMessageAttachment(item, index))
-        .filter(Boolean) as Attachment[];
+        .filter(isTruthy);
 }
 
 export function getEmbeds(embeds: FullMessage["embeds"], spoiler: boolean): Attachment[] {
     return embeds
         .map((embed, mediaIndex) => AttachmentParser.fromEmbed(embed, mediaIndex, spoiler))
-        .filter(Boolean) as Attachment[];
+        .filter(isTruthy);
 }
 
 export function getComponentMedia(components: FullMessage["components"]): Attachment[] {
@@ -188,7 +189,7 @@ export function getComponentMedia(components: FullMessage["components"]): Attach
                     return null;
             }
         })
-        .filter(Boolean) as Attachment[];
+        .filter(isTruthy);
 }
 
 export function unfurlAttachment(

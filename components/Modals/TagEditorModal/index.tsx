@@ -6,6 +6,7 @@
 
 import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
+import { Flex } from "@components/Flex";
 import { Margins } from "@utils/margins";
 import { parseUrl } from "@utils/misc";
 import {
@@ -28,7 +29,6 @@ import {
     useState,
 } from "@webpack/common";
 
-import { Flex } from "@components/Flex";
 import { cl } from "../../..";
 import { useTag } from "../../../hooks";
 import { settings } from "../../../settings";

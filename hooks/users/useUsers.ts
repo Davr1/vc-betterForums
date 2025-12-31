@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { isTruthy } from "@utils/guards";
 import { Guild, User } from "@vencord/discord-types";
 import { useEffect } from "@webpack/common";
 
 import { GuildMemberRequesterStore, MissingGuildMemberStore, UserStore } from "../../stores";
-import { FullUser } from "../../types";
 
 export function useUsers(
     guildId: Guild["id"],
@@ -22,7 +22,7 @@ export function useUsers(
     }, [guildId, userIds]);
 
     return UserStore.use(
-        $ => userIds.values().map($.getUser).filter(Boolean).take(limit).toArray(),
+        $ => userIds.values().map($.getUser).filter(isTruthy).take(limit).toArray(),
         [userIds, limit]
-    ) as FullUser[];
+    ) ;
 }
