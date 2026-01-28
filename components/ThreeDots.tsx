@@ -15,4 +15,4 @@ interface ThreeDotsProps {
     className?: string;
 }
 
-export const ThreeDots = findComponentByCodeLazy<ThreeDotsProps>(".dots,", "dotRadius:");
+export const ThreeDots = findComponentByCodeLazy<ThreeDotsProps>("dotRadius:", "hide:", "themed:");
