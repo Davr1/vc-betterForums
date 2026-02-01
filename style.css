@@ -5,7 +5,9 @@
     padding: var(--space-sm);
     background-color: var(--background-base-low);
     border: 1px solid var(--border-subtle);
-    transition: box-shadow 0.2s ease-out, background 0.2s ease-out,
+    transition:
+        box-shadow 0.2s ease-out,
+        background 0.2s ease-out,
         border 0.2s ease-out;
     cursor: pointer;
     overflow: hidden;
@@ -104,7 +106,7 @@
     max-width: 100%;
     position: relative;
 
-    *:has(>&) {
+    *:has(> &) {
         width: 100%;
     }
 
@@ -310,12 +312,16 @@
     user-select: none;
     outline: 1px solid transparent;
     outline-offset: -1px;
-    transition: all 150ms ease, color 100ms ease, background-color 100ms ease,
+    transition:
+        all 150ms ease,
+        color 100ms ease,
+        background-color 100ms ease,
         outline-color 100ms ease;
     interpolate-size: allow-keywords;
 }
 
-[data-list-id^="forum-channel-list"]:not([class*="scrolling"]) .vc-better-forums-footer-section-clickable:not(.vc-better-forums-footer-section-active) {
+[data-list-id^="forum-channel-list"]:not([class*="scrolling"])
+    .vc-better-forums-footer-section-clickable:not(.vc-better-forums-footer-section-active) {
     cursor: pointer;
 
     &:hover {
@@ -512,7 +518,9 @@
     color: var(--interactive-text-default);
     padding: 0.3rem 0.2rem;
     margin: -0.3rem -0.2rem;
-    transition: color 150ms ease, opacity 150ms ease;
+    transition:
+        color 150ms ease,
+        opacity 150ms ease;
     white-space: nowrap;
 }
 
@@ -548,7 +556,8 @@
     }
 }
 
-.vc-better-forums-thread:not(.vc-better-forums-thread-open, :hover) .vc-better-forums-follow-button:not(.vc-better-forums-follow-button-active) {
+.vc-better-forums-thread:not(.vc-better-forums-thread-open, :hover)
+    .vc-better-forums-follow-button:not(.vc-better-forums-follow-button-active) {
     opacity: 0;
 }
 
@@ -595,7 +604,7 @@
 }
 
 .vc-better-forums-icon-container {
-    color: var(--text-muted);
+    color: var(--icon-subtle);
     margin: -0.25rem;
     padding: 0.25rem;
     display: inline-flex;
@@ -603,7 +612,7 @@
     cursor: pointer;
 
     &:hover {
-        color: var(--icon-secondary);
+        color: var(--icon-strong);
     }
 
     svg {
@@ -691,7 +700,9 @@
 }
 
 .vc-better-forums-custom-input {
-    transition: box-shadow 0.2s, border-color 0.2s ease-in-out !important;
+    transition:
+        box-shadow 0.2s,
+        border-color 0.2s ease-in-out !important;
 
     input::-webkit-inner-spin-button,
     input::-webkit-outer-spin-button {
