@@ -40,7 +40,7 @@ export default definePlugin({
             },
         },
         {
-            find: "this.toggleTagFilter",
+            find: "toggleTagFilter=",
             replacement: {
                 match: /let (\i)=\(0,\i\.\i\)/,
                 replace: "let $1=$self.createStore",
