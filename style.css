@@ -106,7 +106,7 @@
     max-width: 100%;
     position: relative;
 
-    *:has(> &) {
+    [data-mana-component="modal"] [data-text-variant]:has(> &) {
         width: 100%;
     }
 
