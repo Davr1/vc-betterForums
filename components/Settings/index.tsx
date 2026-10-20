@@ -5,7 +5,7 @@
  */
 
 import { useForceUpdater } from "@utils/react";
-import { lodash, Toasts, useCallback, useMemo } from "@webpack/common";
+import { lodash, showToast, useCallback, useMemo } from "@webpack/common";
 
 import { useAllCustomTags, useAllForumTags, useTagActions } from "../../hooks";
 import { settings } from "../../settings";
@@ -51,10 +51,9 @@ export function TagSections() {
                 updateTag(id, value);
             }
 
-            Toasts.show({
-                message: `Successfully imported ${Object.keys(data).length} tags`,
-                id: Toasts.genId(),
-                type: Toasts.Type.SUCCESS,
+            showToast({
+                text: `Successfully imported ${Object.keys(data).length} tags`,
+                variant: "success",
             });
 
             updateVersion();
@@ -64,10 +63,9 @@ export function TagSections() {
 
     const handleError = useCallback(
         (message: string) =>
-            Toasts.show({
-                message,
-                id: Toasts.genId(),
-                type: Toasts.Type.FAILURE,
+            showToast({
+                text: message,
+                variant: "critical",
             }),
         []
     );
