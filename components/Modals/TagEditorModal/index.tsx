@@ -7,6 +7,7 @@
 import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
 import { Flex } from "@components/Flex";
+import { Heading } from "@components/Heading";
 import { Margins } from "@utils/margins";
 import { parseUrl } from "@utils/misc";
 import {
@@ -21,7 +22,6 @@ import {
 import {
     Alerts,
     Checkbox,
-    Forms,
     lodash,
     TextInput,
     useCallback,
@@ -97,7 +97,7 @@ export function TagEditorModal({
                     <Tag tag={fullTag} />
                 </section>
                 <section>
-                    <Forms.FormTitle tag="h5">Name</Forms.FormTitle>
+                    <Heading>Name</Heading>
                     <TextInput
                         value={tag.name}
                         onChange={name => update({ name })}
@@ -105,7 +105,7 @@ export function TagEditorModal({
                     />
                 </section>
                 <section>
-                    <Forms.FormTitle tag="h5">Color</Forms.FormTitle>
+                    <Heading>Color</Heading>
                     <ColorPicker
                         color={tag.color ?? null}
                         onChange={color => update({ color })}
@@ -118,13 +118,13 @@ export function TagEditorModal({
                         onChange={() => update({ invertedColor: !tag.invertedColor })}
                         reverse
                     >
-                        <Forms.FormTitle tag="h5" className="vc-better-forums-settings-row-title">
+                        <Heading className="vc-better-forums-settings-row-title">
                             Invert colors
-                        </Forms.FormTitle>
+                        </Heading>
                     </Checkbox>
                 </section>
                 <section>
-                    <Forms.FormTitle tag="h5">Icon</Forms.FormTitle>
+                    <Heading>Icon</Heading>
                     <IconTextInput onChange={update} modalKey={modalKey} {...fullTag} />
                 </section>
                 <section>
@@ -134,12 +134,12 @@ export function TagEditorModal({
                         onChange={() => update({ monochromeIcon: !tag.monochromeIcon })}
                         reverse
                     >
-                        <Forms.FormTitle tag="h5" className="vc-better-forums-settings-row-title">
+                        <Heading className="vc-better-forums-settings-row-title">
                             <div className="vc-better-forums-settings-row">
                                 <span>Use monochrome icon</span>
                                 <InfoTooltip text="Removes icon colors for better contrast" />
                             </div>
-                        </Forms.FormTitle>
+                        </Heading>
                     </Checkbox>
                 </section>
             </ModalContent>
