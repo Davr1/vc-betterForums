@@ -320,8 +320,7 @@
     interpolate-size: allow-keywords;
 }
 
-[data-list-id^="forum-channel-list"]:not([class*="scrolling"])
-    .vc-better-forums-footer-section-clickable:not(.vc-better-forums-footer-section-active) {
+[data-list-id^="forum-channel-list"]:not([class*="scrolling"]) .vc-better-forums-footer-section-clickable:not(.vc-better-forums-footer-section-active) {
     cursor: pointer;
 
     &:hover {
@@ -556,8 +555,7 @@
     }
 }
 
-.vc-better-forums-thread:not(.vc-better-forums-thread-open, :hover)
-    .vc-better-forums-follow-button:not(.vc-better-forums-follow-button-active) {
+.vc-better-forums-thread:not(.vc-better-forums-thread-open, :hover) .vc-better-forums-follow-button:not(.vc-better-forums-follow-button-active) {
     opacity: 0;
 }
 
@@ -694,12 +692,8 @@
     }
 }
 
-.vc-better-forums-custom-input-wrapper,
 .vc-better-forums-custom-input {
     flex-grow: 1;
-}
-
-.vc-better-forums-custom-input {
     transition:
         box-shadow 0.2s,
         border-color 0.2s ease-in-out !important;

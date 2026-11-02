@@ -30,7 +30,6 @@ export const NewOverrideSection = _memo<NewOverideSectionProps>(function NewOver
                 value={newTagId}
                 onChange={setNewTagId}
                 placeholder="Tag ID"
-                className="vc-better-forums-custom-input-wrapper"
                 inputClassName="vc-better-forums-custom-input"
                 type="number"
                 pattern="\d{17,19}"

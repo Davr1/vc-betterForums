@@ -6,9 +6,9 @@
 
 import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
+import { Flex } from "@components/Flex";
 import { Alerts, Checkbox, Parser, useCallback, useMemo } from "@webpack/common";
 
-import { Flex } from "@components/Flex";
 import { cl } from "../..";
 import { settings } from "../../settings";
 import { CustomTag } from "../../types";

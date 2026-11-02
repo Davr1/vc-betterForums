@@ -6,11 +6,11 @@
 
 import { BaseText } from "@components/BaseText";
 import { Button } from "@components/Button";
+import { Flex } from "@components/Flex";
 import { SettingsSection } from "@components/settings/tabs/plugins/components/Common";
 import { Margins } from "@utils/margins";
 import { TextInput, useCallback, useState } from "@webpack/common";
 
-import { Flex } from "@components/Flex";
 import { cl } from "../..";
 import { TagOverrides } from "../../types";
 import {
@@ -58,6 +58,7 @@ export const BackupSection = _memo<BackupSectionProps>(function BackupSection({
 
     return (
         <SettingsSection
+            id="vc-betterforums-backup-restore"
             name="Backup & restore"
             description="Import and export your forum tag overrides as JSON for easy sharing"
             error={null}
@@ -67,7 +68,6 @@ export const BackupSection = _memo<BackupSectionProps>(function BackupSection({
                     <TextInput
                         value={text}
                         onChange={update}
-                        className="vc-better-forums-custom-input-wrapper"
                         inputClassName={cl("vc-better-forums-custom-input", {
                             "vc-better-forums-custom-input-error": error,
                         })}
