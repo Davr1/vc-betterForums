@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Paragraph } from "@components/Paragraph";
 import { Channel } from "@vencord/discord-types";
-import { Text, Timestamp as TimestampComponent, Tooltip } from "@webpack/common";
+import { Timestamp as TimestampComponent, Tooltip } from "@webpack/common";
 
 import { useFormatTimestamp, useForumChannelState } from "../hooks";
 import { _memo } from "../utils";
@@ -29,14 +30,13 @@ export const Timestamp = _memo<TimestampProps>(function Timestamp({ channel }) {
             }
         >
             {props => (
-                <Text
-                    variant="text-sm/normal"
-                    color="text-subtle"
+                <Paragraph
+                    style={{ color: "var(--text-subtle, var(--text-default))" }}
                     className="vc-better-forums-timestamp-text"
                     {...props}
                 >
                     {children}
-                </Text>
+                </Paragraph>
             )}
         </Tooltip>
     );
