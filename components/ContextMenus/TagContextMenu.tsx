@@ -33,13 +33,18 @@ export function TagsContextMenu({ tag }: TagsContextMenuProps) {
             onClose={ContextMenuApi.closeContextMenu}
             aria-label={getIntlMessage("FORUM_TAG_ACTIONS_MENU_LABEL")}
         >
-            <Menu.MenuItem id="edit-tag" label="Edit tag" action={openEditor} icon={Icons.Pencil} />
+            <Menu.MenuItem
+                id="edit-tag"
+                label="Edit tag"
+                action={openEditor}
+                leadingAccessory={{ type: "icon", icon: Icons.Pencil }}
+            />
             {isDev && !tag.custom && (
                 <Menu.MenuItem
                     id="copy-tag-id"
                     label={getIntlMessage("COPY_ID_FORUM_TAG")}
                     action={copy}
-                    icon={Icons.Id}
+                    leadingAccessory={{ type: "icon", icon: Icons.Id }}
                 />
             )}
         </Menu.Menu>
