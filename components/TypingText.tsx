@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Text, TextProps } from "@components/Text";
 import { getIntlMessage } from "@utils/discord";
 import { Channel, User } from "@vencord/discord-types";
 import { useMemo } from "@webpack/common";
 
-import { BaseText, BaseTextProps } from "@components/BaseText";
 import { useUsers } from "../hooks";
 import { _memo } from "../utils";
 import { Username } from "./Username";
@@ -20,7 +20,7 @@ const typingIntlKeys = Object.freeze({
 });
 const defaultIntlKey = "SEVERAL_USERS_TYPING";
 
-interface TypingTextProps extends BaseTextProps {
+interface TypingTextProps extends TextProps {
     channel: Channel;
     userIds: User["id"][];
 }
@@ -45,7 +45,7 @@ export const TypingText = _memo<TypingTextProps>(function TypingText({
     }, [users, usernames]);
 
     return (
-        <BaseText
+        <Text
             size="sm"
             weight="normal"
             style={{
@@ -55,6 +55,6 @@ export const TypingText = _memo<TypingTextProps>(function TypingText({
             {...props}
         >
             {content}
-        </BaseText>
+        </Text>
     );
 });

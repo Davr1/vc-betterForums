@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText } from "@components/BaseText";
+import { Text } from "@components/Text";
 import { Channel } from "@vencord/discord-types";
 import { useMemo } from "@webpack/common";
 
@@ -34,7 +34,7 @@ export const Title = _memo<TitleProps>(function Title({ channel, isMuted, isUnre
     const color = isMuted ? "interactive-muted" : isUnread ? "text-strong" : "text-subtle";
 
     return (
-        <BaseText
+        <Text
             size="lg"
             weight="semibold"
             style={{
@@ -44,6 +44,6 @@ export const Title = _memo<TitleProps>(function Title({ channel, isMuted, isUnre
             className="vc-better-forums-thread-title"
         >
             {content}
-        </BaseText>
+        </Text>
     );
 });

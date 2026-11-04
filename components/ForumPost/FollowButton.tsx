@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText } from "@components/BaseText";
+import { Text } from "@components/Text";
 import { getIntlMessage } from "@utils/discord";
 import { Tooltip, useCallback } from "@webpack/common";
 
-import { ThreadChannel } from "userplugins/betterForums/types";
 import { cl } from "../..";
+import { ThreadChannel } from "../../types";
 import { _memo, ThreadActions } from "../../utils";
 import { Icons } from "../icons";
 
@@ -47,9 +47,9 @@ export const FollowButton = _memo<FollowButtonProps>(function FollowButton({
                     {...props}
                 >
                     <Icon size={14} />
-                    <BaseText size="sm" weight="normal" style={{ color: "currentcolor" }}>
+                    <Text size="sm" weight="normal" style={{ color: "currentcolor" }}>
                         {getIntlMessage(intlKey)}
-                    </BaseText>
+                    </Text>
                 </button>
             )}
         </Tooltip>

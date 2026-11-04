@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { ModalAPI } from "@utils/modal";
 import { Channel, CustomEmoji, Message, UnicodeEmoji } from "@vencord/discord-types";
 import { findByPropsLazy } from "@webpack";
-import { FluxDispatcher, IconUtils } from "@webpack/common";
+import { closeAllModals, FluxDispatcher, IconUtils } from "@webpack/common";
 
 import { KeywordFilterStore } from "../stores";
 import { ParsedContent, ThreadChannel } from "../types";
@@ -39,12 +38,12 @@ export const MessageParserUtils: {
 } = findByPropsLazy("parsePreprocessor", "unparse", "parse");
 
 export function closeAllScreens(): void {
-    ModalAPI.closeAllModals();
+    closeAllModals();
     FluxDispatcher.dispatch({ type: "LAYER_POP_ALL" });
 }
 
 export function getEmojiURL(
-    { name, id }: { name?: UnicodeEmoji["name"] | null; id?: CustomEmoji["id"] | null },
+    { name, id }: { name?: UnicodeEmoji["name"] | null; id?: CustomEmoji["id"] | null; },
     size: number = 48
 ): string | null {
     if (id) return IconUtils.getEmojiURL({ id, animated: false, size });
@@ -52,7 +51,7 @@ export function getEmojiURL(
     return null;
 }
 
-export function replaceKeywords(text: string, options: { escapeReplacement?: boolean }): string {
+export function replaceKeywords(text: string, options: { escapeReplacement?: boolean; }): string {
     const normalized = normalize(text);
     if (!normalized) return text;
 

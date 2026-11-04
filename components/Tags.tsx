@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText } from "@components/BaseText";
+import { Text } from "@components/Text";
 import { Tooltip, useCallback } from "@webpack/common";
 import { HTMLProps, MouseEvent, ReactNode } from "react";
 
@@ -75,13 +75,13 @@ export const Tag = _memo<TagProps>(function Tag({
             ) : (
                 tag.icon
             )}
-            <BaseText
+            <Text
                 size="xs"
                 weight="bold"
                 style={{ color: "currentcolor", ...textClampStyle(1) }}
             >
                 {tag.name ?? "Unknown tag"}
-            </BaseText>
+            </Text>
         </div>
     );
 });
@@ -100,9 +100,9 @@ export const MoreTags = _memo<MoreTagsProps>(function MoreTags({ tags, renderTag
         >
             {props => (
                 <div className="vc-better-forums-tag" {...props}>
-                    <BaseText size="xs" weight="semibold" style={{ color: "currentcolor" }}>
+                    <Text size="xs" weight="semibold" style={{ color: "currentcolor" }}>
                         +{tags.length}
-                    </BaseText>
+                    </Text>
                 </div>
             )}
         </Tooltip>

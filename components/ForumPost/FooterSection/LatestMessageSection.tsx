@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText } from "@components/BaseText";
+import { Text } from "@components/Text";
 import { getIntlMessage } from "@utils/discord";
 import { useCallback } from "@webpack/common";
 
@@ -56,7 +56,7 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
     const clickHandler = useCallback(() => {
         // wait until router navigation
         setImmediate(() =>
-            MessageActions.jumpToMessage({ channelId: channel.id, messageId, flash: true })
+            MessageActions.jumpToMessage({ channelId: channel.id, messageId: messageId!, flash: true })
         );
     }, [channel.id, messageId]);
 
@@ -100,11 +100,11 @@ export const LatestMessageSection = _memo<LatestMessageSectionProps>(function La
                 !!unreadCount && "•"
             )}
             {!!unreadCount && (
-                <BaseText size="sm" weight="semibold" style={{ color: "var(--text-brand)" }}>
+                <Text size="sm" weight="semibold" style={{ color: "var(--text-brand)" }}>
                     {getIntlMessage("CHANNEL_NEW_POSTS_LABEL", {
                         count: unreadCountText,
                     })}
-                </BaseText>
+                </Text>
             )}
         </FooterSection>
     );

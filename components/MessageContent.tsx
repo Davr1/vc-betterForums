@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText, BaseTextProps } from "@components/BaseText";
+import { Text, TextProps } from "@components/Text";
 import { Channel } from "@vencord/discord-types";
 
 import { cl } from "..";
@@ -12,7 +12,7 @@ import { useFormattedMessage } from "../hooks";
 import { FullMessage } from "../types";
 import { _memo, textClampStyle } from "../utils";
 
-interface MessageContentProps extends Omit<BaseTextProps, "children"> {
+interface MessageContentProps extends Omit<TextProps, "children"> {
     channel: Channel;
     message: FullMessage | null;
     messageClassName?: string;
@@ -44,7 +44,7 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
     });
 
     const text = (
-        <BaseText
+        <Text
             style={{
                 color: "currentcolor",
                 fontStyle: systemMessage ? "italic" : "normal",
@@ -57,7 +57,7 @@ export const MessageContent = _memo<MessageContentProps>(function MessageContent
             {...props}
         >
             {content}
-        </BaseText>
+        </Text>
     );
 
     return visibleIcons ? [leadingIcon, text, trailingIcon] : text;

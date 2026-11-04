@@ -7,10 +7,10 @@
 import { ReactionEmoji } from "@vencord/discord-types";
 import { EmojiStore } from "@webpack/common";
 
-import { ForumChannel } from "../../types";
+import { FullChannel } from "../../types";
 import { useStores } from "../misc/useStores";
 
-export function useDefaultEmoji(channel: ForumChannel): ReactionEmoji | null {
+export function useDefaultEmoji(channel: FullChannel): ReactionEmoji | null {
     const emoji = channel.defaultReactionEmoji;
 
     const customEmoji = useStores([EmojiStore], $ => $.getUsableCustomEmojiById(emoji?.emojiId), [

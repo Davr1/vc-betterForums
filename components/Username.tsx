@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText, BaseTextProps } from "@components/BaseText";
+import { Text, TextProps } from "@components/Text";
 import { Channel, Message, User } from "@vencord/discord-types";
 
 import { cl } from "..";
@@ -12,7 +12,7 @@ import { useMember, useUsernameHook } from "../hooks";
 import { _memo } from "../utils";
 import { Badge } from "./Badge";
 
-interface UsernameProps extends BaseTextProps {
+interface UsernameProps extends TextProps {
     user: User | null;
     message?: Message | null;
     channel: Channel;
@@ -44,7 +44,7 @@ export const Username = _memo<UsernameProps>(function Username({
     const usernameElement = useUsername(member)(username, channel.id);
 
     return (
-        <BaseText
+        <Text
             tag="span"
             className={cl("vc-better-forums-username", className)}
             size="sm"
@@ -59,6 +59,6 @@ export const Username = _memo<UsernameProps>(function Username({
                 </div>
             ) : null}
             {renderColon ? ": " : null}
-        </BaseText>
+        </Text>
     );
 });

@@ -8,14 +8,14 @@ import { FluxStore } from "@vencord/discord-types";
 import { findStoreLazy, proxyLazyWebpack } from "@webpack";
 import {
     ChannelStore as _ChannelStore,
-    Flux,
     GuildMemberStore as _GuildMemberStore,
     PermissionStore as _PermissionStore,
     ReadStateStore as _ReadStateStore,
     RelationshipStore as _RelationshipStore,
     TypingStore as _TypingStore,
     UserSettingsProtoStore as _UserSettingsProtoStore,
-    UserStore as _UserStore
+    UserStore as _UserStore,
+    Flux
 } from "@webpack/common";
 
 import { useStores } from "../hooks";
@@ -65,7 +65,7 @@ export const LurkingStore = $<S.LurkingStore>("LurkingStore");
 export const ThreadMembersStore = $<S.ThreadMembersStore>("ThreadMembersStore");
 export const ThreadMessageStore = $<S.ThreadMessageStore>("ThreadMessageStore");
 
-export const ChannelStore = $(() => _ChannelStore as S.ChannelStore);
+export const ChannelStore = $(() => _ChannelStore as unknown as S.ChannelStore);
 export const GuildMemberStore = $(() => _GuildMemberStore);
 export const PermissionStore = $(() => _PermissionStore);
 export const ReadStateStore = $(() => _ReadStateStore);

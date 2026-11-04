@@ -9,7 +9,6 @@ import { Ref } from "react";
 import { useCheckPermissions, useDefaultEmoji, useSortedReactions } from "../hooks";
 import { ChannelStore } from "../stores";
 import {
-    ForumChannel,
     FullMessage,
     PartiallyOptional,
     ReactionType,
@@ -65,10 +64,7 @@ export const DefaultReaction = _memo<ReactionProps>(function DefaultReaction({
     firstMessage,
     channel,
 }) {
-    const forumChannel = ChannelStore.use(
-        $ => $.getChannel(channel.parent_id) as ForumChannel,
-        [channel.parent_id]
-    );
+    const forumChannel = ChannelStore.use($ => $.getChannel(channel.parent_id)!, [channel.parent_id]);
 
     const defaultEmoji = useDefaultEmoji(forumChannel);
     const { disableReactionCreates, isLurking } = useCheckPermissions(channel);

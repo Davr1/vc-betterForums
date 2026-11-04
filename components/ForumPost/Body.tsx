@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Flex } from "@components/Flex";
 import { Heading } from "@components/Heading";
 
-import { Flex } from "@components/Flex";
 import { useForumPostState } from "../../hooks";
 import { MessagePreviewLineCount, settings } from "../../settings";
 import { UserStore } from "../../stores";
@@ -30,7 +30,7 @@ export const Body = _memo<BodyProps>(function Body({ channel, message }) {
         "showFollowButton",
     ]);
 
-    const owner = UserStore.use($ => $.getUser(channel?.ownerId) ?? null, [channel?.ownerId]);
+    const owner = UserStore.use($ => $.getUser(channel?.ownerId!) ?? null, [channel?.ownerId]);
 
     return (
         <Flex className="vc-better-forums-thread-body" flexDirection="column" gap={6}>

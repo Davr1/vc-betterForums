@@ -6,7 +6,6 @@
 
 import {
     Channel,
-    Embed,
     Emoji,
     GuildMember,
     Message,
@@ -19,16 +18,9 @@ import { ReactNode } from "react";
 import { RichEditorType } from "./components/RichEditor";
 
 export interface FullChannel extends Channel {
-    isForumLikeChannel(): this is ForumChannel;
-    isForumChannel(): this is ForumChannel;
     isActiveThread(): this is ThreadChannel;
     isArchivedThread(): this is ThreadChannel;
     isThread(): this is ThreadChannel;
-}
-
-export interface ForumChannel extends FullChannel {
-    defaultReactionEmoji: Record<"emojiId" | "emojiName", string | null> | null;
-    availableTags: DiscordTag[];
 }
 
 export interface ThreadMetadata {
@@ -41,7 +33,6 @@ export interface ThreadMetadata {
 }
 
 export interface ThreadChannel extends FullChannel {
-    appliedTags: DiscordTag["id"][] | null;
     memberIdsPreview: User["id"][];
     memberCount: number;
     messageCount: number;
@@ -104,15 +95,9 @@ export interface CustomTag extends Omit<DiscordTag, "name"> {
 
 export interface FullUser extends User {
     global_name?: string;
-    primaryGuild?: Partial<{
-        badge: string;
-        identityEnabled: boolean;
-        identityGuildId: string;
-        tag: string;
-    }>;
 }
 
-export type MessageReactionWithBurst = MessageReaction & { burst_count: number; me_burst: boolean };
+export type MessageReactionWithBurst = MessageReaction & { burst_count: number; me_burst: boolean; };
 
 export const enum ReactionType {
     NORMAL = 0,
@@ -147,9 +132,7 @@ export interface Attachment {
 
 export interface FullMessage extends Omit<Message, "components"> {
     attachments: FullMessageAttachment[];
-    embeds: FullEmbed[];
     components: MessageComponent[];
-    soundboardSounds?: string[];
     reactions: MessageReactionWithBurst[];
 }
 
@@ -235,23 +218,6 @@ export const enum EmbedType {
     POLL_RESULT = "poll_result",
 }
 
-export interface FullEmbed extends Embed, Pick<Attachment, "flags" | "contentScanVersion"> {
-    url: string;
-    image: EmbedImage;
-    images: EmbedImage[];
-    type: EmbedType;
-}
-
-interface EmbedImage {
-    url: string;
-    proxyURL: string;
-    width: number;
-    height: number;
-    srcIsAnimated: boolean;
-    flags: number;
-    contentType: string;
-}
-
 export type EmojiSize = "reaction" | "jumbo";
 
 export interface Member extends Partial<Omit<GuildMember, "avatar" | "avatarDecoration">> {
@@ -301,7 +267,7 @@ export interface LazyImageOptions {
     prefferedSize?: number | null;
 }
 
-export type RichEditorSubmit = Partial<{ shouldClear: boolean; shouldRefocus: boolean }> | void;
+export type RichEditorSubmit = Partial<{ shouldClear: boolean; shouldRefocus: boolean; }> | void;
 
 export interface RichEditorOptions {
     defaultValue?: string | null;
@@ -424,7 +390,7 @@ export type ParseFn = (
 
 export interface KeywordTrie {
     trie: Record<string, unknown>;
-    search: (text: string) => Record<string, { start: number; end: number }>;
+    search: (text: string) => Record<string, { start: number; end: number; }>;
 }
 
 export type MessagePostProcessor = (
@@ -462,12 +428,12 @@ export type OmitFromTuple<T extends readonly unknown[], K extends PropertyKey> =
 
 export type RemoveIndex<T> = {
     [K in keyof T as string extends K
-        ? never
-        : number extends K
-        ? never
-        : symbol extends K
-        ? never
-        : K]: T[K];
+    ? never
+    : number extends K
+    ? never
+    : symbol extends K
+    ? never
+    : K]: T[K];
 };
 
 export type Properties<T, TProp = unknown> = {

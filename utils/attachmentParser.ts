@@ -6,11 +6,11 @@
 
 import { isTruthy } from "@utils/guards";
 import { parseUrl } from "@utils/misc";
+import { Embed } from "@vencord/discord-types";
 import { lodash } from "@webpack/common";
 
 import {
     Attachment,
-    FullEmbed,
     FullMessage,
     FullMessageAttachment,
     MessageAttachmentFlag,
@@ -103,7 +103,7 @@ export const AttachmentParser = {
             srcUnfurledMediaItem,
         };
     }),
-    fromEmbed: defineParser<FullEmbed>("embed", embed => {
+    fromEmbed: defineParser<Embed>("embed", embed => {
         const embedImage = embed.image ?? embed.thumbnail ?? embed.images?.[0];
         if (!embedImage?.url) return null;
 

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText, BaseTextProps } from "@components/BaseText";
+import { Text, TextProps } from "@components/Text";
 import { Tooltip, useCallback } from "@webpack/common";
 import { CSSProperties, Ref } from "react";
 
@@ -91,8 +91,8 @@ const MediaItem = _memo<MediaItemProps>(function MediaItem({
     const props = useLazyImage({ items, mediaIndex, prefferedSize });
     const style = prefferedSize
         ? ({
-              "--forum-post-thumbnail-size": `${prefferedSize}px`,
-          } as CSSProperties)
+            "--forum-post-thumbnail-size": `${prefferedSize}px`,
+        } as CSSProperties)
         : {};
 
     return (
@@ -119,7 +119,7 @@ const MediaItem = _memo<MediaItemProps>(function MediaItem({
     );
 });
 
-interface MediaCountProps extends BaseTextProps {
+interface MediaCountProps extends TextProps {
     count?: number | null;
     isExtra?: boolean;
     displayIcon?: boolean;
@@ -135,7 +135,7 @@ const MediaCount = _memo<MediaCountProps>(function MediaCount({
     if (!count) return null;
 
     return (
-        <BaseText
+        <Text
             size="sm"
             weight="normal"
             className={cl("vc-better-forums-thumbnail-decorator", className)}
@@ -144,6 +144,6 @@ const MediaCount = _memo<MediaCountProps>(function MediaCount({
             {isExtra ? "+" : null}
             {count}
             {displayIcon && <Icons.Image size="1em" />}
-        </BaseText>
+        </Text>
     );
 });
