@@ -5,9 +5,9 @@
  */
 
 import { parseUrl } from "@utils/misc";
-import { findByProps, proxyLazyWebpack } from "@webpack";
+import { findByCodeLazy } from "@webpack";
 
-import { ASTNode, ASTNodeType, Stemmer } from "../types";
+import { ASTNode, ASTNodeType } from "../types";
 import { Host } from "./";
 
 const replacements = Object.freeze({
@@ -37,12 +37,8 @@ export function normalize(text: string): string {
         .trim();
 }
 
-// https://github.com/mazko/jssnowball
-const stem = proxyLazyWebpack(() => {
-    const stemmer: { newStemmer: (locale: string) => Stemmer } = findByProps("newStemmer");
-
-    return stemmer.newStemmer("english").stem;
-});
+// Porter2 stemmer (snowball english)
+const stem = findByCodeLazy('case"dying"');
 
 export class InlineNodeBuilder {
     private readonly nodes: ASTNode[] = [];
