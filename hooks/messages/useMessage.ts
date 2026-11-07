@@ -18,7 +18,8 @@ export function useMessage({
 }: MessageFormatOptions): ForumPostMetadata {
     const keywordFilterSettings = UserSettingsProtoStore.use(
         $ =>
-            $.settings.textAndImages?.keywordFilterSettings ?? {
+            ($.settings.textAndImages as unknown as { keywordFilterSettings?: { profanity: boolean; sexualContent: boolean; slurs: boolean; }; })
+                .keywordFilterSettings ?? {
                 profanity: false,
                 sexualContent: false,
                 slurs: false,

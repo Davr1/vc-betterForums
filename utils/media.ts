@@ -5,11 +5,11 @@
  */
 
 import { parseUrl } from "@utils/misc";
+import { Embed } from "@vencord/discord-types";
 
 import {
     BoundingBox,
     EmbedType,
-    FullEmbed,
     FullMessageAttachment,
     Size,
     UnfurledMediaItem,
@@ -110,9 +110,9 @@ export function getPreviewSize(hasMultiple: boolean, size: Partial<Size>): Size 
     return widestFit.width >= tallestFit.width ? widestFit : tallestFit;
 }
 
-const imageTypes = new Set([EmbedType.IMAGE, EmbedType.GIFV]);
+const imageTypes = new Set<Embed["type"]>([EmbedType.IMAGE, EmbedType.GIFV]);
 
-export function isSimpleEmbedMedia({ image, video, type, author, rawTitle }: FullEmbed): boolean {
+export function isSimpleEmbedMedia({ image, video, type, author, rawTitle }: Embed): boolean {
     if (!imageTypes.has(type)) return false;
     if (!image && !video) return false;
 

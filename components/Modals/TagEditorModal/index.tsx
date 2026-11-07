@@ -4,25 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BaseText } from "@components/BaseText";
-import { Button } from "@components/Button";
-import { Flex } from "@components/Flex";
 import { Heading } from "@components/Heading";
 import { Margins } from "@utils/margins";
 import { parseUrl } from "@utils/misc";
-import {
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalProps,
-    ModalRoot,
-    openModal,
-} from "@utils/modal";
+import { RenderModalProps } from "@vencord/discord-types";
 import {
     Alerts,
     Checkbox,
     lodash,
+    Modal,
+    openModal,
     TextInput,
     useCallback,
     useMemo,
@@ -41,7 +32,7 @@ import { ColorPicker } from "./ColorPicker";
 import { IconTextInput } from "./IconTextInput";
 
 interface TagEditorModalProps {
-    modalProps: ModalProps;
+    modalProps: RenderModalProps;
     tag: CustomTag;
     modalKey: string;
     onSubmit?: (tag: Partial<CustomTag> | null) => void;
@@ -84,15 +75,30 @@ export function TagEditorModal({
     );
 
     return (
-        <ModalRoot {...modalProps}>
-            <ModalHeader separator={false}>
-                <BaseText size="lg" weight="semibold" style={{ flexGrow: 1 }}>
-                    Edit tag
-                </BaseText>
-                <ModalCloseButton onClick={modalProps.onClose} />
-            </ModalHeader>
-
-            <ModalContent className={cl("vc-better-forums-modal-content", Margins.bottom8)}>
+        <Modal
+            {...modalProps}
+            title="Edit tag"
+            actions={[
+                {
+                    text: "Cancel",
+                    variant: "secondary",
+                    onClick: () => modalProps.onClose()
+                },
+                {
+                    text: "Save",
+                    variant: "primary",
+                    onClick: handleSubmit
+                },
+                ...(fullTag.id in tagOverrides
+                    ? [{
+                        text: "Remove",
+                        variant: "critical-primary",
+                        onClick: deleteTag
+                    }]
+                    : [])
+            ]}
+        >
+            <div className={cl("vc-better-forums-modal-content", Margins.bottom8)}>
                 <section className="vc-better-forums-tag-preview">
                     <Tag tag={fullTag} />
                 </section>
@@ -142,24 +148,8 @@ export function TagEditorModal({
                         </Heading>
                     </Checkbox>
                 </section>
-            </ModalContent>
-
-            <ModalFooter className="vc-better-forums-modal-footer">
-                <Flex className="vc-better-forums-settings-row" style={{ flexGrow: 0 }}>
-                    <Button variant="secondary" size="small" onClick={() => modalProps.onClose()}>
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSubmit} size="small">
-                        Save
-                    </Button>
-                </Flex>
-                {fullTag.id in tagOverrides && (
-                    <Button variant="dangerSecondary" size="small" onClick={deleteTag}>
-                        Remove
-                    </Button>
-                )}
-            </ModalFooter>
-        </ModalRoot>
+            </div>
+        </Modal>
     );
 }
 

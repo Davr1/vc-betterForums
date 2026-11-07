@@ -11,12 +11,12 @@ export function useAllForumTags(): Map<CustomTag["id"], CustomTag> {
     return ChannelStore.use($ => {
         const forumChannels = Object.values($.loadAllGuildAndPrivateChannelsFromDisk())
             .filter(channel => channel.isForumLikeChannel())
-            .filter(channel => channel.availableTags.length > 0);
+            .filter(channel => (channel.availableTags?.length ?? 0) > 0);
 
         const tags = forumChannels.flatMap(channel =>
-            channel.availableTags.map(tag => ({ ...tag, channelId: channel.id }))
+            (channel.availableTags ?? []).map(tag => ({ ...tag, channelId: channel.id }))
         );
 
-        return new Map(tags.map(tag => [tag.id, tag]));
+        return new Map(tags.map(tag => [tag.id, tag as unknown as CustomTag]));
     });
 }
