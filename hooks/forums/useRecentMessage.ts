@@ -20,9 +20,9 @@ export function useRecentMessage({ id, lastMessageId }: ThreadChannel): FullMess
             if (recentMessage && recentMessage.id !== firstMessage?.id) return recentMessage;
 
             // channel.lastMessageId and recentMessage.id can be out of sync
-            if (lastMessageId === firstMessage?.id) return null;
+            if (!lastMessageId || lastMessageId === firstMessage?.id) return null;
 
-            return (messageStore.getMessage(id, lastMessageId) as FullMessage) ?? null;
+            return (messageStore.getMessage(id, lastMessageId) as unknown as FullMessage) ?? null;
         },
         [id, lastMessageId]
     );

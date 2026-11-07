@@ -32,10 +32,10 @@ export function useForumPostState(channel: Channel): ForumPostState {
             const isMuted = joinedThreadsStore.isMuted(id);
             const hasJoined = joinedThreadsStore.hasJoined(id);
             const hasOpened = readStateStore.hasOpenedThread(id);
-            const isAbandoned = !missingGuildMemberStore.isMember(guild_id, ownerId);
+            const isAbandoned = !missingGuildMemberStore.isMember(guild_id!, ownerId!);
 
             const createdAfterJoin = SnowflakeUtils.extractTimestamp(id) > joinedAt;
-            const isNewThread = readStateStore.isNewForumThread(id, parent_id, guild);
+            const isNewThread = readStateStore.isNewForumThread(id, parent_id!, guild_id!);
             const isNew = isActive && !hasOpened && createdAfterJoin && (isNewThread || hasUnreads);
 
             return {

@@ -8,7 +8,7 @@ import { useMemo } from "@webpack/common";
 
 import { settings } from "../../settings";
 import { ChannelStore } from "../../stores";
-import { CustomTag, DiscordTag, ForumChannel, ThreadChannel } from "../../types";
+import { CustomTag, DiscordTag, ThreadChannel } from "../../types";
 import { tagDefinitions } from "../../utils";
 import { useForumPostState } from "../index";
 
@@ -18,7 +18,7 @@ export function useAppliedTags(channel: ThreadChannel): CustomTag[] {
 
     const availableTags = ChannelStore.use(
         $ => {
-            const forumChannel = $.getChannel(channel.parent_id) as ForumChannel | null;
+            const forumChannel = $.getChannel(channel.parent_id);
 
             return (forumChannel?.availableTags ?? []).reduce((acc, tag) => {
                 acc[tag.id] = tag;

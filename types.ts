@@ -173,7 +173,7 @@ export interface ContentScanMetadata {
 }
 
 export interface SourceMetadata {
-    message?: Message | null;
+    message?: FullMessage | null;
     identifier?: Partial<Attachment> | null;
 }
 
@@ -374,7 +374,7 @@ export interface ParserOptions {
     allowEmojiLinks: boolean;
     disableAutoBlockNewlines: boolean;
     mentionChannels: Channel["id"][];
-    soundboardSounds?: string[];
+    soundboardSounds?: Message["soundboardSounds"];
     muted: boolean;
     unknownUserMentionPlaceholder: boolean;
     viewingChannelId?: Channel["id"];
